@@ -16,15 +16,19 @@ use Illuminate\Database\Eloquent\Builder;
 */
 
 Route::get('/', function () {
+    $clientId = env("GOOGLE_CLIENT_ID");
+    $clientSecret = env("GOOGLE_CLIENT_SECRET");
+    $redirectUri = env("GOOGLE_REDIRECT_URI");
+
     $client = new Google\Client();
     $config = [
         'web' => [
-            'client_id' => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'client_id' => $clientId,
             'project_id' => 'bloomcu-community-analytics',
             'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
             'token_uri' => 'https://oauth2.googleapis.com/token',
             'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
-            'client_secret' => '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',
+            'client_secret' => $clientSecret,
             'redirect_uris' => [
                 "http://127.0.0.1:8000/auth/google/callback","http://localhost","http://127.0.0.1:8000"
             ],
@@ -43,7 +47,7 @@ Route::get('/', function () {
      */
     $client->setAuthConfig($config);
     $client->addScope(Google\Service\Analytics::ANALYTICS_READONLY);
-    $client->setRedirectUri('http://127.0.0.1:8000/auth/google/callback');
+    $client->setRedirectUri($redirectUri);
     $client->setAccessType('offline');
     $client->setPrompt('consent');
     $client->setIncludeGrantedScopes(true);
@@ -60,15 +64,19 @@ Route::get('/', function () {
 });
 
 Route::get('/auth/google/callback', function () {
+    $clientId = env("GOOGLE_CLIENT_ID");
+    $clientSecret = env("GOOGLE_CLIENT_SECRET");
+    $redirectUri = env("GOOGLE_REDIRECT_URI");
+
     $client = new Google\Client();
     $client->setAuthConfig([
         'web' => [
-            'client_id' => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'client_id' => $clientId,
             'project_id' => 'bloomcu-community-analytics',
             'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
             'token_uri' => 'https://oauth2.googleapis.com/token',
             'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
-            'client_secret' => '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',
+            'client_secret' => $clientSecret,
             'redirect_uris' => [
                 "http://127.0.0.1:8000/auth/google/callback","http://localhost","http://127.0.0.1:8000"
             ],
@@ -95,6 +103,10 @@ Route::get('/auth/google/callback', function () {
 });
 
 Route::get('/analytics/admin/accounts', function () {    
+    $clientId = env("GOOGLE_CLIENT_ID");
+    $clientSecret = env("GOOGLE_CLIENT_SECRET");
+    $redirectUri = env("GOOGLE_REDIRECT_URI");
+
     /**
      * Setup credentials for Analytics Admin Client
      * 
@@ -103,9 +115,9 @@ Route::get('/analytics/admin/accounts', function () {
     $credentials = Google\ApiCore\CredentialsWrapper::build([
         'keyFile' => [
             'type'          => 'authorized_user',
-            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
-            'client_secret' => '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',
-            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'refresh_token' => ''
         ],
         'scopes'  => [
             'https://www.googleapis.com/auth/analytics',
@@ -125,7 +137,11 @@ Route::get('/analytics/admin/accounts', function () {
     dd($accounts);
 });
 
-Route::get('/analytics/admin/properties', function () {    
+Route::get('/analytics/admin/properties', function () {   
+    $clientId = env("GOOGLE_CLIENT_ID");
+    $clientSecret = env("GOOGLE_CLIENT_SECRET");
+    $redirectUri = env("GOOGLE_REDIRECT_URI");
+
     /**
      * Setup credentials for Analytics Admin Client
      * 
@@ -134,9 +150,9 @@ Route::get('/analytics/admin/properties', function () {
     $credentials = Google\ApiCore\CredentialsWrapper::build([
         'keyFile' => [
             'type'          => 'authorized_user',
-            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
-            'client_secret' => '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',
-            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'refresh_token' => ''
         ],
         'scopes'  => [
             'https://www.googleapis.com/auth/analytics',
@@ -157,6 +173,10 @@ Route::get('/analytics/admin/properties', function () {
 });
 
 Route::get('/analytics/data/report', function () {    
+    $clientId = env("GOOGLE_CLIENT_ID");
+    $clientSecret = env("GOOGLE_CLIENT_SECRET");
+    $redirectUri = env("GOOGLE_REDIRECT_URI");
+    
     /**
      * Setup credentials for Analytics Data Client
      * 
@@ -166,9 +186,9 @@ Route::get('/analytics/data/report', function () {
     $credentials = Google\ApiCore\CredentialsWrapper::build([
         'keyFile' => [
             'type'          => 'authorized_user',
-            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
-            'client_secret' => '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',
-            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'refresh_token' => ''
         ],
         'scopes'  => [
             // 'https://www.googleapis.com/auth/analytics',
