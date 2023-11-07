@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Database\Eloquent\Builder;
+// use Google\Analytics\Admin\V1beta\AnalyticsAdminServiceClient;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +16,226 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $client = new Google\Client();
+    $config = [
+        'web' => [
+            'client_id' => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'project_id' => 'bloomcu-community-analytics',
+            'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
+            'token_uri' => 'https://oauth2.googleapis.com/token',
+            'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
+            'client_secret' => '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',
+            'redirect_uris' => [
+                "http://127.0.0.1:8000/auth/google/callback","http://localhost","http://127.0.0.1:8000"
+            ],
+            'javascript_origins' => ['https://localhost:3000']
+    ]];
+
+    /**
+     * Create the authorization request
+     * 
+     * The request defines permissions the user will be asked to grant you.
+     * Using 'offline' will give you both an access and refresh token.
+     * Using 'consent' will prompt the user for consent.
+     * Using 'setIncludeGrantedScopes' enables incremental auth.
+     * 
+     * https://developers.google.com/identity/protocols/oauth2/web-server
+     */
+    $client->setAuthConfig($config);
+    $client->addScope(Google\Service\Analytics::ANALYTICS_READONLY);
+    $client->setRedirectUri('http://127.0.0.1:8000/auth/google/callback');
+    $client->setAccessType('offline');
+    $client->setPrompt('consent');
+    $client->setIncludeGrantedScopes(true);
+
+    /**
+     * Redirect to Google's OAuth 2.0 server
+     * 
+     * This occurs when your application first needs to access the user's data. 
+     * With incremental authorization, again for additional resources.
+     */
+    $auth_url = $client->createAuthUrl();
+
+    return redirect($auth_url);
+});
+
+Route::get('/auth/google/callback', function () {
+    $client = new Google\Client();
+    $client->setAuthConfig([
+        'web' => [
+            'client_id' => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'project_id' => 'bloomcu-community-analytics',
+            'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
+            'token_uri' => 'https://oauth2.googleapis.com/token',
+            'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
+            'client_secret' => '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',
+            'redirect_uris' => [
+                "http://127.0.0.1:8000/auth/google/callback","http://localhost","http://127.0.0.1:8000"
+            ],
+            'javascript_origins' => ['https://localhost:3000']
+    ]]);
+
+    /**
+     * Handle the OAuth 2.0 server response
+     * 
+     * If the user approves the access request, then the response contains an authorization code. 
+     * If the user does not approve the request, the response contains an error message. 
+     */
+
+    // TODO: Catch errors, eg "../auth/google/callback?error=access_denied"
+
+    // Exchange access code for access token
+    try {
+        $access_token = $client->fetchAccessTokenWithAuthCode(request()->input('code'));
+        $client->setAccessToken($access_token);
+        dd($access_token);
+    } catch (Throwable $exception) {
+        dd($exception);
+    }
+});
+
+Route::get('/analytics/admin/accounts', function () {    
+    /**
+     * Setup credentials for Analytics Admin Client
+     * 
+     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
+     */
+    $credentials = Google\ApiCore\CredentialsWrapper::build([
+        'keyFile' => [
+            'type'          => 'authorized_user',
+            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'client_secret' => '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',
+            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+        ],
+        'scopes'  => [
+            'https://www.googleapis.com/auth/analytics',
+            'https://www.googleapis.com/auth/analytics.readonly',
+        ]
+    ]);
+
+    /**
+     * List Google Analytics 4 accounts
+     * 
+     * https://cloud.google.com/php/docs/reference/analytics-admin/latest/V1beta.AnalyticsAdminServiceClient#_Google_Analytics_Admin_V1beta_AnalyticsAdminServiceClient__listAccounts__
+     * https://github.com/googleapis/php-analytics-admin
+     * https://developers.google.com/analytics/devguides/config/admin/v1/client-libraries
+     */
+    $client = new Google\Analytics\Admin\V1beta\AnalyticsAdminServiceClient(['credentials' => $credentials]);
+    $accounts = $client->listAccounts();
+    dd($accounts);
+});
+
+Route::get('/analytics/admin/properties', function () {    
+    /**
+     * Setup credentials for Analytics Admin Client
+     * 
+     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
+     */
+    $credentials = Google\ApiCore\CredentialsWrapper::build([
+        'keyFile' => [
+            'type'          => 'authorized_user',
+            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'client_secret' => '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',
+            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+        ],
+        'scopes'  => [
+            'https://www.googleapis.com/auth/analytics',
+            'https://www.googleapis.com/auth/analytics.readonly',
+        ]
+    ]);
+
+    /**
+     * List Google Analytics 4 properties
+     * 
+     * https://cloud.google.com/php/docs/reference/analytics-admin/latest/V1beta.AnalyticsAdminServiceClient#_Google_Analytics_Admin_V1beta_AnalyticsAdminServiceClient__listProperties__
+     * https://github.com/googleapis/php-analytics-admin
+     * https://developers.google.com/analytics/devguides/config/admin/v1/client-libraries
+     */
+    $client = new Google\Analytics\Admin\V1beta\AnalyticsAdminServiceClient(['credentials' => $credentials]);
+    $properties = $client->listProperties('parent:accounts/273824');
+    dd($properties);
+});
+
+Route::get('/analytics/data/report', function () {    
+    /**
+     * Setup credentials for Analytics Data Client
+     * 
+     * https://cloud.google.com/php/docs/reference/analytics-data/latest
+     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
+     */
+    $credentials = Google\ApiCore\CredentialsWrapper::build([
+        'keyFile' => [
+            'type'          => 'authorized_user',
+            'client_id'     => '389040343108-qkvqbu6ges6t13vnvfbd5gngb99kfdie.apps.googleusercontent.com',
+            'client_secret' => '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',
+            'refresh_token' => 'ya29.a0AfB_byALEZ-m-40VMbkqdhee7KDpXIAnF1lgy5-QVChr_ua4zeBO4eSpgGy_0V47MMTlbXH4IWLoFz1T86_qxurtyIU9hCFeAhbb4OPiwACoW3ZsxbfBybvzm6hH2A4kNO_gjfiIgWsLQCLxHVQKT9Pz_mA5UMKrw0uYaCgYKAYcSARESFQGOcNnC0TFLtVkaufpCr6ShATF-jA0171'
+        ],
+        'scopes'  => [
+            // 'https://www.googleapis.com/auth/analytics',
+            'https://www.googleapis.com/auth/analytics.readonly',
+        ]
+    ]);
+
+    /**
+     * Run a report
+     * 
+     * https://cloud.google.com/php/docs/reference/analytics-data/latest
+     * https://stackoverflow.com/questions/67576611/why-does-analytics-data-api-v1-beta-not-conform-to-the-rest-spec
+     * Examples: https://kdaws.com/learn/ga4-how-to-use-the-google-analytics-php-data-library/
+     * Examples: https://github.com/GoogleCloudPlatform/php-docs-samples/blob/main/analyticsdata/src/run_report.php
+     */
+    $client = new Google\Analytics\Data\V1beta\BetaAnalyticsDataClient(['credentials' => $credentials]);
+
+    $report = $client->runReport([
+        'property' => 'properties/382835060',
+        'dateRanges' => [
+            // https://cloud.google.com/php/docs/reference/analytics-data/latest/V1beta.DateRange
+            new Google\Analytics\Data\V1beta\DateRange([
+                // 'start_date' => '2023-09-01',
+                // 'end_date' => '2023-09-15'
+                'start_date' => '30daysAgo',
+                'end_date' => 'today'
+            ])
+        ],
+        'dimensions' => [
+            // https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema#dimensions
+            new Google\Analytics\Data\V1beta\Dimension([
+                'name' => 'pageTitle'
+            ]),
+        ],
+        // 'dimensionFilter' => new Google\Analytics\Data\V1beta\FilterExpression([
+        //     'filter' => new Google\Analytics\Data\V1beta\Filter([
+        //         'field_name' => 'customUser:link_classes',
+        //         'string_filter' => new Google\Analytics\Data\V1beta\Filter\StringFilter([
+        //             'match_type' => Google\Analytics\Data\V1beta\Filter\StringFilter\MatchType::BEGINS_WITH,
+        //             'value' => 'AdvertA',
+        //             'case_sensitive' => false
+        //         ])
+        //     ])
+        // ]),
+        'metrics' => [
+            new Google\Analytics\Data\V1beta\Metric([
+                // 'name' => 'eventCount',
+                // 'name' => 'activeUsers',
+                'name' => 'screenPageViews',
+            ])
+        ],
+        'orderBys' => [
+            new Google\Analytics\Data\V1beta\OrderBy([
+                'metric' => new Google\Analytics\Data\V1beta\OrderBy\MetricOrderBy([
+                    'metric_name' => 'screenPageViews',
+                ])
+            ])
+        ]
+    ]);
+
+    $results = [];
+    foreach ($report->getRows() as $row) {
+        array_push($results, [
+            'dimension' => $row->getDimensionValues()[0]->getValue(),
+            'metric' => $row->getMetricValues()[0]->getValue(),
+        ]);
+    }
+
+    dd($results);
 });
