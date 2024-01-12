@@ -72,6 +72,14 @@ valet link app-name
 ```
 Then visit: http://app-name.test
 
+**Step 8:** Secure application
+
+> Using Artisan CLI, run:
+```
+valet secure analytics-api
+```
+> Unsecure by running: valet unsecure analytics-api
+
 ## Get started
 
 [WIP] - API usage instructions coming soon.
