@@ -102,7 +102,7 @@ Route::get('/auth/google/callback', function () {
     }
 });
 
-Route::get('/analytics/admin/accounts', function () {    
+Route::get('/analytics/admin/accounts', function () { 
     $clientId = env("GOOGLE_CLIENT_ID");
     $clientSecret = env("GOOGLE_CLIENT_SECRET");
     $redirectUri = env("GOOGLE_REDIRECT_URI");
@@ -117,7 +117,7 @@ Route::get('/analytics/admin/accounts', function () {
             'type'          => 'authorized_user',
             'client_id'     => $clientId,
             'client_secret' => $clientSecret,
-            'refresh_token' => ''
+            'refresh_token' => 'ya29.a0AfB_byC2abZKrJacNx5yZdmFiBebi7VyAKZasRVCzFBTj8CIpkNtz5KhbJkeVsjKYiDXhOd2aCUrCwunpwtjOwmNT66N5rg1oqvoi0WmFYr7m3bmiKGAJkqvlwq0bst_TDMdq3cx-rSOkLNBUh89Vl7SXyvmZB2X_WkdaCgYKAb8SARESFQHGX2Mi2l6d2Sae5Bxz0ydYWNB5Jw0171'
         ],
         'scopes'  => [
             'https://www.googleapis.com/auth/analytics',
@@ -152,7 +152,7 @@ Route::get('/analytics/admin/properties', function () {
             'type'          => 'authorized_user',
             'client_id'     => $clientId,
             'client_secret' => $clientSecret,
-            'refresh_token' => ''
+            'refresh_token' => 'ya29.a0AfB_byC2abZKrJacNx5yZdmFiBebi7VyAKZasRVCzFBTj8CIpkNtz5KhbJkeVsjKYiDXhOd2aCUrCwunpwtjOwmNT66N5rg1oqvoi0WmFYr7m3bmiKGAJkqvlwq0bst_TDMdq3cx-rSOkLNBUh89Vl7SXyvmZB2X_WkdaCgYKAb8SARESFQHGX2Mi2l6d2Sae5Bxz0ydYWNB5Jw0171'
         ],
         'scopes'  => [
             'https://www.googleapis.com/auth/analytics',
