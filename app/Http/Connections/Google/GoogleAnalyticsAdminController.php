@@ -1,7 +1,7 @@
 <?php
 // TODO: Move this to an Http/Services folder
 
-namespace DDD\Http\Integrations\Google;
+namespace DDD\Http\Connections\Google;
 
 use Illuminate\Http\Request;
 use DDD\App\Facades\Google\GoogleAnalyticsAdmin;

@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use DDD\Http\Integrations\IntegrationController;
-use DDD\Http\Integrations\Google\GoogleAuthController;
-use DDD\Http\Integrations\Google\GoogleAnalyticsAdminController;
+use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Connections\Google\GoogleAuthController;
+use DDD\Http\Connections\Google\GoogleAnalyticsAdminController;
 use DDD\Http\Analytics\AnalyticsController;
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -20,14 +20,14 @@ Route::middleware('auth:sanctum')->group(function() {
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
-        // Integrations
-        Route::prefix('integrations')->group(function() {
-            Route::get('', [IntegrationController::class, 'index']);
-            Route::post('', [IntegrationController::class, 'store']);
+        // Connections
+        Route::prefix('connections')->group(function() {
+            Route::get('', [ConnectionController::class, 'index']);
+            Route::post('', [ConnectionController::class, 'store']);
         });
 
         // Analytics
-        Route::prefix('analytics/{integration}')->group(function() {
+        Route::prefix('analytics/{connection}')->group(function() {
             Route::get('', [AnalyticsController::class, 'runReport']);
         });
     }); 

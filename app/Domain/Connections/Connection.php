@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Domain\Integrations;
+namespace DDD\Domain\Connections;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 
-class Integration extends Model
+class Connection extends Model
 {
     use HasFactory,
         BelongsToOrganization,

@@ -4,7 +4,7 @@ namespace DDD\App\Services\Google;
 
 use Google\Service\Oauth2;
 use Google\Client;
-use DDD\Domain\Integrations\Integration;
+use DDD\Domain\Connections\Connection;
 use DDD\Domain\Base\Users\User;
 
 class GoogleAuthService
@@ -78,7 +78,7 @@ class GoogleAuthService
         }
     }
 
-    // public function storeCredentials($code): Integration | \Throwable
+    // public function storeCredentials($code): Connection | \Throwable
     // {
     //     /**
     //      * Handle the OAuth 2.0 server response
@@ -90,7 +90,7 @@ class GoogleAuthService
     //     try {
     //         $token = $this->client->fetchAccessTokenWithAuthCode($code);
 
-    //         $integration = Integration::firstOrCreate(
+    //         $connection = Connection::firstOrCreate(
     //             [
     //                 'user_id' => auth()->id()
     //             ],
@@ -101,7 +101,7 @@ class GoogleAuthService
     //             ]
     //         );
 
-    //         return $integration;
+    //         return $connection;
     //     } catch (\Throwable $exception) {
     //         return $exception;
     //     }
@@ -120,27 +120,27 @@ class GoogleAuthService
     //     }
     // }
 
-    // public function getGoogleUserCredentials(User $user): Integration
+    // public function getGoogleUserCredentials(User $user): Connection
     // {
-    //     $integration = Integration::where('user_id', $user->id)->first();
+    //     $connection = Connection::where('user_id', $user->id)->first();
 
-    //     $this->client->setAccessToken($integration->token);
+    //     $this->client->setAccessToken($connection->token);
 
     //     if ($this->client->isAccessTokenExpired()) {
-    //         $this->refreshAccessToken($integration);
+    //         $this->refreshAccessToken($connection);
     //     }
 
-    //     return $integration;
+    //     return $connection;
     // }
 
-    private function refreshAccessToken(Integration $integration)
+    private function refreshAccessToken(Connection $connection)
     {
         // Fetch new access token
         $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
         $this->client->setAccessToken($this->client->getAccessToken());
 
         // Save new access token
-        $integration->token = $this->client->getAccessToken();
-        $integration->save();
+        $connection->token = $this->client->getAccessToken();
+        $connection->save();
     }
 }

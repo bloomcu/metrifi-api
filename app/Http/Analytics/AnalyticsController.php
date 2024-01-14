@@ -5,15 +5,15 @@ namespace DDD\Http\Analytics;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Integrations\Integration;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
 class AnalyticsController extends Controller
 {
-    public function runReport(Organization $organization, Integration $integration)
+    public function runReport(Organization $organization, Connection $connection)
     {   
-        $report = GoogleAnalyticsData::runReport($integration->token, $integration->uid);
+        $report = GoogleAnalyticsData::runReport($connection->token, $connection->uid);
 
         return response()->json([
             'data' => $report

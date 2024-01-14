@@ -3,17 +3,17 @@
 namespace DDD\Domain\Organizations;
 
 // Domains
-use DDD\Domain\Integrations\Integration;
+use DDD\Domain\Connections\Connection;
 use DDD\Domain\Base\Organizations\Organization as BaseOrganization;
 
 class Organization extends BaseOrganization {
     /**
-     * Integrations associated with the organization.
+     * Connections associated with the organization.
      *
      * @return hasMany
      */
-    public function integrations()
+    public function connections()
     {
-        return $this->hasMany(Integration::class);
+        return $this->hasMany(Connection::class);
     }
 }

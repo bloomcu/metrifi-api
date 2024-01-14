@@ -1,24 +1,24 @@
 <?php
-// TODO: Rename integrations to connections
+// TODO: Rename connections to connections
 
-namespace DDD\Http\Integrations;
+namespace DDD\Http\Connections;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
-class IntegrationController extends Controller
+class ConnectionController extends Controller
 {
     public function index(Organization $organization)
     {   
         return response()->json([
-            'data' => $organization->integrations
+            'data' => $organization->connections
         ], 200);
     }
 
     public function store(Organization $organization, Request $request)
     {
-        $integration = $organization->integrations()->create([
+        $connection = $organization->connections()->create([
             'user_id' => auth()->user()->id,
             'service' => $request->service,
             'name' => $request->name,
@@ -27,7 +27,7 @@ class IntegrationController extends Controller
         ]);
 
         return response()->json([
-            'data' => $integration
+            'data' => $connection
         ], 200);
     }
 }
