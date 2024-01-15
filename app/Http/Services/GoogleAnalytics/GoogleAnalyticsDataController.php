@@ -7,6 +7,15 @@ use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
+    public function runFunnelReport(Connection $connection)
+    {   
+        $report = GoogleAnalyticsData::runFunnelReport($connection);
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
     public function runReport(Connection $connection)
     {   
         $report = GoogleAnalyticsData::runReport($connection);

@@ -3,6 +3,8 @@
 
 namespace DDD\App\Services\GoogleAnalytics;
 
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\ApiException;
 use Google\Analytics\Data\V1beta\RunReportRequest;
@@ -17,6 +19,62 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
+    /**
+     * Run a funnel report
+     * 
+     * Not available in PHP SDK yet. Must use v1alpha version of the Google Analytics Data API.
+     * Docs: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels
+     * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
+     * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
+     */
+    public function runFunnelReport(Connection $connection)
+    {
+        $accessToken = $this->setupAccessToken($connection);
+
+        try {
+            $request = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
+            [
+                'dateRanges' => [
+                    'startDate' => '7daysAgo',
+                    'endDate' => 'today'
+                ],
+                'funnel' => [
+                    'isOpenFunnel' => false,
+                    'steps' => [
+                        [
+                            'name' => 'Homepage',
+                            'filterExpression' => [
+                                'funnelFieldFilter' => [
+                                    'fieldName' => 'pageLocation',
+                                    'stringFilter' => [
+                                        'value' => 'https://www.lbsfcu.org/',
+                                        'matchType' => 'EXACT'
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'name' => 'Auto Loan',
+                            'filterExpression' => [
+                                'funnelFieldFilter' => [
+                                    'fieldName' => 'pageLocation',
+                                    'stringFilter' => [
+                                        'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
+                                        'matchType' => 'EXACT'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ])->json();
+
+            return $request;
+        } catch (ApiException $ex) {
+            abort(500, 'Call failed with message: %s' . $ex->getMessage());
+        }
+    }
+
     /**
      * Run a report
      * 
@@ -76,6 +134,20 @@ class GoogleAnalyticsDataService
      * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
      */
     // TODO: Should this be a constructor, or a standalone class or helper?
+    private function setupAccessToken(Connection $connection)
+    {
+        $validConnection = GoogleAuth::validateConnection($connection);
+ 
+        return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
+     }
+
+    /**
+     * Setup credentials for Analytics Data Client
+     * 
+     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
+     */
+     // TODO: We only need this method when using the PHP SDK. When using the REST API, we can just use the access token directly.
+     // TODO: Should this be a constructor, or a standalone class or helper?
     private function setupCredentials(Connection $connection)
     {
         $validConnection = GoogleAuth::validateConnection($connection);
@@ -85,7 +157,7 @@ class GoogleAnalyticsDataService
                 'type'          => 'authorized_user',
                 'client_id'     => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
-                'refresh_token' => $validConnection->token['access_token'],
+                'refresh_token' => $validConnection->token['access_token'], // TODO: consider renaming 'token' to 'credentials'
             ],
             'scopes'  => [
                 'https://www.googleapis.com/auth/analytics',

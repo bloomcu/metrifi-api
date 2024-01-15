@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
+        Route::get('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
         Route::get('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
     });
 
