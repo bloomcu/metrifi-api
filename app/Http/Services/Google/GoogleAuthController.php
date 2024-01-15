@@ -1,7 +1,6 @@
 <?php
-// TODO: Move this to an Http/Services folder
 
-namespace DDD\Http\Connections\Google;
+namespace DDD\Http\Services\Google;
 
 use Illuminate\Http\Request;
 use DDD\App\Facades\Google\GoogleAuth;
@@ -30,7 +29,6 @@ class GoogleAuthController extends Controller
      */
     public function callback(Request $request)
     {   
-        // $googleCredentials = GoogleAuth::storeCredentials($request->code);
         $token = GoogleAuth::getAccessToken($request->code);
 
         return response()->json([

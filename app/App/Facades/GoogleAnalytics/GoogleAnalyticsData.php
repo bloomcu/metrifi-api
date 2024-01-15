@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\App\Facades\Google;
+namespace DDD\App\Facades\GoogleAnalytics;
 
 use Illuminate\Support\Facades\Facade;
 

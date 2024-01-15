@@ -3,7 +3,7 @@
 namespace DDD\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use DDD\App\Services\Google\GoogleAnalyticsAdminService;
+use DDD\App\Services\GoogleAnalytics\GoogleAnalyticsAdminService;
 
 class GoogleAnalyticsAdminServiceProvider extends ServiceProvider
 {

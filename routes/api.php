@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use DDD\Http\Services\Google\GoogleAuthController;
+use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
+use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Connections\ConnectionController;
-use DDD\Http\Connections\Google\GoogleAuthController;
-use DDD\Http\Connections\Google\GoogleAnalyticsAdminController;
-use DDD\Http\Analytics\AnalyticsController;
 
 Route::middleware('auth:sanctum')->group(function() {
     
@@ -14,9 +14,14 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('callback', [GoogleAuthController::class, 'callback']);
     });
 
-    // Google Analytics Admin
+    // Google Analytics admin
     Route::prefix('ga')->group(function() {
         Route::post('accounts', [GoogleAnalyticsAdminController::class, 'listAccounts']);
+    });
+
+    // Google Analytics data
+    Route::prefix('ga')->group(function() {
+        Route::get('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
@@ -24,11 +29,6 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);
             Route::post('', [ConnectionController::class, 'store']);
-        });
-
-        // Analytics
-        Route::prefix('analytics/{connection}')->group(function() {
-            Route::get('', [AnalyticsController::class, 'runReport']);
         });
     }); 
 });

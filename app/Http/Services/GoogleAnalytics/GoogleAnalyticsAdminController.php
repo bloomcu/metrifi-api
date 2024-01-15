@@ -1,10 +1,9 @@
 <?php
-// TODO: Move this to an Http/Services folder
 
-namespace DDD\Http\Connections\Google;
+namespace DDD\Http\Services\GoogleAnalytics;
 
 use Illuminate\Http\Request;
-use DDD\App\Facades\Google\GoogleAnalyticsAdmin;
+use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsAdmin;
 use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsAdminController extends Controller

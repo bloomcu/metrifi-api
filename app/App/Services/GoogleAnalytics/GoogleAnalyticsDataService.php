@@ -1,7 +1,7 @@
 <?php
 // TODO: Maybe move this to the Google Analytics service folder
 
-namespace DDD\App\Services\Google;
+namespace DDD\App\Services\GoogleAnalytics;
 
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\ApiException;
@@ -28,39 +28,42 @@ class GoogleAnalyticsDataService
         // Prepare the request message.
         // $request = new RunReportRequest();
         $request = (new RunReportRequest())
-	    ->setProperty($property)
-	    ->setDateRanges([
-	        new DateRange([
-	            'start_date' => '2023-12-14',
-	            'end_date' => 'today',
-	        ]),
-	    ])
-	    ->setDimensions([new Dimension([
-	            'name' => 'date',
-	        ]),
-	    ])
-	    ->setMetrics([new Metric([
-	            'name' => 'activeUsers',
-	        ])
-	    ])
-	    ->setOrderbys([new OrderBy([
-		    	'dimension' => new DimensionOrderBy([
-		    		'dimension_name' => 'date'
-		    	])
-	    	])
-	    ]);
+            ->setProperty($property)
+            ->setDateRanges([
+                new DateRange([
+                    'start_date' => '7daysAgo',
+                    'end_date' => 'today',
+                ]),
+            ])
+            // ->setDimensions([
+            //     new Dimension([
+            //         'name' => 'date',
+            //     ]),
+            // ])
+            ->setMetrics([
+                new Metric([
+                    'name' => 'activeUsers',
+                ]),
+                new Metric([
+                    'name' => 'eventCount',
+                ]),
+                new Metric([
+                    'name' => 'newUsers',
+                ]),
+            ]);
+            // ->setOrderbys([
+            //     new OrderBy([
+            //         'dimension' => new DimensionOrderBy([
+            //             'dimension_name' => 'date'
+            //         ])
+            //     ])
+	        // ]);
 
         // Call the API and handle any network failures.
         try {
             $response = $client->runReport($request);
-            printf('Response data: %s' . PHP_EOL, $response->serializeToJsonString());
 
-            // $accounts = collect($response)->map(function ($account) {
-            //     $accountJsonString = $account->serializeToJsonString();
-            //     return json_decode($accountJsonString);
-            // });
-
-            // return $accounts;
+            return json_decode($response->serializeToJsonString());
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
