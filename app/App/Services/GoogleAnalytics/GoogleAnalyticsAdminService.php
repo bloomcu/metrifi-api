@@ -39,6 +39,7 @@ class GoogleAnalyticsAdminService
      * 
      * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
      */
+    // TODO: Should this be a constructor, or a standalone class or helper?
     private function setupCredentials($token)
     {
         $credentials = CredentialsWrapper::build([

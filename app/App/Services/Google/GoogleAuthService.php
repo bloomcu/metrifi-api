@@ -2,10 +2,8 @@
 
 namespace DDD\App\Services\Google;
 
-use Google\Service\Oauth2;
 use Google\Client;
 use DDD\Domain\Connections\Connection;
-use DDD\Domain\Base\Users\User;
 
 class GoogleAuthService
 {
@@ -78,6 +76,30 @@ class GoogleAuthService
         }
     }
 
+    public function validateConnection(Connection $connection)
+    {
+        $this->client->setAccessToken($connection->token);
+
+        if ($this->client->isAccessTokenExpired()) {
+            $this->refreshAccessToken($connection->token);
+
+            // Update connection
+            $connection->token = $this->client->getAccessToken();
+            $connection->save();
+        }
+
+        return $connection;
+    }
+
+    private function refreshAccessToken($token)
+    {
+        // Fetch new access token
+        $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+
+        // Save new access token
+        return $this->client->getAccessToken();
+    }
+
     // public function storeCredentials($code): Connection | \Throwable
     // {
     //     /**
@@ -119,28 +141,4 @@ class GoogleAuthService
     //         return $exception;
     //     }
     // }
-
-    // public function getGoogleUserCredentials(User $user): Connection
-    // {
-    //     $connection = Connection::where('user_id', $user->id)->first();
-
-    //     $this->client->setAccessToken($connection->token);
-
-    //     if ($this->client->isAccessTokenExpired()) {
-    //         $this->refreshAccessToken($connection);
-    //     }
-
-    //     return $connection;
-    // }
-
-    private function refreshAccessToken(Connection $connection)
-    {
-        // Fetch new access token
-        $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-        $this->client->setAccessToken($this->client->getAccessToken());
-
-        // Save new access token
-        $connection->token = $this->client->getAccessToken();
-        $connection->save();
-    }
 }

@@ -5,13 +5,15 @@ namespace DDD\App\Services\GoogleAnalytics;
 
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\ApiException;
-use Google\Analytics\Data\V1beta\Client\BetaAnalyticsDataClient;
-use Google\Analytics\Data\V1beta\DateRange;
-use Google\Analytics\Data\V1beta\Dimension;
-use Google\Analytics\Data\V1beta\Metric;
-use Google\Analytics\Data\V1beta\OrderBy;
-use Google\Analytics\Data\V1beta\OrderBy\DimensionOrderBy;
 use Google\Analytics\Data\V1beta\RunReportRequest;
+use Google\Analytics\Data\V1beta\OrderBy\DimensionOrderBy;
+use Google\Analytics\Data\V1beta\OrderBy;
+use Google\Analytics\Data\V1beta\Metric;
+use Google\Analytics\Data\V1beta\Dimension;
+use Google\Analytics\Data\V1beta\DateRange;
+use Google\Analytics\Data\V1beta\Client\BetaAnalyticsDataClient;
+use DDD\Domain\Connections\Connection;
+use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
@@ -21,14 +23,13 @@ class GoogleAnalyticsDataService
      * Docs: https://cloud.google.com/php/docs/reference/analytics-data/latest/Google.Analytics.Data.V1beta.BetaAnalyticsDataClient#_runReport
      * PHP Client: https://github.com/googleapis/php-analytics-data/blob/master/samples/V1beta/BetaAnalyticsDataClient/run_report.php
      */
-    public function runReport($token, $property)
+    public function runReport(Connection $connection)
     {
-        $client = new BetaAnalyticsDataClient(['credentials' => $this->setupCredentials($token)]);
+        $client = new BetaAnalyticsDataClient(['credentials' => $this->setupCredentials($connection)]);
 
-        // Prepare the request message.
-        // $request = new RunReportRequest();
+        // Prepare the request
         $request = (new RunReportRequest())
-            ->setProperty($property)
+            ->setProperty($connection->uid)
             ->setDateRanges([
                 new DateRange([
                     'start_date' => '7daysAgo',
@@ -74,14 +75,17 @@ class GoogleAnalyticsDataService
      * 
      * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
      */
-    private function setupCredentials($token)
+    // TODO: Should this be a constructor, or a standalone class or helper?
+    private function setupCredentials(Connection $connection)
     {
+        $validConnection = GoogleAuth::validateConnection($connection);
+
         $credentials = CredentialsWrapper::build([
             'keyFile' => [
                 'type'          => 'authorized_user',
                 'client_id'     => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
-                'refresh_token' => $token['access_token'],
+                'refresh_token' => $validConnection->token['access_token'],
             ],
             'scopes'  => [
                 'https://www.googleapis.com/auth/analytics',
