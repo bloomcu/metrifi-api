@@ -19,7 +19,7 @@ class FunnelStepResource extends JsonResource
             'order' => $this->order,
             'name' => $this->name,
             'description' => $this->description,
-            'filter_expression' => $this->filter_expression,
+            'expression' => $this->expression,
         ];
     }
 }

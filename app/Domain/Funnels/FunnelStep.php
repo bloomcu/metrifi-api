@@ -18,6 +18,6 @@ class FunnelStep extends Model
     ];
 
     protected $casts = [
-        'filter_expression' => 'json',
+        'expression' => 'json',
     ];
 }

@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Route;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
-use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelController;
+use DDD\Http\Connections\ConnectionController;
 
 Route::middleware('auth:sanctum')->group(function() {
     
@@ -40,6 +41,13 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{funnel}', [FunnelController::class, 'show']);
             Route::put('/{funnel}', [FunnelController::class, 'update']);
             Route::delete('/{funnel}', [FunnelController::class, 'destroy']);
+
+            // Funnel steps
+            Route::prefix('{funnel}/steps')->group(function() {
+                Route::post('/', [FunnelStepController::class, 'store']);
+                Route::put('/{step}', [FunnelStepController::class, 'update']);
+                Route::delete('/{step}', [FunnelStepController::class, 'destroy']);
+            });
         });
     }); 
 });
