@@ -5,6 +5,7 @@ use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Funnels\FunnelController;
 
 Route::middleware('auth:sanctum')->group(function() {
     
@@ -30,6 +31,15 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);
             Route::post('', [ConnectionController::class, 'store']);
+        });
+
+        // Funnels
+        Route::prefix('funnels')->group(function() {
+            Route::get('/', [FunnelController::class, 'index']);
+            Route::post('/', [FunnelController::class, 'store']);
+            Route::get('/{funnel}', [FunnelController::class, 'show']);
+            Route::put('/{funnel}', [FunnelController::class, 'update']);
+            Route::delete('/{funnel}', [FunnelController::class, 'destroy']);
         });
     }); 
 });

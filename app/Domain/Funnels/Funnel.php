@@ -1,34 +1,32 @@
 <?php
 
-namespace DDD\Domain\Connections;
+namespace DDD\Domain\Funnels;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Funnels\FunnelStep;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
+use DDD\App\Traits\BelongsToConnection;
 
-class Connection extends Model
+class Funnel extends Model
 {
     use HasFactory,
         BelongsToOrganization,
-        BelongsToUser;
+        BelongsToUser,
+        BelongsToConnection;
 
     protected $guarded = [
         'id',
     ];
 
-    protected $casts = [
-        'token' => 'json',
-    ];
-
     /**
-     * Funnels associated with the connection.
+     * Steps associated with the funnel.
      *
      * @return hasMany
      */
-    public function funnels()
+    public function steps()
     {
-        return $this->hasMany(Funnel::class);
+        return $this->hasMany(FunnelStep::class);
     }
 }
