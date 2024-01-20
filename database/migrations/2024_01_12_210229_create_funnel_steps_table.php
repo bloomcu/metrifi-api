@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('funnel_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('funnel_id');
-            $table->string('type');
+            $table->string('type'); // TODO: We can move this into the express json?
             $table->integer('order')->nullable();
             $table->string('name')->nullable();
             $table->string('description')->nullable();

@@ -23,8 +23,8 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
-        Route::get('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
-        Route::get('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
+        Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
+        Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {

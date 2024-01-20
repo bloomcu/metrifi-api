@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\ApiException;
 use Google\Analytics\Data\V1beta\RunReportRequest;
+use Google\Analytics\Data\V1beta\OrderBy\MetricOrderBy;
 use Google\Analytics\Data\V1beta\OrderBy\DimensionOrderBy;
 use Google\Analytics\Data\V1beta\OrderBy;
 use Google\Analytics\Data\V1beta\Metric;
@@ -19,6 +20,27 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
+    /**
+     * Run a report
+     * 
+     * Docs: https://cloud.google.com/php/docs/reference/analytics-data/latest/Google.Analytics.Data.V1beta.BetaAnalyticsDataClient#_runReport
+     * PHP Client: https://github.com/googleapis/php-analytics-data/blob/master/samples/V1beta/BetaAnalyticsDataClient/run_report.php
+     */
+    public function runReport(Connection $connection, $params)
+    {
+        try {
+            $accessToken = $this->setupAccessToken($connection);
+            
+            $endpoint = 'https://analyticsdata.googleapis.com/v1beta/' . $connection->uid . ':runReport?access_token=' . $accessToken;
+
+            $response = Http::post($endpoint, $params)->json();
+
+            return $response;
+        } catch (ApiException $ex) {
+            abort(500, 'Call failed with message: %s' . $ex->getMessage());
+        }
+    }
+
     /**
      * Run a funnel report
      * 
@@ -32,7 +54,7 @@ class GoogleAnalyticsDataService
         $accessToken = $this->setupAccessToken($connection);
 
         try {
-            $request = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
+            $response = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
             [
                 'dateRanges' => [
                     'startDate' => '7daysAgo',
@@ -69,60 +91,7 @@ class GoogleAnalyticsDataService
                 ]
             ])->json();
 
-            return $request;
-        } catch (ApiException $ex) {
-            abort(500, 'Call failed with message: %s' . $ex->getMessage());
-        }
-    }
-
-    /**
-     * Run a report
-     * 
-     * Docs: https://cloud.google.com/php/docs/reference/analytics-data/latest/Google.Analytics.Data.V1beta.BetaAnalyticsDataClient#_runReport
-     * PHP Client: https://github.com/googleapis/php-analytics-data/blob/master/samples/V1beta/BetaAnalyticsDataClient/run_report.php
-     */
-    public function runReport(Connection $connection)
-    {
-        $client = new BetaAnalyticsDataClient(['credentials' => $this->setupCredentials($connection)]);
-
-        // Prepare the request
-        $request = (new RunReportRequest())
-            ->setProperty($connection->uid)
-            ->setDateRanges([
-                new DateRange([
-                    'start_date' => '7daysAgo',
-                    'end_date' => 'today',
-                ]),
-            ])
-            // ->setDimensions([
-            //     new Dimension([
-            //         'name' => 'date',
-            //     ]),
-            // ])
-            ->setMetrics([
-                new Metric([
-                    'name' => 'activeUsers',
-                ]),
-                new Metric([
-                    'name' => 'eventCount',
-                ]),
-                new Metric([
-                    'name' => 'newUsers',
-                ]),
-            ]);
-            // ->setOrderbys([
-            //     new OrderBy([
-            //         'dimension' => new DimensionOrderBy([
-            //             'dimension_name' => 'date'
-            //         ])
-            //     ])
-	        // ]);
-
-        // Call the API and handle any network failures.
-        try {
-            $response = $client->runReport($request);
-
-            return json_decode($response->serializeToJsonString());
+            return $response;
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }

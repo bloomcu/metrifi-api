@@ -4,8 +4,9 @@ namespace DDD\Domain\Funnels;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use DDD\App\Traits\BelongsToFunnel;
 use DDD\Domain\Funnels\Traits\IsOrderable;
+use DDD\Domain\Funnels\Casts\FunnelStepExpression;
+use DDD\App\Traits\BelongsToFunnel;
 
 class FunnelStep extends Model
 {
@@ -18,6 +19,6 @@ class FunnelStep extends Model
     ];
 
     protected $casts = [
-        'expression' => 'json',
+        'expression' => FunnelStepExpression::class,
     ];
 }
