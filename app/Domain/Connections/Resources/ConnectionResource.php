@@ -21,6 +21,8 @@ class ConnectionResource extends JsonResource
             'service' => $this->service,
             'name' => $this->name,
             'uid' => $this->uid,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
