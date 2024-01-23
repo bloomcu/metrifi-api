@@ -19,7 +19,7 @@ class GoogleAnalyticsDataController extends Controller
 
     public function runReport(Connection $connection, Request $request)
     {   
-        $report = GoogleAnalyticsData::runReport($connection, $request->params);
+        $report = GoogleAnalyticsData::runReport($connection, $request);
 
         return response()->json([
             'data' => $report

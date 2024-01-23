@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Services\Google\GoogleAuthController;
+use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataExportToCSVController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Funnels\FunnelStepController;
@@ -25,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::prefix('ga')->group(function() {
         Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
         Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
+        Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
