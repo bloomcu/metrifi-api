@@ -175,6 +175,9 @@ return [
         DDD\App\Providers\AuthServiceProvider::class,
         DDD\App\Providers\BroadcastServiceProvider::class,
         DDD\App\Providers\EventServiceProvider::class,
+        DDD\App\Providers\GoogleAnalyticsAdminServiceProvider::class,
+        DDD\App\Providers\GoogleAnalyticsDataServiceProvider::class,
+        DDD\App\Providers\GoogleAuthServiceProvider::class,
         DDD\App\Providers\RouteServiceProvider::class,
 
     ],
