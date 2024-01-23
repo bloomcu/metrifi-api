@@ -19,6 +19,7 @@ class ConnectionResource extends JsonResource
             'id' => $this->id,
             'user' => new UserResource($this->user),
             'service' => $this->service,
+            'account_name' => $this->account_name,
             'name' => $this->name,
             'uid' => $this->uid,
             'created_at' => $this->created_at,
