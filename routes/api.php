@@ -24,9 +24,11 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
-        Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
-        Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
-        Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
+        Route::post('page-views/{connection}', [GoogleAnalyticsDataController::class, 'fetchPageViews']);
+        Route::post('outbound-clicks/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicks']);
+        // Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
+        // Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
+        // Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {

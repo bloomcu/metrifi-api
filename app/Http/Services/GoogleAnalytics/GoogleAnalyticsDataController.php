@@ -8,21 +8,47 @@ use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
-    public function runFunnelReport(Connection $connection)
-    {   
-        $report = GoogleAnalyticsData::runFunnelReport($connection);
+    public function fetchPageViews(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::fetchPageViews(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate
+        );
 
         return response()->json([
             'data' => $report
         ], 200);
     }
 
-    public function runReport(Connection $connection, Request $request)
-    {   
-        $report = GoogleAnalyticsData::runReport($connection, $request);
+    public function fetchOutboundClicks(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::fetchOutboundClicks(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate
+        );
 
         return response()->json([
             'data' => $report
         ], 200);
     }
+
+    // public function runReport(Connection $connection, Request $request)
+    // {   
+    //     $report = GoogleAnalyticsData::runReport($connection, $request);
+
+    //     return response()->json([
+    //         'data' => $report
+    //     ], 200);
+    // }
+
+    // public function runFunnelReport(Connection $connection)
+    // {   
+    //     $report = GoogleAnalyticsData::runFunnelReport($connection);
+
+    //     return response()->json([
+    //         'data' => $report
+    //     ], 200);
+    // }
 }
