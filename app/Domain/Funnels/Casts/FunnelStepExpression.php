@@ -20,10 +20,8 @@ class FunnelStepExpression implements CastsAttributes
         $value = isset($value) ? json_decode($value, true) : [];
 
         $defaults = [
-            'type' => null, // e.g., 'view', 'event', 'outbound'
-            'field_name' => null, // e.g., 'pageLocation', 'pagePath', 'pageReferrer', 'landingPage', 'linkUrl (outbound)'
-            'field_operator' => null, // e.g., 'EXACT', 'BEGINS_WITH', 'ENDS_WITH', 'CONTAINS'
-            'field_value' => null, // e.g., 'https://bloomcu.com/contact', 'some other value'
+            'page_paths' => null,
+            'link_urls' => null,
         ];
 
         return array_merge($defaults, $value);
