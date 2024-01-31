@@ -15,10 +15,10 @@ class FunnelStepController extends Controller
     public function store(Organization $organization, Funnel $funnel, Request $request)
     {
         $step = $funnel->steps()->create([
-            'type' => $request->type,
+            'metric' => $request->metric,
             'name' => $request->name,
             'description' => $request->description,
-            'expression' => $request->expression,
+            // 'measurables' => $request->measurables,
         ]);
 
         return new FunnelStepResource($step);
