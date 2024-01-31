@@ -20,14 +20,36 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
-    public function fetchPageViews(Connection $connection, $startDate, $endDate)
+    public function fetchPageViews(Connection $connection, $startDate, $endDate, $pagePaths = null)
     {
+        // By default, return all pages where path begins with '/'
+        $pagePathsExpression = [
+            'filter' => [
+                'fieldName' => 'pagePath',
+                'stringFilter' => [
+                    'matchType' => 'BEGINS_WITH',
+                    'value' => '/'
+                ]
+            ]
+        ];
+
+        // If specific page paths are being requested, rebuild the filter expression
+        if ($pagePaths) {
+            $pagePathsExpression = collect($pagePaths)->map(fn ($path) => [
+                'filter' => [
+                    'fieldName' => 'pagePath',
+                    'stringFilter' => [
+                        'matchType' => 'EXACT',
+                        'value' => $path
+                    ]
+                ]
+            ])->toArray();
+        }
+
+        // Run the report
         return $this->runReport($connection, [
             'dateRanges' => [
-                [ 
-                    'startDate' => $startDate,
-                    'endDate' => $endDate,
-                ]
+                ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
                 ['name' => 'pagePath'],
@@ -36,15 +58,14 @@ class GoogleAnalyticsDataService
                 ['name' => 'screenPageViews']
             ],
             'dimensionFilter' => [
-                'filter' => [
-                    'fieldName' => 'pagePath',
-                    'stringFilter' => [
-                        'matchType' => 'BEGINS_WITH',
-                        'value' => '/'
+                'orGroup' => [
+                    'expressions' => [
+                        ...$pagePathsExpression
                     ]
                 ]
             ],
-            'limit' => '250'
+            'limit' => '250',
+            'metricAggregations' => ['TOTAL'],
         ]);
     }
 
@@ -52,10 +73,7 @@ class GoogleAnalyticsDataService
     {
         return $this->runReport($connection, [
             'dateRanges' => [
-                [ 
-                    'startDate' => $startDate,
-                    'endDate' => $endDate,
-                ]
+                ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
                 ['name' => 'linkUrl'],

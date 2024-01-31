@@ -13,7 +13,8 @@ class GoogleAnalyticsDataController extends Controller
         $report = GoogleAnalyticsData::fetchPageViews(
             connection: $connection, 
             startDate: $request->startDate, 
-            endDate: $request->endDate
+            endDate: $request->endDate,
+            pagePaths: $request->pagePaths,
         );
 
         return response()->json([
