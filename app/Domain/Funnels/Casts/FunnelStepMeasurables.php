@@ -4,7 +4,7 @@ namespace DDD\Domain\Funnels\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class FunnelStepExpression implements CastsAttributes
+class FunnelStepMeasurables implements CastsAttributes
 {
     /**
      * Cast the given value.
@@ -19,10 +19,7 @@ class FunnelStepExpression implements CastsAttributes
     {
         $value = isset($value) ? json_decode($value, true) : [];
 
-        $defaults = [
-            'page_paths' => null,
-            'link_urls' => null,
-        ];
+        $defaults = [];
 
         return array_merge($defaults, $value);
     }

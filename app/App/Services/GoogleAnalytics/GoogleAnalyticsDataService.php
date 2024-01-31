@@ -22,6 +22,7 @@ class GoogleAnalyticsDataService
 {
     public function fetchPageViews(Connection $connection, $startDate, $endDate, $pagePaths = null)
     {
+        
         // By default, return all pages where path begins with '/'
         $pagePathsExpression = [
             'filter' => [
