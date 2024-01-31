@@ -23,6 +23,8 @@ class FunnelResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'steps' => FunnelStepResource::collection($this->steps),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
