@@ -20,6 +20,7 @@ class FunnelController extends Controller
     {
         $funnel = $organization->funnels()->create([
             'user_id' => $request->user()->id,
+            'connection_id' => $organization->connections->first()->id,
             'name' => $request->name,
             'description' => $request->description,
         ]);

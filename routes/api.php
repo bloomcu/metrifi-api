@@ -5,6 +5,7 @@ use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataExportToCSVController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Funnels\FunnelStepPredictionController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Connections\ConnectionController;
@@ -36,6 +37,12 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);
             Route::post('', [ConnectionController::class, 'store']);
+        });
+
+        // Predict funnel steps
+        // TODO: Create the funnel first then predict the steps and move this into the funnels routes
+        Route::prefix('predict/{funnel}')->group(function() {
+            Route::get('/', [FunnelStepPredictionController::class, 'run']);
         });
 
         // Funnels
