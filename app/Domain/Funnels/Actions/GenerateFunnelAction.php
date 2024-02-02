@@ -100,6 +100,6 @@ class GenerateFunnelAction
 
         $messages = $this->listThreadMessages($threadRun->threadId);
 
-        return $messages->data[0]->content[0]->text->value;
+        return json_decode($messages->data[0]->content[0]->text->value);
     }
 }

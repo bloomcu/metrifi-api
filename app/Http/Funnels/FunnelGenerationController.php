@@ -14,25 +14,24 @@ class FunnelGenerationController extends Controller
 {
     public function run(Organization $organization, Connection $connection, Request $request)
     {
-        $steps = GenerateFunnelAction::run($connection, $request->terminalPagePath);
-        
-        return json_decode($steps);
-        
-        return response()->json([
-            'original' => json_decode($steps),
+        $response = GenerateFunnelAction::run($connection, $request->terminalPagePath);
+
+        $funnel = $organization->funnels()->create([
+            'user_id' => $request->user()->id,
+            'connection_id' => $connection->id,
+            'name' => 'Generated funnel',
+            'description' => 'Generated from the terminal page path: ' . $request->terminalPagePath,
         ]);
 
-        // Create a new funnel
+        foreach ($response->data->pagePaths as $pagePath) {
+            $funnel->steps()->create([
+                'metric' => 'pageViews',
+                'name' => $pagePath,
+                'measurables' => [$pagePath],
+            ]);
+        }
 
-        // foreach ($steps as $step) {
-        //     $funnel->steps()->create([
-        //         'metric' => 'pageViews',
-        //         'name' => 'The step name',
-        //         'measurables' => [$step],
-        //     ]);
-        // }
-
-        // return new FunnelResource($funnel);
+        return new FunnelResource($funnel);
     }
 
     public function check(Organization $organization, Funnel $funnel, Request $request)
