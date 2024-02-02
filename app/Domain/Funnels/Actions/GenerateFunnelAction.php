@@ -22,7 +22,7 @@ class GenerateFunnelAction
     {   
         $file = $this->generateFile($connection);
 
-        $assistantId = 'asst_umtD7i5B9n5rL5jbKP1UkFE3'; // Funnel Maker Assistant
+        $assistantId = 'asst_umtD7i5B9n5rL5jbKP1UkFE3'; // V0.3.9 - TPP Funnel Maker (Unstable API version)
         // $assistantId = 'asst_zjutsMhDsZfywxHj3q4hYB5R'; // V0.3.14 - TPP Funnel Maker (Stable API version)
         $messageContent = 'Terminal Page Path: "' . $terminalPagePath . '"; File ID: "' . $file->id . '"';
         // $assistantId = 'asst_c3sNfaAdIsE1UJaNZSHhhZXy'; // Test Assistant
