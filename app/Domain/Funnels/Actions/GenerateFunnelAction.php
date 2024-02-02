@@ -7,10 +7,10 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Support\Facades\Storage;
 use DDD\Domain\Pages\Page;
-use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class PredictFunnelStepsAction
+class GenerateFunnelAction
 {
     use AsAction;
 
@@ -18,9 +18,9 @@ class PredictFunnelStepsAction
      * @param  Page  $page
      * @return string
      */
-    function handle(Funnel $funnel, string $terminalPagePath)
+    function handle(Connection $connection, string $terminalPagePath)
     {   
-        $file = $this->generateFile($funnel);
+        $file = $this->generateFile($connection);
 
         $assistantId = 'asst_umtD7i5B9n5rL5jbKP1UkFE3'; // Funnel Maker Assistant
         // $assistantId = 'asst_zjutsMhDsZfywxHj3q4hYB5R'; // V0.3.14 - TPP Funnel Maker (Stable API version)
@@ -33,24 +33,12 @@ class PredictFunnelStepsAction
         return $this->retrieveFinalMessage($threadRun);
     }
 
-    private function fetchPageViewsAsJson(Funnel $funnel)
-    {
-        $report = GoogleAnalyticsData::fetchPageViews(
-            connection: $funnel->connection, 
-            startDate: '28daysAgo',
-            endDate: 'today',
-            pagePaths: null,
-        );
-
-        return json_encode($report, JSON_PRETTY_PRINT);
-    }
-
-    private function generateFile(Funnel $funnel)
+    private function generateFile(Connection $connection)
     {
         try {
-            $filename = $funnel->connection->name . ' - pageviews.json';
+            $filename = $connection->name . ' - pageviews.json';
 
-            Storage::disk('local')->put($filename, $this->fetchPageViewsAsJson($funnel));
+            Storage::disk('local')->put($filename, $this->fetchPageViewsAsJson($connection));
 
             return OpenAI::files()->upload([
                 'purpose' => 'assistants',
@@ -60,6 +48,18 @@ class PredictFunnelStepsAction
         } catch (\Exception $e) {
             throw new \Exception('Failed to upload file');
         }
+    }
+
+    private function fetchPageViewsAsJson(Connection $connection)
+    {
+        $report = GoogleAnalyticsData::fetchPageViews(
+            connection: $connection, 
+            startDate: '28daysAgo',
+            endDate: 'today',
+            pagePaths: null,
+        );
+
+        return json_encode($report, JSON_PRETTY_PRINT);
     }
 
     private function createAndRunThread(string $assistantId, string $messageContent)
