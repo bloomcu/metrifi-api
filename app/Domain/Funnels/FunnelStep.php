@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Traits\IsOrderable;
 use DDD\Domain\Funnels\Casts\FunnelStepMeasurables;
 use DDD\App\Traits\BelongsToFunnel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FunnelStep extends Model
 {
     use HasFactory,
+        SoftDeletes,
         BelongsToFunnel,
         IsOrderable;
 
@@ -19,7 +21,6 @@ class FunnelStep extends Model
     ];
 
     protected $casts = [
-        // 'measurables' => 'array',
         'measurables' => FunnelStepMeasurables::class,
     ];
 }
