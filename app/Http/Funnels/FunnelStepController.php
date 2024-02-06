@@ -18,7 +18,7 @@ class FunnelStepController extends Controller
             'metric' => $request->metric,
             'name' => $request->name,
             'description' => $request->description,
-            // 'measurables' => $request->measurables,
+            'measurables' => $request->measurables,
         ]);
 
         return new FunnelStepResource($step);
