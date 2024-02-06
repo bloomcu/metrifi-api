@@ -25,6 +25,6 @@ class Organization extends BaseOrganization {
      */
     public function funnels()
     {
-        return $this->hasMany(Funnel::class);
+        return $this->hasMany(Funnel::class)->latest();
     }
 }
