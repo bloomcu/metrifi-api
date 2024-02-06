@@ -22,6 +22,7 @@ class FunnelResource extends JsonResource
             'connection' => new ConnectionResource($this->connection),
             'name' => $this->name,
             'description' => $this->description,
+            'zoom' => $this->zoom,
             'steps' => FunnelStepResource::collection($this->steps),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
