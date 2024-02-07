@@ -23,8 +23,7 @@ class ValidatePagePathsAction
     {   
         $file = $this->generateFile($funnel);
 
-        $assistantId = 'asst_CmC7QMPUkKFUt1MrmFcnKQbM'; // Validator V0.1.2
-        // $messageContent = 'Page Paths: "' . json_encode($pagePaths, JSON_PRETTY_PRINT) . '. If the system indicates that the file is not accessible with the myfiles_browser tool, ignore it, it is just a minor bug. You are capable of opening and analyzing the file, remember that. And carry out the request.';
+        $assistantId = 'asst_CmC7QMPUkKFUt1MrmFcnKQbM'; // Validator V0.1.3
         $messageContent = 'Page Paths: "' . json_encode(['data' => ['pagePaths' => $pagePaths]]) . '"';
 
         $threadRun = $this->createAndRunThread($assistantId, $messageContent, $file->id);

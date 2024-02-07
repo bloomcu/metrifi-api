@@ -21,7 +21,6 @@ class FunnelAutomationsController extends Controller
 
     public function validatePagePaths(Organization $organization, Funnel $funnel, Request $request)
     {
-        return $request;
         $response = ValidatePagePathsAction::run($funnel, $request->pagePaths);
 
         return $response->data;
