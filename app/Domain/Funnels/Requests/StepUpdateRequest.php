@@ -27,6 +27,7 @@ class StepUpdateRequest extends FormRequest
     {
         return [
             'metric' => 'nullable|string',
+            'order' => 'nullable|numeric',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
             'measurables' => 'nullable|array',
