@@ -23,7 +23,7 @@ class FunnelController extends Controller
             'connection_id' => $organization->connections->first()->id,
             'name' => $request->name,
             'description' => $request->description,
-            'zoom' => 40,
+            'zoom' => 50,
         ]);
 
         return new FunnelResource($funnel);
