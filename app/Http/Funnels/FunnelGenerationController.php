@@ -25,17 +25,14 @@ class FunnelGenerationController extends Controller
 
         foreach ($response->data->pagePaths as $pagePath) {
             $funnel->steps()->create([
-                'metric' => 'pageViews',
                 'name' => $pagePath,
-                'measurables' => [$pagePath],
+                'measurables' => [
+                    'metric' => 'pageViews',
+                    'measurable' => $pagePath
+                ],
             ]);
         }
 
         return new FunnelResource($funnel);
-    }
-
-    public function check(Organization $organization, Funnel $funnel, Request $request)
-    {
-        
     }
 }
