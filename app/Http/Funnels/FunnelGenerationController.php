@@ -20,9 +20,13 @@ class FunnelGenerationController extends Controller
         // Get all endpoints that funnels could be generated from.
         $action = GetFunnelEndpoints::run($connection, $request->startingPagePath);
 
+        $max = 300;
+        $count = 0;
         $funnels = [];
 
         foreach ($action->data->pagePaths as $terminalPagePath) {
+            if (++$count === $max + 1) break;
+            
             $funnel = $organization->funnels()->create([
                 'user_id' => $request->user()->id,
                 'connection_id' => $connection->id,
