@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Resources\FunnelStepResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
+use DDD\Domain\Funnels\Jobs\GenerateFunnelStepsJob;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\GetValidPagePaths;
-use DDD\Domain\Funnels\Actions\GetEndpointSegments;
 use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
+use DDD\Domain\Funnels\Actions\GetEndpointSegments;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
@@ -19,7 +20,7 @@ class FunnelGenerationController extends Controller
     {
         // Get all endpoints that funnels could be generated from.
         $action = GetFunnelEndpoints::run($connection, $request->startingPagePath);
-
+        
         $max = 100;
         $count = 0;
         $funnels = [];
@@ -41,23 +42,14 @@ class FunnelGenerationController extends Controller
 
     public function generateFunnelSteps(Organization $organization, Funnel $funnel, Request $request)
     {
-        // Break funnel endpoint into parts then validate the parts.
-        $segments = GetEndpointSegments::run($request->terminalPagePath);
-        $validated = GetValidPagePaths::run($funnel, $segments->data->pagePaths);
+        GenerateFunnelStepsJob::dispatch($funnel, $request->terminalPagePath);
 
-        foreach ($validated->data->pagePaths as $key => $pagePath) {
-            $funnel->steps()->create([
-                'order' => $key + 1,
-                'name' => $pagePath,
-                'measurables' => [
-                    [
-                        'metric' => 'pageViews',
-                        'measurable' => $pagePath,
-                    ]
-                ]
-            ]);
-        }
+        // $funnel->update([
+        //     'automating' => true,
+        // ]);
 
-        return FunnelStepResource::collection($funnel->steps);
+        return response()->json([
+            'message' => 'Funnel steps are being generated.',
+        ]);
     }
 }
