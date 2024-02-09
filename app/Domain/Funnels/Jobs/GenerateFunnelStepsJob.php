@@ -2,6 +2,7 @@
 
 namespace DDD\Domain\Funnels\Jobs;
 
+use Throwable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,6 +16,13 @@ use DDD\Domain\Funnels\Actions\GetEndpointSegments;
 class GenerateFunnelStepsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     *
+     * @var int
+     */
+    public $backoff = 60;
 
     public $funnel;
     public $terminalPagePath;
@@ -30,6 +38,7 @@ class GenerateFunnelStepsJob implements ShouldQueue
         // Mark funnel as automating
         $this->funnel->update([
             'automating' => true,
+            'automation_msg' => null,
         ]);
 
         // Break funnel endpoint into parts.
@@ -55,6 +64,14 @@ class GenerateFunnelStepsJob implements ShouldQueue
         // Mark funnel automation as complete
         $this->funnel->update([
             'automating' => false,
+        ]);
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        $this->funnel->update([
+            'automating' => false,
+            'automation_msg' => 'Failed to generate steps. Please try again.',
         ]);
     }
 }
