@@ -8,6 +8,8 @@ use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\ValidatePagePathsAction;
 use DDD\Domain\Funnels\Actions\SegmentTerminalPagePathAction;
+use DDD\Domain\Funnels\Actions\DiscoverTerminalPagePathsAction;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
 class FunnelAutomationsController extends Controller
@@ -35,4 +37,6 @@ class FunnelAutomationsController extends Controller
 
         // return new FunnelResource($funnel);
     }
+
+    
 }

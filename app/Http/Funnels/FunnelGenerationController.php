@@ -7,12 +7,28 @@ use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\GenerateFunnelAction;
+use DDD\Domain\Funnels\Actions\DiscoverTerminalPagePathsAction;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
 class FunnelGenerationController extends Controller
 {
-    public function run(Organization $organization, Connection $connection, Request $request)
+    public function generateAll(Organization $organization, Connection $connection, Request $request)
+    {
+        $action = DiscoverTerminalPagePathsAction::run($connection, $request->startingPagePath);
+
+        foreach ($action->data->pagePaths as $pagePath) {
+            $organization->funnels()->create([
+                'user_id' => $request->user()->id,
+                'connection_id' => $connection->id,
+                'name' => $pagePath,
+            ]);
+        }
+
+        return FunnelResource::collection($organization->funnels);
+    }
+    
+    public function generateSingle(Organization $organization, Connection $connection, Request $request)
     {
         $response = GenerateFunnelAction::run($connection, $request->terminalPagePath);
 
