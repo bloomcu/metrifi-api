@@ -2,6 +2,18 @@
 
 A Laravel SaaS starter.
 
+## Working with queues locally
+
+Start workers
+```
+php artisan queue:work
+```
+
+Restart workers
+```
+php artisan queue:restart
+```
+
 ## Install Locally
 
 **Step 1:** Clone this repository
