@@ -7,13 +7,14 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Support\Facades\Storage;
 use DDD\Domain\Pages\Page;
-use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class DiscoverTerminalPagePathsAction
+class GetFunnelEndpoints
 {
     use AsAction;
+
+    // TODO: This whole action needs to be refactored as an assistant model
 
     /**
      * @param  Page  $page

@@ -39,10 +39,10 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::post('', [ConnectionController::class, 'store']);
         });
 
-        // Generate a funnel
-        Route::prefix('generate/{connection}')->group(function() {
-            Route::get('/all', [FunnelGenerationController::class, 'generateAll']);
-            Route::get('/single', [FunnelGenerationController::class, 'generateSingle']);
+        // Funnel generation
+        Route::prefix('generate')->group(function() {
+            Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
+            Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
         });
 
         // Funnels
@@ -58,12 +58,6 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/', [FunnelStepController::class, 'store']);
                 Route::put('/{step}', [FunnelStepController::class, 'update']);
                 Route::delete('/{step}', [FunnelStepController::class, 'destroy']);
-            });
-            
-            // Funnel automations
-            Route::prefix('{funnel}/automations')->group(function() {
-                Route::get('/segment-terminal-page-path', [FunnelAutomationsController::class, 'segmentTerminalPagePath']);
-                Route::get('/validate-page-paths', [FunnelAutomationsController::class, 'validatePagePaths']);
             });
         });
     }); 

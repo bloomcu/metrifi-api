@@ -7,42 +7,42 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Support\Facades\Storage;
 use DDD\Domain\Pages\Page;
+use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class GenerateFunnelAction
+class GetValidPagePaths
 {
     use AsAction;
 
+    // TODO: This whole action needs to be refactored as an assistant model
+    
     /**
      * @param  Page  $page
      * @return string
      */
-    function handle(Connection $connection, string $terminalPagePath)
+    function handle(Funnel $funnel, array $pagePaths)
     {   
-        $file = $this->generateFile($connection);
+        $file = $this->generateFile($funnel);
 
-        $assistantId = 'asst_umtD7i5B9n5rL5jbKP1UkFE3'; // V0.3.9 - TPP Funnel Maker (Unstable API version)
-        // $assistantId = 'asst_zjutsMhDsZfywxHj3q4hYB5R'; // V0.3.14 - TPP Funnel Maker (Stable API version)
-        $messageContent = 'Terminal Page Path: "' . $terminalPagePath . '"';
-        // $assistantId = 'asst_c3sNfaAdIsE1UJaNZSHhhZXy'; // Test Assistant
-        // $messageContent = 'Hello Mr. Assistant.';
+        $assistantId = 'asst_CmC7QMPUkKFUt1MrmFcnKQbM'; // Validator V0.1.3
+        $messageContent = 'Page Paths: "' . json_encode(['data' => ['pagePaths' => $pagePaths]]) . '"';
 
         $threadRun = $this->createAndRunThread($assistantId, $messageContent, $file->id);
         
         return $this->retrieveFinalMessage($threadRun);
     }
 
-    private function generateFile(Connection $connection)
+    private function generateFile(Funnel $funnel)
     {
         try {
-            $filename = $connection->name . ' - pageviews.json';
+            $filename = $funnel->name . ' - pagepaths.json';
 
-            Storage::disk('local')->put($filename, $this->fetchPageViewsAsJson($connection));
+            Storage::disk('local')->put('private/' . $filename, $this->fetchPageViewsAsJson($funnel->connection));
 
             return OpenAI::files()->upload([
                 'purpose' => 'assistants',
-                'file' => fopen(storage_path('app/private' . $filename), 'rb')
+                'file' => fopen(storage_path('app/private/' . $filename), 'rb')
             ]);
 
         } catch (\Exception $e) {
@@ -71,7 +71,7 @@ class GenerateFunnelAction
                     [
                         'role' => 'user',
                         'content' => $messageContent,
-                        'file_ids' => [$fileId],
+                        'file_ids' => [$fileId]
                     ],
                 ],
             ],
@@ -91,6 +91,7 @@ class GenerateFunnelAction
     private function retrieveFinalMessage(ThreadRunResponse $threadRun)
     {
         while(in_array($threadRun->status, ['queued', 'in_progress'])) {
+            usleep(500000); // Sleep for 0.5 seconds (500,000 microseconds)
             $threadRun = $this->retrieveThreadRun($threadRun->threadId, $threadRun->id);
         }
 

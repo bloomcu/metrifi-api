@@ -5,62 +5,29 @@ namespace DDD\Domain\Funnels\Actions;
 use OpenAI\Responses\Threads\Runs\ThreadRunResponse;
 use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Illuminate\Support\Facades\Storage;
 use DDD\Domain\Pages\Page;
-use DDD\Domain\Funnels\Funnel;
-use DDD\Domain\Connections\Connection;
-use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class ValidatePagePathsAction
+class GetEndpointSegments
 {
     use AsAction;
+
+    // TODO: This whole action needs to be refactored as an assistant model
 
     /**
      * @param  Page  $page
      * @return string
      */
-    function handle(Funnel $funnel, array $pagePaths)
+    function handle(string $terminalPagePath)
     {   
-        $file = $this->generateFile($funnel);
+        $assistantId = 'asst_BsM3epJYI7izJiTlOGs52bfl'; // Segmenter V0.1.3
+        $messageContent = 'Terminal Page Path: "' . $terminalPagePath . '"';
 
-        $assistantId = 'asst_CmC7QMPUkKFUt1MrmFcnKQbM'; // Validator V0.1.3
-        $messageContent = 'Page Paths: "' . json_encode(['data' => ['pagePaths' => $pagePaths]]) . '"';
-
-        $threadRun = $this->createAndRunThread($assistantId, $messageContent, $file->id);
+        $threadRun = $this->createAndRunThread($assistantId, $messageContent);
         
         return $this->retrieveFinalMessage($threadRun);
     }
 
-    private function generateFile(Funnel $funnel)
-    {
-        try {
-            $filename = $funnel->name . ' - pagepaths.json';
-
-            Storage::disk('local')->put('private/' . $filename, $this->fetchPageViewsAsJson($funnel->connection));
-
-            return OpenAI::files()->upload([
-                'purpose' => 'assistants',
-                'file' => fopen(storage_path('app/private/' . $filename), 'rb')
-            ]);
-
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to upload file');
-        }
-    }
-
-    private function fetchPageViewsAsJson(Connection $connection)
-    {
-        $report = GoogleAnalyticsData::fetchPageViews(
-            connection: $connection, 
-            startDate: '28daysAgo',
-            endDate: 'today',
-            pagePaths: null,
-        );
-
-        return json_encode($report, JSON_PRETTY_PRINT);
-    }
-
-    private function createAndRunThread(string $assistantId, string $messageContent, string $fileId)
+    private function createAndRunThread(string $assistantId, string $messageContent)
     {
         return OpenAI::threads()->createAndRun([
             'assistant_id' => $assistantId,
@@ -69,7 +36,6 @@ class ValidatePagePathsAction
                     [
                         'role' => 'user',
                         'content' => $messageContent,
-                        'file_ids' => [$fileId]
                     ],
                 ],
             ],

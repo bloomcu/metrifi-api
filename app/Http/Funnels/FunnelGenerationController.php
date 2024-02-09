@@ -4,51 +4,52 @@ namespace DDD\Http\Funnels;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Funnels\Resources\FunnelStepResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Funnels\Funnel;
-use DDD\Domain\Funnels\Actions\GenerateFunnelAction;
-use DDD\Domain\Funnels\Actions\DiscoverTerminalPagePathsAction;
+use DDD\Domain\Funnels\Actions\GetValidPagePaths;
+use DDD\Domain\Funnels\Actions\GetEndpointSegments;
+use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
 class FunnelGenerationController extends Controller
 {
-    public function generateAll(Organization $organization, Connection $connection, Request $request)
+    public function generateFunnels(Organization $organization, Connection $connection, Request $request)
     {
-        $action = DiscoverTerminalPagePathsAction::run($connection, $request->startingPagePath);
+        // Get all endpoints that funnels could be generated from.
+        $action = GetFunnelEndpoints::run($connection, $request->startingPagePath);
 
-        foreach ($action->data->pagePaths as $pagePath) {
+        foreach ($action->data->pagePaths as $terminalPagePath) {
             $organization->funnels()->create([
                 'user_id' => $request->user()->id,
                 'connection_id' => $connection->id,
-                'name' => $pagePath,
+                'name' => $terminalPagePath,
             ]);
         }
 
         return FunnelResource::collection($organization->funnels);
     }
-    
-    public function generateSingle(Organization $organization, Connection $connection, Request $request)
+
+    public function generateFunnelSteps(Organization $organization, Funnel $funnel, Request $request)
     {
-        $response = GenerateFunnelAction::run($connection, $request->terminalPagePath);
+        // Break funnel endpoint into parts then validate the parts.
+        $segments = GetEndpointSegments::run($request->terminalPagePath);
+        $validated = GetValidPagePaths::run($funnel, $segments->data->pagePaths);
 
-        $funnel = $organization->funnels()->create([
-            'user_id' => $request->user()->id,
-            'connection_id' => $connection->id,
-            'name' => 'Generated funnel',
-            'description' => 'Generated from the terminal page path: ' . $request->terminalPagePath,
-        ]);
-
-        foreach ($response->data->pagePaths as $pagePath) {
+        foreach ($validated->data->pagePaths as $key => $pagePath) {
             $funnel->steps()->create([
+                'order' => $key + 1,
                 'name' => $pagePath,
                 'measurables' => [
-                    'metric' => 'pageViews',
-                    'measurable' => $pagePath
-                ],
+                    [
+                        'metric' => 'pageViews',
+                        'measurable' => $pagePath,
+                    ]
+                ]
             ]);
         }
 
-        return new FunnelResource($funnel);
+        return FunnelStepResource::collection($funnel->steps);
     }
 }
