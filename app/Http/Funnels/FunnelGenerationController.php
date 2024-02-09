@@ -32,9 +32,12 @@ class FunnelGenerationController extends Controller
                 'user_id' => $request->user()->id,
                 'connection_id' => $connection->id,
                 'name' => $terminalPagePath,
+                'automating' => true,
             ]);
 
             array_push($funnels, $funnel);
+
+            GenerateFunnelStepsJob::dispatch($funnel, $terminalPagePath);
         }
 
         return FunnelResource::collection($funnels);
@@ -43,10 +46,6 @@ class FunnelGenerationController extends Controller
     public function generateFunnelSteps(Organization $organization, Funnel $funnel, Request $request)
     {
         GenerateFunnelStepsJob::dispatch($funnel, $request->terminalPagePath);
-
-        // $funnel->update([
-        //     'automating' => true,
-        // ]);
 
         return response()->json([
             'message' => 'Funnel steps are being generated.',
