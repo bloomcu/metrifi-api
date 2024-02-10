@@ -47,6 +47,11 @@ class FunnelGenerationController extends Controller
     {
         GenerateFunnelStepsJob::dispatch($funnel, $request->terminalPagePath);
 
+        $funnel->update([
+            'automating' => true,
+            'automation_msg' => null,
+        ]);
+
         return response()->json([
             'message' => 'Funnel steps are being generated.',
         ]);
