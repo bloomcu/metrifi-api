@@ -5,6 +5,7 @@ namespace DDD\Domain\Funnels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\FunnelStep;
+use DDD\Domain\Messages\Message;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToConnection;
@@ -31,7 +32,6 @@ class Funnel extends Model
         });
     }
 
-
     /**
      * Steps associated with the funnel.
      *
@@ -40,5 +40,15 @@ class Funnel extends Model
     public function steps()
     {
         return $this->hasMany(FunnelStep::class)->orderBy('order');
+    }
+
+    /**
+     * Messages associated with the funnel.
+     *
+     * @return hasMany
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class)->latest();
     }
 }

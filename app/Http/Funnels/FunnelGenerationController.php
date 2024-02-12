@@ -8,9 +8,8 @@ use DDD\Domain\Funnels\Resources\FunnelStepResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Funnels\Jobs\GenerateFunnelStepsJob;
 use DDD\Domain\Funnels\Funnel;
-use DDD\Domain\Funnels\Actions\GetValidPagePaths;
 use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
-use DDD\Domain\Funnels\Actions\GetEndpointSegments;
+use DDD\Domain\Funnels\Actions\GetOutboundLinksAction;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
@@ -55,5 +54,21 @@ class FunnelGenerationController extends Controller
         return response()->json([
             'message' => 'Funnel steps are being generated.',
         ]);
+    }
+
+    public function generateFunnelOutboundLinksMessage(Organization $organization, Funnel $funnel)
+    {
+        $links = GetOutBoundLinksAction::run($funnel);
+
+        // Create a message for the funnel
+        if ($links) {
+            $funnel->messages()->create([
+                'type' => 'info',
+                'title' => count($links) . ' outbound link(s) found',
+                'json' => $links,
+            ]);
+        }
+
+        return response()->json(['data' => $links]);
     }
 }

@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('generate')->group(function() {
             Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
             Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
+            Route::get('/outbound-links/{funnel}', [FunnelGenerationController::class, 'generateFunnelOutboundLinksMessage']);
         });
 
         // Funnels

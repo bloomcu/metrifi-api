@@ -22,7 +22,7 @@ class GenerateFunnelStepsJob implements ShouldQueue
      *
      * @var int
      */
-    public $backoff = 60;
+    public $backoff = 10;
 
     public $funnel;
     public $terminalPagePath;
