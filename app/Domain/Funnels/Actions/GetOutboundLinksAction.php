@@ -17,30 +17,32 @@ class GetOutboundLinksAction
      */
     function handle(Funnel $funnel)
     {   
+        if (!$funnel->steps()->exists()) {
+            throw new \Exception('No steps found for funnel');
+        }
+        
+        // Get the measurable for the last step of the funnel
+        // TODO: Consider refactoring this to use a terminal page path from a funnel column
+        $max = $funnel->steps()->max('order');
+        $lastStep = $funnel->steps()->where('order', $max)->first();
+        $terminalPagePath = $lastStep->measurables[0]['measurable'];
+
+        // Get outbound clicks from GA
         $report = GoogleAnalyticsData::fetchOutboundClicks(
             connection: $funnel->connection, 
             startDate: '28daysAgo',
             endDate: 'today',
         );
 
-        // Get the measurable for the last step of the funnel
-        // TODO: This is a temporary solution. We need to refactor this to get the terminal page path from the funnel
-        $lastStep = $funnel->steps()->latest()->first();
-        $terminalPagePath = $lastStep->measurables[0]['measurable'];
-
-        return $this->findOutboundLinks($report['rows'], $terminalPagePath);
-    }
-
-    private function findOutboundLinks($rows, $pagePath) {
+        // Find outbound links that were clicked on the terminal page path page
         $links = [];
-
-        foreach ($rows as $row) {
+        foreach ($report['rows'] as $row) {
             // Dimension values include the link URL, link domain, and page path for each row.
             $dimensionValues = isset($row['dimensionValues']) ? $row['dimensionValues'] : [];
 
             if (count($dimensionValues) == 3) {
                 // The third item in "dimensionValues" represents the page path
-                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] == $pagePath) {
+                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] == $terminalPagePath) {
                     // The first item in "dimensionValues" represents the link URL
                     $links[] = isset($dimensionValues[0]['value']) ? $dimensionValues[0]['value'] : '';
                 }

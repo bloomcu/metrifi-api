@@ -8,8 +8,9 @@ use DDD\Domain\Funnels\Resources\FunnelStepResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Funnels\Jobs\GenerateFunnelStepsJob;
 use DDD\Domain\Funnels\Funnel;
-use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
 use DDD\Domain\Funnels\Actions\GetOutboundLinksAction;
+use DDD\Domain\Funnels\Actions\GetFunnelStepsAction;
+use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
@@ -44,20 +45,22 @@ class FunnelGenerationController extends Controller
 
     public function generateFunnelSteps(Organization $organization, Funnel $funnel, Request $request)
     {
-        GenerateFunnelStepsJob::dispatch($funnel, $request->terminalPagePath);
+        $steps = GetFunnelStepsAction::run($funnel, $request->terminalPagePath);
 
-        $funnel->update([
-            'automating' => true,
-            'automation_msg' => null,
-        ]);
+        // Create funnel steps.
+        foreach ($steps as $key => $pagePath) {
+            $funnel->steps()->create([
+                'order' => $key + 1,
+                'name' => $pagePath,
+                'measurables' => [
+                    [
+                        'metric' => 'pageViews',
+                        'measurable' => $pagePath,
+                    ]
+                ]
+            ]);
+        }
 
-        return response()->json([
-            'message' => 'Funnel steps are being generated.',
-        ]);
-    }
-
-    public function generateFunnelOutboundLinksMessage(Organization $organization, Funnel $funnel)
-    {
         $links = GetOutBoundLinksAction::run($funnel);
 
         // Create a message for the funnel
@@ -69,6 +72,23 @@ class FunnelGenerationController extends Controller
             ]);
         }
 
-        return response()->json(['data' => $links]);
+        // return FunnelStepResource::collection($funnel->steps);
+        return new FunnelResource($funnel);
     }
+
+    // public function generateFunnelOutboundLinksMessage(Organization $organization, Funnel $funnel)
+    // {
+    //     $links = GetOutBoundLinksAction::run($funnel);
+
+    //     // Create a message for the funnel
+    //     if ($links) {
+    //         $funnel->messages()->create([
+    //             'type' => 'info',
+    //             'title' => count($links) . ' outbound link(s) found',
+    //             'json' => $links,
+    //         ]);
+    //     }
+
+    //     return response()->json(['data' => $funnel->messages], 200);
+    // }
 }
