@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Funnels\Funnel;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class GetFunnelStepsAction
+class GenerateFunnelStepsAction
 {
     use AsAction;
 
@@ -18,7 +18,24 @@ class GetFunnelStepsAction
         // Validate the segments as having traffic
         $validPagePaths = $this->validatePagePaths($funnel, $pagePaths);
 
-        return $validPagePaths;
+        // Create funnel steps.
+        $steps = [];
+        foreach ($validPagePaths as $key => $pagePath) {
+            $step = $funnel->steps()->create([
+                'order' => $key + 1,
+                'name' => $pagePath,
+                'measurables' => [
+                    [
+                        'metric' => 'pageViews',
+                        'measurable' => $pagePath,
+                    ]
+                ]
+            ]);
+
+            array_push($steps, $step);
+        }
+
+        return $steps;
     }
 
     private function segmentTerminalPagePath(string $terminalPagePath) {

@@ -7,7 +7,7 @@ use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class GetOutboundLinksAction
+class GenerateOutBoundLinksMessageAction
 {
     use AsAction;
 
@@ -19,8 +19,17 @@ class GetOutboundLinksAction
 
         $report = $this->getOutboundLinksReport($funnel->connection);
         $terminalPagePath = $this->getFunnelLastStepTerminalPagePath($funnel);
+        $links = $this->getOutboundLinksByPagePath($report, $terminalPagePath);
 
-        return $this->getOutboundLinksByPagePath($report, $terminalPagePath);
+        if ($links) {
+            return $funnel->messages()->create([
+                'type' => 'info',
+                'title' => count($links) . ' outbound link(s) found',
+                'json' => $links,
+            ]);
+        }
+
+        return null;
     }
 
     private function getOutboundLinksByPagePath(array $report, string $terminalPagePath) {
@@ -44,9 +53,11 @@ class GetOutboundLinksAction
     }
 
     private function getFunnelLastStepTerminalPagePath(Funnel $funnel) {
-        $lastStep = $funnel->steps()->orderBy('order', 'desc')->first();
+        $max = $funnel->steps()->max('order');
+        $lastStep = $funnel->steps()->where('order', $max)->first();
+        $lastStepPath = $lastStep->measurables[0]['measurable'];
 
-        return $lastStep->measurables[0]['measurable'];
+        return $lastStepPath;
     }
 
     private function getOutboundLinksReport(Connection $connection) {

@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class GetFunnelEndpointsAction
+class GenerateFunnelEndpointsAction
 {
     use AsAction;
 
