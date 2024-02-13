@@ -29,6 +29,7 @@ class Funnel extends Model
 
         self::deleting(function (Funnel $funnel) {
             $funnel->steps()->delete();
+            $funnel->messages()->delete();
         });
     }
 
