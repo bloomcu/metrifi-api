@@ -26,7 +26,7 @@ class FunnelGenerationController extends Controller
 
         // Create an array of jobs
         $jobs = [];
-        $max = 100;
+        $max = 250;
         $count = 0;
         foreach ($endpoints as $terminalPagePath) {
             if (++$count === $max + 1) break;
@@ -38,7 +38,7 @@ class FunnelGenerationController extends Controller
             // All jobs complete successfully
             $organization->update([
                 'automating' => false,
-                'automation_msg' => 'Funnels have been generated from ' . $batch->totalJobs . ' endpoints.',
+                'automation_msg' => null,
             ]);
         })->catch(function (Batch $batch, Throwable $e) use ($organization) {
             // First batch job that fails
@@ -52,12 +52,12 @@ class FunnelGenerationController extends Controller
         // Update organization to indicate that funnels are being generated.
         $organization->update([
             'automating' => true,
-            'automation_msg' => 'Funnels are being generated from ' . count($endpoints) . ' endpoints.'
+            'automation_msg' => count($endpoints) . ' funnels are being generated. Please wait.'
         ]);
 
         return response()->json([
             'data' => $endpoints,
-            'message' => 'Funnels are being generated from ' . count($endpoints) . ' endpoints on batch id ' . $batch->id . '.'
+            'message' => count($endpoints) . ' funnels are being generated. Please wait.'
         ], 202);
     }
 
