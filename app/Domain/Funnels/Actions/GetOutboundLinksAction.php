@@ -3,39 +3,30 @@
 namespace DDD\Domain\Funnels\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use DDD\Domain\Pages\Page;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
 class GetOutboundLinksAction
 {
     use AsAction;
 
-    /**
-     * @param  Page  $page
-     * @return string
-     */
     function handle(Funnel $funnel)
     {   
         if (!$funnel->steps()->exists()) {
             throw new \Exception('No steps found for funnel');
         }
-        
-        // Get the measurable for the last step of the funnel
-        // TODO: Consider refactoring this to use a terminal page path from a funnel column
-        $max = $funnel->steps()->max('order');
-        $lastStep = $funnel->steps()->where('order', $max)->first();
-        $terminalPagePath = $lastStep->measurables[0]['measurable'];
 
-        // Get outbound clicks from GA
-        $report = GoogleAnalyticsData::fetchOutboundClicks(
-            connection: $funnel->connection, 
-            startDate: '28daysAgo',
-            endDate: 'today',
-        );
+        $report = $this->getOutboundLinksReport($funnel->connection);
+        $terminalPagePath = $this->getFunnelLastStepTerminalPagePath($funnel);
 
+        return $this->getOutboundLinksByPagePath($report, $terminalPagePath);
+    }
+
+    private function getOutboundLinksByPagePath(array $report, string $terminalPagePath) {
         // Find outbound links that were clicked on the terminal page path page
         $links = [];
+
         foreach ($report['rows'] as $row) {
             // Dimension values include the link URL, link domain, and page path for each row.
             $dimensionValues = isset($row['dimensionValues']) ? $row['dimensionValues'] : [];
@@ -50,5 +41,19 @@ class GetOutboundLinksAction
         }
 
         return $links;
+    }
+
+    private function getFunnelLastStepTerminalPagePath(Funnel $funnel) {
+        $lastStep = $funnel->steps()->orderBy('order', 'desc')->first();
+
+        return $lastStep->measurables[0]['measurable'];
+    }
+
+    private function getOutboundLinksReport(Connection $connection) {
+        return GoogleAnalyticsData::fetchOutboundClicks(
+            connection: $connection, 
+            startDate: '28daysAgo',
+            endDate: 'today',
+        );
     }
 }

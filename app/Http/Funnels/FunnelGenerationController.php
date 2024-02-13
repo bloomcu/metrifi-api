@@ -72,8 +72,8 @@ class FunnelGenerationController extends Controller
             ]);
         }
 
-        // return FunnelStepResource::collection($funnel->steps);
-        return new FunnelResource($funnel);
+        return FunnelStepResource::collection($funnel->steps);
+        // return new FunnelResource($funnel);
     }
 
     // public function generateFunnelOutboundLinksMessage(Organization $organization, Funnel $funnel)

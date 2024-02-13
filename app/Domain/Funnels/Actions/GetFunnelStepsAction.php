@@ -3,7 +3,6 @@
 namespace DDD\Domain\Funnels\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use DDD\Domain\Pages\Page;
 use DDD\Domain\Funnels\Funnel;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
@@ -11,10 +10,6 @@ class GetFunnelStepsAction
 {
     use AsAction;
 
-    /**
-     * @param  Page  $page
-     * @return string
-     */
     function handle(Funnel $funnel, string $terminalPagePath)
     {   
         // Break terminal page path into segments
