@@ -10,7 +10,7 @@ use DDD\Domain\Funnels\Jobs\GenerateFunnelStepsJob;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\GetOutboundLinksAction;
 use DDD\Domain\Funnels\Actions\GetFunnelStepsAction;
-use DDD\Domain\Funnels\Actions\GetFunnelEndpoints;
+use DDD\Domain\Funnels\Actions\GetFunnelEndpointsAction;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
@@ -19,13 +19,13 @@ class FunnelGenerationController extends Controller
     public function generateFunnels(Organization $organization, Connection $connection, Request $request)
     {
         // Get all endpoints that funnels could be generated from.
-        $action = GetFunnelEndpoints::run($connection, $request->startingPagePath);
-        
-        $max = 100;
+        $endpoints = GetFunnelEndpointsAction::run($connection, $request->startingPagePath);
+
+        $max = 10;
         $count = 0;
         $funnels = [];
 
-        foreach ($action->data->pagePaths as $terminalPagePath) {
+        foreach ($endpoints as $terminalPagePath) {
             if (++$count === $max + 1) break;
             
             $funnel = $organization->funnels()->create([
