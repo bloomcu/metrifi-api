@@ -24,8 +24,11 @@ class GenerateOutBoundLinksMessageAction
         if ($links) {
             return $funnel->messages()->create([
                 'type' => 'info',
-                'title' => count($links) . ' outbound link(s) found',
-                'json' => $links,
+                'title' => count($links) . ' outbound link(s) found for the final step of the funnel.',
+                'json' => [
+                    'links' => $links,
+                    'pagePath' => $terminalPagePath,
+                ],
             ]);
         }
 
