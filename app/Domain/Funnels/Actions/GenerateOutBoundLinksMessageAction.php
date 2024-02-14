@@ -36,6 +36,10 @@ class GenerateOutBoundLinksMessageAction
         // Find outbound links that were clicked on the terminal page path page
         $links = [];
 
+        if (!isset($report['rows'])) {
+            return $links;
+        }
+        
         foreach ($report['rows'] as $row) {
             // Dimension values include the link URL, link domain, and page path for each row.
             $dimensionValues = isset($row['dimensionValues']) ? $row['dimensionValues'] : [];
