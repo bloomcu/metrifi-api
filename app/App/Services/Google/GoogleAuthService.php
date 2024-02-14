@@ -52,9 +52,29 @@ class GoogleAuthService
         return $this->client->createAuthUrl();
     }
 
+    /**
+     * Chain this to add a different scope value to the request
+     * 
+     * E.g., GoogleAuth::addScope('https://www.googleapis.com/auth/userinfo.email')->getAuthUrl();
+     */
     public function addScope(string $scope): GoogleAuthService
     {
         $this->client->addScope($scope);
+
+        return $this;
+    }
+
+    /**
+     * Chain this to add a state value to the request
+     * 
+     * Recommended, call the setState function. Using a state value can increase your assurance that
+     * an incoming connection is the result of an authentication request.
+     * 
+     * E.g., GoogleAuth::setState('sample_passthrough_value')->getAuthUrl();
+     */
+    public function setState(string $state): GoogleAuthService
+    {
+        $this->client->setState($state);
 
         return $this;
     }
