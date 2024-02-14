@@ -30,7 +30,7 @@ class GenerateFunnelEndpointsAction
 
         // Filter paths to include only items that start and end with "/"
         $allPaths = array_filter($allPaths, function($path) {
-            return strncmp($path, "/", 1) === 0 && substr($path, -1) === "/";
+            return strncmp($path, "/", 1) === 0;
         });
     
         // Identify terminal page paths
