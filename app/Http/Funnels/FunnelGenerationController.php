@@ -24,6 +24,12 @@ class FunnelGenerationController extends Controller
         // Get all endpoints that funnels could be generated from.
         $endpoints = GenerateFunnelEndpointsAction::run($connection, $request->startingPagePath);
 
+        if (!$endpoints) {
+            return response()->json([
+                'message' => 'No funnels could be generated from the provided starting page path.'
+            ], 400);
+        }
+
         // Create an array of jobs
         $jobs = [];
         $max = 250;
