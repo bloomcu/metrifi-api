@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);
             Route::post('', [ConnectionController::class, 'store']);
+            Route::delete('/{connection}', [ConnectionController::class, 'destroy']);
         });
 
         // Funnel generation

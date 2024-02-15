@@ -6,6 +6,7 @@ namespace DDD\Http\Connections;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Connections\Resources\ConnectionResource;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
 class ConnectionController extends Controller
@@ -25,6 +26,13 @@ class ConnectionController extends Controller
             'uid' => $request->uid,
             'token' => $request->token,
         ]);
+
+        return new ConnectionResource($connection);
+    }
+
+    public function destroy(Organization $organization, Connection $connection)
+    {
+        $connection->delete();
 
         return new ConnectionResource($connection);
     }
