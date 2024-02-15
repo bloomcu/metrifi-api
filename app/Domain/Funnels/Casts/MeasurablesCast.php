@@ -3,8 +3,9 @@
 namespace DDD\Domain\Funnels\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use DDD\Domain\Funnels\DTO\Metric;
 
-class FunnelStepMeasurables implements CastsAttributes
+class MeasurablesCast implements CastsAttributes
 {
     /**
      * Cast the given value.
@@ -17,11 +18,15 @@ class FunnelStepMeasurables implements CastsAttributes
      */
     public function get($model, string $key, $value, array $attributes)
     {
-        $value = isset($value) ? json_decode($value, true) : [];
+        return collect(json_decode($value, true))->map(function ($metric) {
+            $defaults = [
+                'connection_id' => null,
+                'metric' => 'pageViews',
+                'measurable' => null,
+            ];
 
-        $defaults = [];
-
-        return array_merge($defaults, $value);
+            return array_merge($defaults, $metric);
+        });
     }
 
     /**
