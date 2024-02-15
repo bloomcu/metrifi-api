@@ -19,6 +19,7 @@ class FunnelResource extends JsonResource
         return [
             'id' => $this->id,
             'user' => new UserResource($this->user),
+            'connection_id' => $this->connection_id,
             'connection' => new ConnectionResource($this->connection),
             'name' => $this->name,
             'description' => $this->description,
