@@ -20,6 +20,7 @@
         "laravel/framework": "^9.17",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.7",
+        "laravel/vapor-core": "^2.36",
         "league/flysystem-aws-s3-v3": "^3.0",
         "lorisleiva/laravel-actions": "^2.7",
         "openai-php/laravel": "^0.8.1",
