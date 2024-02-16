@@ -5,6 +5,7 @@ namespace DDD\Domain\Funnels\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Connections\Resources\ConnectionResource;
 use DDD\Domain\Base\Users\Resources\UserResource;
+use DDD\Domain\Organizations\Resources\OrganizationResource;
 
 class FunnelResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class FunnelResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
             'connection_id' => $this->connection_id,
             'connection' => new ConnectionResource($this->connection),
