@@ -13,7 +13,15 @@ trait IsOrderable
     protected static function bootIsOrderable(): void
     {
         static::creating(function (Model $model) {
-            $model->setHighestOrderNumber();
+            if (!request()->order) {
+                $model->setHighestOrderNumber();
+            }
+        });
+
+        static::updating(function (Model $model) {
+            if (request()->order) {
+                $model->reorder(request()->order);
+            }
         });
     }
 

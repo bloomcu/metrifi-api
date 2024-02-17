@@ -2,11 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Services\Google\GoogleAuthController;
-use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataExportToCSVController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Funnels\FunnelStepController;
+use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
+use DDD\Http\Funnels\FunnelAutomationsController;
 use DDD\Http\Connections\ConnectionController;
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -24,9 +25,11 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
-        Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
-        Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
-        Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
+        Route::post('page-views/{connection}', [GoogleAnalyticsDataController::class, 'fetchPageViews']);
+        Route::post('outbound-clicks/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicks']);
+        // Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
+        // Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
+        // Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
@@ -34,6 +37,14 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);
             Route::post('', [ConnectionController::class, 'store']);
+            Route::delete('/{connection}', [ConnectionController::class, 'destroy']);
+        });
+
+        // Funnel generation
+        Route::prefix('generate')->group(function() {
+            Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
+            Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
+            Route::get('/outbound-links/{funnel}', [FunnelGenerationController::class, 'generateFunnelOutboundLinksMessage']);
         });
 
         // Funnels

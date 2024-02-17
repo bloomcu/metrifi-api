@@ -5,15 +5,15 @@ namespace DDD\Http\Connections;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Connections\Resources\ConnectionResource;
+use DDD\Domain\Connections\Connection;
 use DDD\App\Controllers\Controller;
 
 class ConnectionController extends Controller
 {
     public function index(Organization $organization)
     {   
-        return response()->json([
-            'data' => $organization->connections
-        ], 200);
+        return ConnectionResource::collection($organization->connections);
     }
 
     public function store(Organization $organization, Request $request)
@@ -21,13 +21,19 @@ class ConnectionController extends Controller
         $connection = $organization->connections()->create([
             'user_id' => auth()->user()->id,
             'service' => $request->service,
+            'account_name' => $request->account_name,
             'name' => $request->name,
             'uid' => $request->uid,
             'token' => $request->token,
         ]);
 
-        return response()->json([
-            'data' => $connection
-        ], 200);
+        return new ConnectionResource($connection);
+    }
+
+    public function destroy(Organization $organization, Connection $connection)
+    {
+        $connection->delete();
+
+        return new ConnectionResource($connection);
     }
 }

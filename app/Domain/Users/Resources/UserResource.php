@@ -1,11 +1,10 @@
 <?php
 
-namespace DDD\Domain\Connections\Resources;
+namespace DDD\Domain\Users\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use DDD\Domain\Users\Resources\UserResource;
 
-class ConnectionResource extends JsonResource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,13 +16,10 @@ class ConnectionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->user),
-            'service' => $this->service,
-            'account_name' => $this->account_name,
             'name' => $this->name,
-            'uid' => $this->uid,
+            'email' => $this->email,
+            'role' => $this->role,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

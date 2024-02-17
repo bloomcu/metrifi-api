@@ -13,14 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('funnel_steps', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('funnel_id');
             $table->string('type');
-            $table->integer('order')->nullable();
-            $table->string('name')->nullable();
-            $table->string('description')->nullable();
-            $table->json('expression')->nullable();
+            $table->string('title')->nullable();
+            $table->text('content')->nullable();
+            $table->json('json')->nullable();
             $table->timestamps();
 
             // Foreign constraints
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funnel_steps');
+        Schema::dropIfExists('messages');
     }
 };

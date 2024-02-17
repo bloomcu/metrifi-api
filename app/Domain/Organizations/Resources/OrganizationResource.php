@@ -1,11 +1,8 @@
 <?php
 
-namespace DDD\Domain\Base\Organizations\Resources;
+namespace DDD\Domain\Organizations\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-
-// Resources
-use DDD\Domain\Base\Subscriptions\Plans\Resources\PlanResource;
 
 class OrganizationResource extends JsonResource
 {
@@ -23,10 +20,7 @@ class OrganizationResource extends JsonResource
             'slug' => $this->slug,
             'automating' => $this->automating,
             'automation_msg' => $this->automation_msg,
-            // 'user_count' => $this->userCount(),
-            'subscribed' => $this->subscribed('default'),
-            'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
-            'plan' => new PlanResource($this->plan),
+            'created_at' => $this->created_at,
         ];
     }
 }

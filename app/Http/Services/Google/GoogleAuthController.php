@@ -15,7 +15,9 @@ class GoogleAuthController extends Controller
      */
     public function connect(Request $request)
     {
-        $url = GoogleAuth::addScope($request->scope)->getAuthUrl();
+        $url = GoogleAuth::addScope($request->scope)
+            ->setState($request->state)
+            ->getAuthUrl();
         
         return response()->json([
             'url' => $url

@@ -20,6 +20,83 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
+    public function fetchPageViews(Connection $connection, $startDate, $endDate, $pagePaths = null)
+    {
+        
+        // By default, return all pages where path begins with '/'
+        $pagePathsExpression = [
+            'filter' => [
+                'fieldName' => 'pagePath',
+                'stringFilter' => [
+                    'matchType' => 'BEGINS_WITH',
+                    'value' => '/'
+                ]
+            ]
+        ];
+
+        // If specific page paths are being requested, rebuild the filter expression
+        if ($pagePaths) {
+            $pagePathsExpression = collect($pagePaths)->map(fn ($path) => [
+                'filter' => [
+                    'fieldName' => 'pagePath',
+                    'stringFilter' => [
+                        'matchType' => 'EXACT',
+                        'value' => $path
+                    ]
+                ]
+            ])->toArray();
+        }
+
+        // Run the report
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                ['name' => 'pagePath'],
+            ],
+            'metrics' => [
+                ['name' => 'screenPageViews']
+            ],
+            'dimensionFilter' => [
+                'orGroup' => [
+                    'expressions' => [
+                        ...$pagePathsExpression
+                    ]
+                ]
+            ],
+            'limit' => '250',
+            'metricAggregations' => ['TOTAL'],
+        ]);
+    }
+
+    public function fetchOutboundClicks(Connection $connection, $startDate, $endDate)
+    {
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                ['name' => 'linkUrl'],
+                ['name' => 'linkDomain'],
+                ['name' => 'pagePath'],
+            ],
+            'metrics' => [
+                ['name' => 'eventCount']
+            ],
+            'dimensionFilter' => [
+                'filter' => [
+                    'fieldName' => 'linkUrl',
+                    'stringFilter' => [
+                        'matchType' => 'FULL_REGEXP',
+                        'value' => '.+'
+                    ]
+                ]
+            ],
+            'limit' => '250'
+        ]);
+    }
+
     /**
      * Run a report
      * 
@@ -49,53 +126,53 @@ class GoogleAnalyticsDataService
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
      * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
      */
-    public function runFunnelReport(Connection $connection)
-    {
-        $accessToken = $this->setupAccessToken($connection);
+    // public function runFunnelReport(Connection $connection)
+    // {
+    //     $accessToken = $this->setupAccessToken($connection);
 
-        try {
-            $response = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
-            [
-                'dateRanges' => [
-                    'startDate' => '7daysAgo',
-                    'endDate' => 'today'
-                ],
-                'funnel' => [
-                    'isOpenFunnel' => false,
-                    'steps' => [
-                        [
-                            'name' => 'Homepage',
-                            'filterExpression' => [
-                                'funnelFieldFilter' => [
-                                    'fieldName' => 'pageLocation',
-                                    'stringFilter' => [
-                                        'value' => 'https://www.lbsfcu.org/',
-                                        'matchType' => 'EXACT'
-                                    ]
-                                ]
-                            ]
-                        ],
-                        [
-                            'name' => 'Auto Loan',
-                            'filterExpression' => [
-                                'funnelFieldFilter' => [
-                                    'fieldName' => 'pageLocation',
-                                    'stringFilter' => [
-                                        'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
-                                        'matchType' => 'EXACT'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ])->json();
+    //     try {
+    //         $response = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
+    //         [
+    //             'dateRanges' => [
+    //                 'startDate' => '7daysAgo',
+    //                 'endDate' => 'today'
+    //             ],
+    //             'funnel' => [
+    //                 'isOpenFunnel' => false,
+    //                 'steps' => [
+    //                     [
+    //                         'name' => 'Homepage',
+    //                         'filterExpression' => [
+    //                             'funnelFieldFilter' => [
+    //                                 'fieldName' => 'pageLocation',
+    //                                 'stringFilter' => [
+    //                                     'value' => 'https://www.lbsfcu.org/',
+    //                                     'matchType' => 'EXACT'
+    //                                 ]
+    //                             ]
+    //                         ]
+    //                     ],
+    //                     [
+    //                         'name' => 'Auto Loan',
+    //                         'filterExpression' => [
+    //                             'funnelFieldFilter' => [
+    //                                 'fieldName' => 'pageLocation',
+    //                                 'stringFilter' => [
+    //                                     'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
+    //                                     'matchType' => 'EXACT'
+    //                                 ]
+    //                             ]
+    //                         ]
+    //                     ]
+    //                 ]
+    //             ]
+    //         ])->json();
 
-            return $response;
-        } catch (ApiException $ex) {
-            abort(500, 'Call failed with message: %s' . $ex->getMessage());
-        }
-    }
+    //         return $response;
+    //     } catch (ApiException $ex) {
+    //         abort(500, 'Call failed with message: %s' . $ex->getMessage());
+    //     }
+    // }
 
     /**
      * Setup credentials for Analytics Data Client
@@ -117,23 +194,23 @@ class GoogleAnalyticsDataService
      */
      // TODO: We only need this method when using the PHP SDK. When using the REST API, we can just use the access token directly.
      // TODO: Should this be a constructor, or a standalone class or helper?
-    private function setupCredentials(Connection $connection)
-    {
-        $validConnection = GoogleAuth::validateConnection($connection);
+    // private function setupCredentials(Connection $connection)
+    // {
+    //     $validConnection = GoogleAuth::validateConnection($connection);
 
-        $credentials = CredentialsWrapper::build([
-            'keyFile' => [
-                'type'          => 'authorized_user',
-                'client_id'     => config('services.google.client_id'),
-                'client_secret' => config('services.google.client_secret'),
-                'refresh_token' => $validConnection->token['access_token'], // TODO: consider renaming 'token' to 'credentials'
-            ],
-            'scopes'  => [
-                'https://www.googleapis.com/auth/analytics',
-                'https://www.googleapis.com/auth/analytics.readonly',
-            ]
-        ]);
+    //     $credentials = CredentialsWrapper::build([
+    //         'keyFile' => [
+    //             'type'          => 'authorized_user',
+    //             'client_id'     => config('services.google.client_id'),
+    //             'client_secret' => config('services.google.client_secret'),
+    //             'refresh_token' => $validConnection->token['access_token'], // TODO: consider renaming 'token' to 'credentials'
+    //         ],
+    //         'scopes'  => [
+    //             'https://www.googleapis.com/auth/analytics',
+    //             'https://www.googleapis.com/auth/analytics.readonly',
+    //         ]
+    //     ]);
 
-        return $credentials;
-    }
+    //     return $credentials;
+    // }
 }
