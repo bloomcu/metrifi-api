@@ -25,7 +25,7 @@ class GoogleAnalyticsDataService
         // By default, return all pages where path begins with '/'
         $expressions = [
             'filter' => [
-                'fieldName' => 'pagePath',
+                'fieldName' => 'pagePathPlusQueryString',
                 'stringFilter' => [
                     'matchType' => 'BEGINS_WITH',
                     'value' => '/'
@@ -37,7 +37,7 @@ class GoogleAnalyticsDataService
         if ($pagePaths) {
             $expressions = collect($pagePaths)->map(fn ($path) => [
                 'filter' => [
-                    'fieldName' => 'pagePath',
+                    'fieldName' => 'pagePathPlusQueryString',
                     'stringFilter' => [
                         'matchType' => 'EXACT',
                         'value' => $path 
@@ -52,7 +52,7 @@ class GoogleAnalyticsDataService
                 ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
-                ['name' => 'pagePath'],
+                ['name' => 'pagePathPlusQueryString'],
             ],
             'metrics' => [
                 ['name' => 'screenPageViews']
@@ -102,7 +102,7 @@ class GoogleAnalyticsDataService
             'dimensions' => [
                 ['name' => 'linkUrl'],
                 ['name' => 'linkDomain'],
-                ['name' => 'pagePath'],
+                ['name' => 'pagePathPlusQueryString'],
             ],
             'metrics' => [
                 ['name' => 'eventCount']
