@@ -13,6 +13,8 @@ class GenerateOutBoundLinksMessageAction
 
     function handle(Funnel $funnel)
     {   
+        // TODO: Use the method in our GoogleAnalyticsDataService class for this
+        
         if (!$funnel->steps()->exists()) {
             throw new \Exception('No steps found for funnel');
         }
@@ -33,6 +35,22 @@ class GenerateOutBoundLinksMessageAction
         }
 
         return null;
+    }
+
+    private function getOutboundLinksReport(Connection $connection) {
+        return GoogleAnalyticsData::fetchOutboundClicks(
+            connection: $connection, 
+            startDate: '28daysAgo',
+            endDate: 'today',
+        );
+    }
+
+    private function getFunnelLastStepTerminalPagePath(Funnel $funnel) {
+        $max = $funnel->steps()->max('order');
+        $lastStep = $funnel->steps()->where('order', $max)->first();
+        $lastStepPath = $lastStep->measurables[0]['measurable'];
+
+        return $lastStepPath;
     }
 
     private function getOutboundLinksByPagePath(array $report, string $terminalPagePath) {
@@ -57,21 +75,5 @@ class GenerateOutBoundLinksMessageAction
         }
 
         return $links;
-    }
-
-    private function getFunnelLastStepTerminalPagePath(Funnel $funnel) {
-        $max = $funnel->steps()->max('order');
-        $lastStep = $funnel->steps()->where('order', $max)->first();
-        $lastStepPath = $lastStep->measurables[0]['measurable'];
-
-        return $lastStepPath;
-    }
-
-    private function getOutboundLinksReport(Connection $connection) {
-        return GoogleAnalyticsData::fetchOutboundClicks(
-            connection: $connection, 
-            startDate: '28daysAgo',
-            endDate: 'today',
-        );
     }
 }
