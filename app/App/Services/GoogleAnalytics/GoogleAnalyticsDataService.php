@@ -140,19 +140,21 @@ class GoogleAnalyticsDataService
             $metricValues = isset($row['metricValues']) ? $row['metricValues'] : [];
             
             // The third item in "dimensionValues" represents the page path
-            if ($dimensionValues[2]['value'] === $pagePath) {
-                // The metric value represents the event count
-                $clickCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
-
-                // The first item in "dimensionValues" represents the link URL
-                array_push($report['links'], [
-                    'linkUrl' => $dimensionValues[0]['value'],
-                    'linkDomain' => $dimensionValues[1]['value'],
-                    'clicks' => $clickCount
-                ]);
-
-                // Add the event count to the total
-                $report['total'] += $clickCount;
+            if (count($dimensionValues) == 3) {
+                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] === $pagePath) {
+                    // The metric value represents the event count
+                    $eventCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
+    
+                    // The first item in "dimensionValues" represents the link URL
+                    array_push($report['links'], [
+                        'linkUrl' => $dimensionValues[0]['value'],
+                        'linkDomain' => $dimensionValues[1]['value'],
+                        'clicks' => $eventCount
+                    ]);
+    
+                    // Add the event count to the total
+                    $report['total'] += $eventCount;
+                }
             }
         }
 
