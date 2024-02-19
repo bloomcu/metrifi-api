@@ -25,7 +25,7 @@ class GoogleAnalyticsDataService
         // By default, return all pages where path begins with '/'
         $expressions = [
             'filter' => [
-                'fieldName' => 'pagePathPlusQueryString',
+                'fieldName' => 'pagePath',
                 'stringFilter' => [
                     'matchType' => 'BEGINS_WITH',
                     'value' => '/'
@@ -37,7 +37,7 @@ class GoogleAnalyticsDataService
         if ($pagePaths) {
             $expressions = collect($pagePaths)->map(fn ($path) => [
                 'filter' => [
-                    'fieldName' => 'pagePathPlusQueryString',
+                    'fieldName' => 'pagePath',
                     'stringFilter' => [
                         'matchType' => 'EXACT',
                         'value' => $path 
@@ -52,7 +52,7 @@ class GoogleAnalyticsDataService
                 ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
-                ['name' => 'pagePathPlusQueryString'],
+                ['name' => 'pagePath'],
             ],
             'metrics' => [
                 ['name' => 'screenPageViews']
@@ -102,7 +102,7 @@ class GoogleAnalyticsDataService
             'dimensions' => [
                 ['name' => 'linkUrl'],
                 ['name' => 'linkDomain'],
-                ['name' => 'pagePathPlusQueryString'],
+                ['name' => 'pagePath'],
             ],
             'metrics' => [
                 ['name' => 'eventCount']
@@ -122,7 +122,7 @@ class GoogleAnalyticsDataService
     public function fetchOutboundClicksByPagePath(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null, $pagePath)
     {
         $fullReport = $this->fetchOutboundClicks($connection, $startDate, $endDate, $outboundLinkUrls);
-
+        
         $report = [
             'links' => [],
             'total' => 0
@@ -139,21 +139,20 @@ class GoogleAnalyticsDataService
             // Metric value represents the event count
             $metricValues = isset($row['metricValues']) ? $row['metricValues'] : [];
             
-            if (count($dimensionValues) == 3) {
-                // The third item in "dimensionValues" represents the page path
-                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] === $pagePath) {
-                    // The metric value represents the event count
-                    $eventCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
+            // The third item in "dimensionValues" represents the page path
+            if ($dimensionValues[2]['value'] === $pagePath) {
+                // The metric value represents the event count
+                $clickCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
 
-                    // The first item in "dimensionValues" represents the link URL
-                    array_push($report['links'], [
-                        'linkUrl' => isset($dimensionValues[0]['value']) ? $dimensionValues[0]['value'] : '',
-                        'clicks' => $eventCount,
-                    ]);
+                // The first item in "dimensionValues" represents the link URL
+                array_push($report['links'], [
+                    'linkUrl' => $dimensionValues[0]['value'],
+                    'linkDomain' => $dimensionValues[1]['value'],
+                    'clicks' => $clickCount
+                ]);
 
-                    // Add the event count to the total
-                    $report['total'] += $eventCount;
-                }
+                // Add the event count to the total
+                $report['total'] += $clickCount;
             }
         }
 
