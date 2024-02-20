@@ -139,9 +139,9 @@ class GoogleAnalyticsDataService
             // Metric value represents the event count
             $metricValues = isset($row['metricValues']) ? $row['metricValues'] : [];
             
-            if (count($dimensionValues) == 3) {
+            if (count($dimensionValues) == 2) {
                 // The third item in "dimensionValues" represents the page path
-                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] === $pagePath) {
+                if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] === $pagePath) {
                     // The metric value represents the event count
                     $eventCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
 
