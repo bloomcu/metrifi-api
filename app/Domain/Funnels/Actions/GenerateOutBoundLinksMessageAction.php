@@ -65,9 +65,9 @@ class GenerateOutBoundLinksMessageAction
             // Dimension values include the link URL, link domain, and page path for each row.
             $dimensionValues = isset($row['dimensionValues']) ? $row['dimensionValues'] : [];
 
-            if (count($dimensionValues) == 3) {
+            if (count($dimensionValues) == 2) {
                 // The third item in "dimensionValues" represents the page path
-                if (isset($dimensionValues[2]['value']) && $dimensionValues[2]['value'] == $terminalPagePath) {
+                if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] == $terminalPagePath) {
                     // The first item in "dimensionValues" represents the link URL
                     $links[] = isset($dimensionValues[0]['value']) ? $dimensionValues[0]['value'] : '';
                 }
