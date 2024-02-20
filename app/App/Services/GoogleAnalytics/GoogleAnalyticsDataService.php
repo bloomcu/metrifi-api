@@ -22,9 +22,8 @@ class GoogleAnalyticsDataService
 {
     public function fetchPageViews(Connection $connection, $startDate, $endDate, $pagePaths = null)
     {
-        
         // By default, return all pages where path begins with '/'
-        $pagePathsExpression = [
+        $expressions = [
             'filter' => [
                 'fieldName' => 'pagePath',
                 'stringFilter' => [
@@ -34,14 +33,14 @@ class GoogleAnalyticsDataService
             ]
         ];
 
-        // If specific page paths are being requested, rebuild the filter expression
+        // If specific page paths are being requested, filter on them
         if ($pagePaths) {
-            $pagePathsExpression = collect($pagePaths)->map(fn ($path) => [
+            $expressions = collect($pagePaths)->map(fn ($path) => [
                 'filter' => [
                     'fieldName' => 'pagePath',
                     'stringFilter' => [
                         'matchType' => 'EXACT',
-                        'value' => $path
+                        'value' => $path 
                     ]
                 ]
             ])->toArray();
@@ -61,7 +60,7 @@ class GoogleAnalyticsDataService
             'dimensionFilter' => [
                 'orGroup' => [
                     'expressions' => [
-                        ...$pagePathsExpression
+                        ...$expressions
                     ]
                 ]
             ],
@@ -70,31 +69,96 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function fetchOutboundClicks(Connection $connection, $startDate, $endDate)
+    public function fetchOutboundClicks(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null)
     {
+        // By default, return all outbound link clicks
+        $expressions = [
+            'filter' => [
+                'fieldName' => 'linkUrl',
+                'stringFilter' => [
+                    'matchType' => 'FULL_REGEXP',
+                    'value' => '.+' // Match any page path
+                ]
+            ]
+        ];
+
+        // If outbound link urls are specified, filter on them
+        if ($outboundLinkUrls) {
+            $expressions = collect($outboundLinkUrls)->map(fn ($linkUrl) => [
+                'filter' => [
+                    'fieldName' => 'linkUrl',
+                    'stringFilter' => [
+                        'matchType' => 'EXACT',
+                        'value' => $linkUrl
+                    ]
+                ]
+            ])->toArray();
+        }
+        
         return $this->runReport($connection, [
             'dateRanges' => [
                 ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
                 ['name' => 'linkUrl'],
-                ['name' => 'linkDomain'],
+                // ['name' => 'linkDomain'],
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
                 ['name' => 'eventCount']
             ],
             'dimensionFilter' => [
-                'filter' => [
-                    'fieldName' => 'linkUrl',
-                    'stringFilter' => [
-                        'matchType' => 'FULL_REGEXP',
-                        'value' => '.+'
+                'orGroup' => [
+                    'expressions' => [
+                        ...$expressions
                     ]
                 ]
             ],
-            'limit' => '250'
+            'limit' => '250',
+            'metricAggregations' => ['TOTAL'],
         ]);
+    }
+
+    public function fetchOutboundClicksByPagePath(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null, $pagePath)
+    {
+        $fullReport = $this->fetchOutboundClicks($connection, $startDate, $endDate, $outboundLinkUrls);
+        
+        $report = [
+            'links' => [],
+            'total' => 0
+        ];
+
+        if (!isset($fullReport['rows'])) {
+            return $report;
+        }
+
+        foreach ($fullReport['rows'] as $row) {
+            // Dimension values include the link URL, link domain, and page path for each row.
+            $dimensionValues = isset($row['dimensionValues']) ? $row['dimensionValues'] : [];
+
+            // Metric value represents the event count
+            $metricValues = isset($row['metricValues']) ? $row['metricValues'] : [];
+            
+            // The second item in "dimensionValues" represents the page path
+            if (count($dimensionValues) == 2) {
+                if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] === $pagePath) {
+                    // The metric value represents the event count
+                    $eventCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
+    
+                    // The first item in "dimensionValues" represents the link URL
+                    array_push($report['links'], [
+                        'linkUrl' => $dimensionValues[0]['value'],
+                        // 'linkDomain' => $dimensionValues[1]['value'],
+                        'clicks' => $eventCount
+                    ]);
+    
+                    // Add the event count to the total
+                    $report['total'] += $eventCount;
+                }
+            }
+        }
+
+        return $report;
     }
 
     /**

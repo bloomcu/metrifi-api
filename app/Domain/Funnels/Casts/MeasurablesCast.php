@@ -22,6 +22,7 @@ class MeasurablesCast implements CastsAttributes
             $defaults = [
                 'connection_id' => null,
                 'metric' => 'pageViews',
+                'pagePath' => null,
                 'measurable' => null,
             ];
 

@@ -28,7 +28,23 @@ class GoogleAnalyticsDataController extends Controller
         $report = GoogleAnalyticsData::fetchOutboundClicks(
             connection: $connection, 
             startDate: $request->startDate, 
-            endDate: $request->endDate
+            endDate: $request->endDate,
+            outboundLinkUrls: $request->outboundLinkUrls,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
+    public function fetchOutboundClicksByPagePath(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::fetchOutboundClicksByPagePath(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate,
+            outboundLinkUrls: $request->outboundLinkUrls,
+            pagePath: $request->pagePath,
         );
 
         return response()->json([
