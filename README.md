@@ -9,6 +9,11 @@ Start workers
 php artisan queue:work
 ```
 
+Specify queue and sleep parameters
+```
+php artisan queue:work --queue=funnels --sleep=3
+```
+
 Restart workers
 ```
 php artisan queue:restart
