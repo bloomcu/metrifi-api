@@ -4,6 +4,7 @@ namespace DDD\Domain\Organizations;
 
 // Domains
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Connections\Connection;
 use DDD\Domain\Base\Organizations\Organization as BaseOrganization;
 
@@ -26,5 +27,15 @@ class Organization extends BaseOrganization {
     public function funnels()
     {
         return $this->hasMany(Funnel::class)->latest();
+    }
+
+    /**
+     * Dashboards associated with the organization.
+     *
+     * @return hasMany
+     */
+    public function dashboards()
+    {
+        return $this->hasMany(Dashboard::class)->latest();
     }
 }

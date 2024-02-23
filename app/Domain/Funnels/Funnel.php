@@ -2,14 +2,15 @@
 
 namespace DDD\Domain\Funnels;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use DDD\Domain\Funnels\FunnelStep;
 use DDD\Domain\Messages\Message;
+use DDD\Domain\Funnels\FunnelStep;
+use DDD\Domain\Dashboards\Dashboard;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToConnection;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Funnel extends Model
 {
@@ -51,5 +52,15 @@ class Funnel extends Model
     public function messages()
     {
         return $this->hasMany(Message::class)->latest();
+    }
+
+    /**
+     * Dashboards this funnel is associated with.
+     *
+     * @return BelongsToMany
+     */
+    public function dashboards()
+    {
+        return $this->belongsToMany(Dashboard::class);
     }
 }

@@ -7,7 +7,8 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
-use DDD\Http\Funnels\FunnelAutomationsController;
+use DDD\Http\Dashboards\DashboardFunnelController;
+use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -41,13 +42,6 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::delete('/{connection}', [ConnectionController::class, 'destroy']);
         });
 
-        // Funnel generation
-        Route::prefix('generate')->group(function() {
-            Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
-            Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
-            Route::get('/outbound-links/{funnel}', [FunnelGenerationController::class, 'generateFunnelOutboundLinksMessage']);
-        });
-
         // Funnels
         Route::prefix('funnels')->group(function() {
             Route::get('/', [FunnelController::class, 'index']);
@@ -61,6 +55,28 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/', [FunnelStepController::class, 'store']);
                 Route::put('/{step}', [FunnelStepController::class, 'update']);
                 Route::delete('/{step}', [FunnelStepController::class, 'destroy']);
+            });
+        });
+
+        // Funnel generation
+        Route::prefix('generate')->group(function() {
+            Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
+            Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
+            Route::get('/outbound-links/{funnel}', [FunnelGenerationController::class, 'generateFunnelOutboundLinksMessage']);
+        });
+
+        // Dashboards
+        Route::prefix('dashboards')->group(function() {
+            Route::get('/', [DashboardController::class, 'index']);
+            Route::post('/', [DashboardController::class, 'store']);
+            Route::get('/{dashboard}', [DashboardController::class, 'show']);
+            Route::put('/{dashboard}', [DashboardController::class, 'update']);
+            Route::delete('/{dashboard}', [DashboardController::class, 'destroy']);
+
+            // Dashboard funnels
+            Route::prefix('{dashboard}/funnels')->group(function() {
+                Route::post('/attach', [DashboardFunnelController::class, 'attach']);
+                Route::post('/detach', [DashboardFunnelController::class, 'detach']);
             });
         });
     }); 
