@@ -13,23 +13,31 @@ class DashboardFunnelController extends Controller
 {
     public function attach(Organization $organization, Dashboard $dashboard, Request $request)
     {
-        $funnel = Funnel::findOrFail($request->funnel_id);
-
-        $dashboard->funnels()->attach($funnel->id);
+        // $funnel = Funnel::findOrFail($request->funnel_id);
 
         // $dashboard->funnels()->attach($request->funnel_id, [
         //     'order' => $request->order,
         // ]);
 
-        return new FunnelResource($funnel);
+        // return new FunnelResource($funnel);
+
+        $dashboard->funnels()->attach($request->funnel_ids);
+
+        return response()->json([
+            'message' => 'Funnel(s) attached to dashboard successfully'
+        ], 200);
     }
 
     public function detach(Organization $organization, Dashboard $dashboard, Request $request)
     {
-        $funnel = Funnel::findOrFail($request->funnel_id);
+        // $funnel = Funnel::findOrFail($request->funnel_id);
 
-        $dashboard->funnels()->detach($funnel->id);
+        // return new FunnelResource($funnel);
 
-        return new FunnelResource($funnel);
+        $dashboard->funnels()->detach($request->funnel_id);
+
+        return response()->json([
+            'message' => 'Funnel detached from dashboard successfully'
+        ], 200);
     }
 }
