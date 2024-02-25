@@ -5,6 +5,7 @@ use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Funnels\FunnelStepController;
+use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Dashboards\DashboardFunnelController;
@@ -63,6 +64,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/funnels/{connection}', [FunnelGenerationController::class, 'generateFunnels']);
             Route::get('/steps/{funnel}', [FunnelGenerationController::class, 'generateFunnelSteps']);
             Route::get('/outbound-links/{funnel}', [FunnelGenerationController::class, 'generateFunnelOutboundLinksMessage']);
+        });
+
+        // Funnel search
+        Route::prefix('funnels-search')->group(function() {
+            Route::get('/', [FunnelSearchController::class, 'search']);
         });
 
         // Dashboards

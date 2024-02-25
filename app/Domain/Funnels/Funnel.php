@@ -2,6 +2,7 @@
 
 namespace DDD\Domain\Funnels;
 
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,7 @@ class Funnel extends Model
 {
     use HasFactory,
         SoftDeletes,
+        Searchable,
         BelongsToOrganization,
         BelongsToUser,
         BelongsToConnection;
@@ -33,6 +35,22 @@ class Funnel extends Model
             $funnel->messages()->delete();
         });
     }
+
+    // /**
+    //  * Get the indexable data array for the model.
+    //  *
+    //  * @return array<string, mixed>
+    //  */
+    // public function toSearchableArray(): array
+    // {
+    //     return [
+    //         'id' => (int) $this->id,
+    //         'organization_id' => (int) $this->organization_id,
+    //         'name' => $this->name,
+    //         'created_at' => $this->created_at,
+    //         'updated_at' => $this->updated_at,
+    //     ];
+    // }
 
     /**
      * Steps associated with the funnel.
