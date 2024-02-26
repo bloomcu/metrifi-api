@@ -9,7 +9,7 @@ use Illuminate\Bus\Batch;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Resources\FunnelStepResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
-use DDD\Domain\Funnels\Jobs\StoreFunnelJob;
+use DDD\Domain\Funnels\Jobs\GenerateFunnelJob;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\GenerateOutBoundLinksMessageAction;
 use DDD\Domain\Funnels\Actions\GenerateFunnelStepsAction;
@@ -36,23 +36,37 @@ class FunnelGenerationController extends Controller
         $count = 0;
         foreach ($endpoints as $terminalPagePath) {
             if (++$count === $max + 1) break;
-            array_push($jobs, new StoreFunnelJob($organization, $connection, $terminalPagePath, request()->user()->id));
+
+            // Delay jobs for 6 seconds to avoid GA4 API rate limiting (100 requests per second per project)
+            array_push(
+                $jobs, 
+                (new GenerateFunnelJob($organization, $connection, $terminalPagePath, request()->user()->id))
+                    ->delay(now()->addSeconds($count + 6))
+            );
         }
 
         // Create a new batch instance.
         $batch = Bus::batch($jobs)->then(function (Batch $batch) use ($organization) {
-            // All jobs complete successfully
+            // All jobs completed successfully
             $organization->update([
                 'automating' => false,
                 'automation_msg' => null,
             ]);
         })->catch(function (Batch $batch, Throwable $e) use ($organization) {
-            // First batch job that fails
+            // First batch job failure detected
+            $organization->update([
+                'automation_msg' => 'Failed to generate a funnel. Continuing to generate other funnels. Exception: ' . $e->getMessage(),
+            ]);
+        })->finally(function (Batch $batch) use ($organization) {
+            // The batch has finished executing
             $organization->update([
                 'automating' => false,
-                'automation_msg' => 'Failed to generate a funnel. Exception: ' . $e->getMessage(),
+                'automation_msg' => null,
             ]);
-        })->dispatch();
+        })
+        // ->onQueue('funnels')
+        ->allowFailures()
+        ->dispatch();
         
 
         // Update organization to indicate that funnels are being generated.

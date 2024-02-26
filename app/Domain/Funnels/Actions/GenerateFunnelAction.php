@@ -9,7 +9,7 @@ use DDD\Domain\Funnels\Actions\GenerateOutBoundLinksMessageAction;
 use DDD\Domain\Funnels\Actions\GenerateFunnelStepsAction;
 use DDD\Domain\Connections\Connection;
 
-class StoreFunnelAction
+class GenerateFunnelAction
 {
     use AsAction;
 
@@ -19,7 +19,6 @@ class StoreFunnelAction
             'user_id' => $userId ?? Auth::id(),
             'connection_id' => $connection->id,
             'name' => $terminalPagePath,
-            'automating' => true,
         ]);
 
         GenerateFunnelStepsAction::run($funnel, $terminalPagePath);

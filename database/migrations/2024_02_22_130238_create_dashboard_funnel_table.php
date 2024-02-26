@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            // $table->timestamp('expires_at')->nullable()->after('last_used_at');
+        Schema::create('dashboard_funnel', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('dashboard_id');
+            $table->foreignId('funnel_id');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            // $table->dropColumn('expires_at');
-        });
+        Schema::dropIfExists('dashboard_funnel');
     }
 };

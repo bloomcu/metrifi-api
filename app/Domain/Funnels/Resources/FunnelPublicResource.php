@@ -3,8 +3,9 @@
 namespace DDD\Domain\Funnels\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use DDD\Domain\Organizations\Resources\OrganizationPublicResource;
 
-class FunnelStepResource extends JsonResource
+class FunnelPublicResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +17,10 @@ class FunnelStepResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'order' => $this->order,
-            'metric' => $this->metric, // pageView, outboundLinkClick, elementClick, formSubmission
+            'organization' => new OrganizationPublicResource($this->organization),
             'name' => $this->name,
-            'description' => $this->description,
-            'measurables' => $this->measurables, // Pages, Links, Elements, Forms.
-            'total' => 0,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
