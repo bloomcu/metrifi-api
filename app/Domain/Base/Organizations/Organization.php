@@ -6,13 +6,9 @@ use DDD\App\Traits\HasComments;
 use DDD\App\Traits\HasSlug;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// Domains
 use Illuminate\Database\Eloquent\Model;
-// Vendors
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-// use Spatie\MediaLibrary\HasMedia;
-// use Spatie\MediaLibrary\InteractsWithMedia;
 
 // Traits
 use Laravel\Cashier\Billable;
@@ -22,7 +18,6 @@ class Organization extends Model
 {
     use Billable,
         HasComments,
-        // InteractsWithMedia,
         HasFactory,
         HasSlug;
 
