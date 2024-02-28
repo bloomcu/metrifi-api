@@ -11,14 +11,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \DDD\Domain\Base\Users\User::factory(1)->create();
-
         $this->call([
-            // CategoriesSeeder::class,
             SubscriptionPlansSeeder::class,
             OrganizationsSeeder::class,
-            TagsSeeder::class,
-            StatusesSeeder::class,
+            UsersSeeder::class,
+            ConnectionsSeeder::class,
+            FunnelsSeeder::class,
+            FunnelStepsSeeder::class,
+            DashboardsSeeder::class,
         ]);
     }
 }
