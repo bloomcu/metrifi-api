@@ -15,10 +15,8 @@ return new class extends Migration
     {
         Schema::table('funnel_steps', function (Blueprint $table) {
             $table->text('metric')->after('type')->nullable();
-            $table->dropColumn('type');
-
             $table->json('measurables')->after('expression')->nullable();
-            $table->dropColumn('expression');
+            $table->dropColumn(['type', 'expression']);
         });
     }
 

@@ -14,8 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('funnels', function (Blueprint $table) {
-            $table->dropColumn('automating');
-            $table->dropColumn('automation_msg');
+            $table->dropColumn(['automating', 'automation_msg']);
         });
     }
 
