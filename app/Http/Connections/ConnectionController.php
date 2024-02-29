@@ -13,7 +13,9 @@ class ConnectionController extends Controller
 {
     public function index(Organization $organization)
     {   
-        return ConnectionResource::collection($organization->connections);
+        $connections = $organization->connections->loadCount('funnels');
+        
+        return ConnectionResource::collection($connections);
     }
 
     public function store(Organization $organization, Request $request)

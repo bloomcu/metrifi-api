@@ -21,7 +21,7 @@ class DashboardFunnelController extends Controller
 
         // return new FunnelResource($funnel);
 
-        $dashboard->funnels()->attach($request->funnel_ids);
+        $dashboard->funnels()->syncWithoutDetaching($request->funnel_ids);
 
         return response()->json([
             'message' => 'Funnel(s) attached to dashboard successfully'
