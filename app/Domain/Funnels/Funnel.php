@@ -6,6 +6,7 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use DDD\Domain\Messages\Message;
 use DDD\Domain\Funnels\FunnelStep;
 use DDD\Domain\Dashboards\Dashboard;
@@ -17,6 +18,7 @@ class Funnel extends Model
 {
     use HasFactory,
         SoftDeletes,
+        CascadeSoftDeletes,
         Searchable,
         BelongsToOrganization,
         BelongsToUser,
@@ -26,15 +28,24 @@ class Funnel extends Model
         'id',
     ];
 
-    public static function boot ()
+    protected $cascadeDeletes = ['steps', 'messages'];
+
+    public static function boot()
     {
         parent::boot();
 
         self::deleting(function (Funnel $funnel) {
-            $funnel->steps()->delete();
-            $funnel->messages()->delete();
+            $funnel->dashboards()->detach();
         });
     }
+
+    // public function cascadeDelete()
+    // {
+    //     $this->steps()->delete();
+    //     $this->messages()->delete();
+    //     $this->dashboards()->detach();
+    //     $this->delete();
+    // }
 
     // /**
     //  * Get the indexable data array for the model.

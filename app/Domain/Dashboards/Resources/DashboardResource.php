@@ -23,6 +23,7 @@ class DashboardResource extends JsonResource
             'user' => new UserResource($this->user),
             'name' => $this->name,
             'description' => $this->description,
+            'zoom' => $this->zoom,
             'funnels' => FunnelResource::collection($this->funnels),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

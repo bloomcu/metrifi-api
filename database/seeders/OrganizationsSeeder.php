@@ -15,7 +15,6 @@ class OrganizationsSeeder extends Seeder
     {
         $organizations = [
             ['title' => 'BloomCU'],
-            // ['title' => 'Lone Star'],
         ];
 
         foreach ($organizations as $organization) {
