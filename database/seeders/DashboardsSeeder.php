@@ -16,8 +16,8 @@ class DashboardsSeeder extends Seeder
             [
                 'organization_id' => 1,
                 'user_id' => 1,
-                'name' => 'The funnel name',
-                'description' => 'The funnel description',
+                'name' => 'The dashboard name',
+                'description' => 'The dashboard description',
                 'zoom' => 0,
             ],
         ];
