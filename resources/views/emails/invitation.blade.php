@@ -4,8 +4,7 @@
     <title>Invitation email</title>
 </head>
 <div>
-    <h1>You've been invited to join the {{ $invitation->organization->title }} team</h1>
-    <p>Join forces with the team and help build your next website.</p>
+    <h1>You've been invited to join the {{ $invitation->organization->title }} team on {{ config('app.name') }}</h1>
 
     <a href="{{ $invitation->url() }}">Join now</a>
 

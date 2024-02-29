@@ -1,12 +1,12 @@
 <?php
 
-namespace DDD\Domain\Base\Sites\Requests;
+namespace DDD\Domain\Dashboards\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class SiteStoreRequest extends FormRequest
+class DashboardUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,15 +26,9 @@ class SiteStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'nullable|string',
-            'domain' => 'required|string|unique:sites',
-            'launch_info' => 'nullable|array',
-            'launch_info.launch_date' => 'nullable|date',
-            'launch_info.freeze_date' => 'nullable|date',
-            'launch_info.dev_domain' => 'nullable|string',
-            'launch_info.prod_domain' => 'nullable|string',
-            'launch_info.prod_ip' => 'nullable|ip',
-            'launch_info.notes' => 'nullable|string',
+            'name' => 'nullable|string',
+            'description' => 'nullable|string',
+            'zoom' => 'nullable|numeric',
         ];
     }
 

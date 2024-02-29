@@ -8,20 +8,17 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        // \DDD\Domain\Base\Users\User::factory(1)->create();
-
         $this->call([
-            // CategoriesSeeder::class,
             SubscriptionPlansSeeder::class,
             OrganizationsSeeder::class,
-            SitesSeeder::class,
-            TagsSeeder::class,
-            StatusesSeeder::class,
+            UsersSeeder::class,
+            ConnectionsSeeder::class,
+            FunnelsSeeder::class,
+            FunnelStepsSeeder::class,
+            DashboardsSeeder::class,
         ]);
     }
 }

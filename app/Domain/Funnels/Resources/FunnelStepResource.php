@@ -21,7 +21,7 @@ class FunnelStepResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'measurables' => $this->measurables, // Pages, Links, Elements, Forms.
-            'total' => '0',
+            'total' => 0,
         ];
     }
 }
