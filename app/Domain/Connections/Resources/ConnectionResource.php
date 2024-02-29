@@ -4,6 +4,7 @@ namespace DDD\Domain\Connections\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Users\Resources\UserResource;
+use DDD\Domain\Funnels\Resources\FunnelResource;
 
 class ConnectionResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class ConnectionResource extends JsonResource
             'account_name' => $this->account_name,
             'name' => $this->name,
             'uid' => $this->uid,
+            'funnels_count' => $this->whenCounted('funnels'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
