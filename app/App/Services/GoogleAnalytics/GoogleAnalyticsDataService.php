@@ -55,7 +55,8 @@ class GoogleAnalyticsDataService
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
-                ['name' => 'screenPageViews']
+                // ['name' => 'screenPageViews'],
+                ['name' => 'totalUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
@@ -105,7 +106,8 @@ class GoogleAnalyticsDataService
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
-                ['name' => 'eventCount']
+                // ['name' => 'eventCount'],
+                ['name' => 'totalUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
