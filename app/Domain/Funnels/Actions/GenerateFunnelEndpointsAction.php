@@ -54,11 +54,11 @@ class GenerateFunnelEndpointsAction
 
     private function getReport(Connection $connection)
     {
-        return GoogleAnalyticsData::fetchUsersByPagePath(
+        return GoogleAnalyticsData::pageUsers(
             connection: $connection, 
             startDate: '28daysAgo',
             endDate: 'today',
-            pagePaths: null,
+            measurables: null,
         );
     }
 }

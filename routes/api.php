@@ -28,17 +28,13 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
+        // Page users
         Route::post('page-users/{connection}', [GoogleAnalyticsDataController::class, 'pageUsers']);
-        Route::post('page-users-with-query-string/{connection}', [GoogleAnalyticsDataController::class, 'pageUsersWithQueryString']);
+        Route::post('page-plus-query-string-users/{connection}', [GoogleAnalyticsDataController::class, 'pagePlusQueryStringUsers']);
 
-
-        Route::post('users-by-pagepath/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByPagePath']);
-        Route::post('users-by-pagepath-query-string/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByPagePathQueryString']);
-        Route::post('users-by-outbound-link/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByOutboundLink']);
-        Route::post('outbound-clicks-by-page-path/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicksByPagePath']);
-        // Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
-        // Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
-        // Route::post('export/{connection}', [GoogleAnalyticsDataExportToCSVController::class, 'exportReport']);
+        // Outbound link users
+        Route::post('outbound-link-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkUsers']);
+        Route::post('outbound-link-by-page-path-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkByPagePathUsers']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {

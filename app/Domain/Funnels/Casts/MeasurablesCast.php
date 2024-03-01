@@ -3,7 +3,6 @@
 namespace DDD\Domain\Funnels\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use DDD\Domain\Funnels\DTO\Metric;
 
 class MeasurablesCast implements CastsAttributes
 {
@@ -22,9 +21,9 @@ class MeasurablesCast implements CastsAttributes
             $defaults = [
                 // 'connection_id' => null,
                 'metric' => 'pageViews',
-                // 'pagePath' => null,
+                'pagePath' => null,
                 'measurable' => null,
-                'contains' => [],
+                // 'contains' => [],
             ];
 
             return array_merge($defaults, $metric);

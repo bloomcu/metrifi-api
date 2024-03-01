@@ -11,17 +11,18 @@ class GoogleAnalyticsDataService
     public function pageUsers(Connection $connection, $startDate, $endDate, $measurables = [])
     {
         // Default filter expression
-        $filters = [
-            [
-                'filter' => [
-                    'fieldName' => 'pagePath',
-                    'stringFilter' => [
-                        'matchType' => 'FULL_REGEXP',
-                        'value' => '.+' // Cannot be empty
-                    ]
-                ]
-            ]
-        ];
+        // $filters = [
+        //     [
+        //         'filter' => [
+        //             'fieldName' => 'pagePath',
+        //             'stringFilter' => [
+        //                 'matchType' => 'BEGINS_WITH',
+        //                 'value' => '/' // Cannot be empty
+        //             ]
+        //         ]
+        //     ]
+        // ];
+        // $filters = [];
 
         // If page path is specified, filter on it
         if ($measurables && count($measurables)) {
@@ -31,11 +32,24 @@ class GoogleAnalyticsDataService
                         'fieldName' => 'pagePath',
                         'stringFilter' => [
                             'matchType' => 'EXACT',
+                            'caseSensitive' => true,
                             'value' => $measurable
                         ]
                     ]
                 ];
             }
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'pagePath',
+                        'stringFilter' => [
+                            'matchType' => 'BEGINS_WITH',
+                            'value' => '/'
+                        ]
+                    ]
+                ]
+            ];
         }
 
         // Run the report
@@ -50,7 +64,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'totalUsers']
             ],
             'dimensionFilter' => [
-                'andGroup' => [
+                'orGroup' => [
                     'expressions' => $filters
                 ]
             ],
@@ -59,36 +73,48 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function pageUsersWithQueryString(Connection $connection, $startDate, $endDate, $contains = [])
+    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $measurables = [])
     {
         // Default filter expression
+        // $filters = [
+        //     [
+        //         'filter' => [
+        //             'fieldName' => 'pagePathPlusQueryString',
+        //             'stringFilter' => [
+        //                 'matchType' => 'FULL_REGEXP',
+        //                 'value' => '.+' // Cannot be empty
+        //             ]
+        //         ]
+        //     ]
+        // ];
         // $filters = [];
 
-        $filters = [
-            [
-                'filter' => [
-                    'fieldName' => 'pagePathPlusQueryString',
-                    'stringFilter' => [
-                        'matchType' => 'FULL_REGEXP',
-                        'value' => '.+' // Cannot be empty
-                    ]
-                ]
-            ]
-        ];
-
         // If contains array are specified, filter on them
-        if (count($contains)) {
-            foreach($contains as $string) {
+        if (count($measurables)) {
+            foreach($measurables as $measurable) {
                 $filters[] = [
                     'filter' => [
                         'fieldName' => 'pagePathPlusQueryString',
                         'stringFilter' => [
                             'matchType' => 'CONTAINS',
-                            'value' => $string
+                            'caseSensitive' => true,
+                            'value' => $measurable
                         ]
                     ]
                 ];
             }
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'pagePathPlusQueryString',
+                        'stringFilter' => [
+                            'matchType' => 'FULL_REGEXP',
+                            'value' => '.+' // Result cannot be empty
+                        ]
+                    ]
+                ]
+            ];
         }
 
         // Run the report
@@ -103,7 +129,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'totalUsers']
             ],
             'dimensionFilter' => [
-                'andGroup' => [
+                'orGroup' => [
                     'expressions' => $filters
                 ]
             ],
@@ -112,105 +138,7 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function fetchUsersByPagePath(Connection $connection, $startDate, $endDate, $pagePaths = null)
-    {
-        // By default, return all pages where path begins with '/'
-        $expressions = [
-            'filter' => [
-                'fieldName' => 'pagePath',
-                'stringFilter' => [
-                    'matchType' => 'BEGINS_WITH',
-                    'value' => '/'
-                ]
-            ]
-        ];
-
-        // If specific page paths are being requested, filter on them
-        if ($pagePaths) {
-            $expressions = collect($pagePaths)->map(fn ($path) => [
-                'filter' => [
-                    'fieldName' => 'pagePath',
-                    'stringFilter' => [
-                        'matchType' => 'EXACT',
-                        'value' => $path 
-                    ]
-                ]
-            ])->toArray();
-        }
-
-        // Run the report
-        return $this->runReport($connection, [
-            'dateRanges' => [
-                ['startDate' => $startDate, 'endDate' => $endDate]
-            ],
-            'dimensions' => [
-                ['name' => 'pagePath'],
-            ],
-            'metrics' => [
-                ['name' => 'totalUsers']
-            ],
-            'dimensionFilter' => [
-                'orGroup' => [
-                    'expressions' => [
-                        ...$expressions
-                    ]
-                ]
-            ],
-            'limit' => '250',
-            'metricAggregations' => ['TOTAL'],
-        ]);
-    }
-
-    public function fetchUsersByPagePathQueryString(Connection $connection, $startDate, $endDate, $filters = [])
-    {
-        // Default filter expression
-        $filterExpressions = [
-            'filter' => [
-                'fieldName' => 'pagePathPlusQueryString',
-                'stringFilter' => [
-                    'matchType' => 'FULL_REGEXP',
-                    'value' => '.+' // Cannot be empty
-                ]
-            ]
-        ];
-
-        // Build user defined filter expressions
-        if ($filters) {
-            $filterExpressions = collect($filters)->map(fn ($filterValue) => [
-                'filter' => [
-                    'fieldName' => 'pagePathPlusQueryString',
-                    'stringFilter' => [
-                        'matchType' => 'CONTAINS',
-                        'value' => $filterValue
-                    ]
-                ]
-            ])->toArray();
-        }
-
-        // Run the report
-        return $this->runReport($connection, [
-            'dateRanges' => [
-                ['startDate' => $startDate, 'endDate' => $endDate]
-            ],
-            'dimensions' => [
-                ['name' => 'pagePathPlusQueryString'],
-            ],
-            'metrics' => [
-                ['name' => 'totalUsers']
-            ],
-            'dimensionFilter' => [
-                'orGroup' => [
-                    'expressions' => [
-                        ...$filterExpressions
-                    ]
-                ]
-            ],
-            'limit' => '250',
-            'metricAggregations' => ['TOTAL'],
-        ]);
-    }
-
-    public function fetchUsersByOutboundLink(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null)
+    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null)
     {
         // By default, return all outbound link clicks
         $expressions = [
@@ -260,9 +188,9 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function fetchOutboundClicksByPagePath(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null, $pagePath)
+    public function outboundLinkByPagePathUsers(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null, $pagePath)
     {
-        $fullReport = $this->fetchUsersByOutboundLink($connection, $startDate, $endDate, $outboundLinkUrls);
+        $fullReport = $this->outboundLinkUsers($connection, $startDate, $endDate, $outboundLinkUrls);
 
         $report = [
             'links' => [],
