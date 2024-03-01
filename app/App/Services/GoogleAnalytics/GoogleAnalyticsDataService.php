@@ -90,7 +90,7 @@ class GoogleAnalyticsDataService
         // $filters = [];
 
         // If contains array are specified, filter on them
-        if (count($measurables)) {
+        if ($measurables && count($measurables)) {
             foreach($measurables as $measurable) {
                 $filters[] = [
                     'filter' => [
