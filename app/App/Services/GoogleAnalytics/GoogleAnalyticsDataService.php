@@ -8,7 +8,7 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
-    public function fetchPageViews(Connection $connection, $startDate, $endDate, $pagePaths = null)
+    public function fetchUsersByPagePath(Connection $connection, $startDate, $endDate, $pagePaths = null)
     {
         // By default, return all pages where path begins with '/'
         $expressions = [
@@ -43,7 +43,6 @@ class GoogleAnalyticsDataService
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
-                // ['name' => 'screenPageViews'],
                 ['name' => 'totalUsers']
             ],
             'dimensionFilter' => [

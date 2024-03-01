@@ -18,6 +18,7 @@ class GenerateFunnelEndpointsAction
     }
 
     private function findFunnelEndpoints($report, $startingPagePath) {
+        
         // Filter report to get paths that start with the starting page path
         $allPaths = array_filter($report['rows'], function($row) use ($startingPagePath) {
             return strpos($row['dimensionValues'][0]['value'], $startingPagePath) === 0;
@@ -53,7 +54,7 @@ class GenerateFunnelEndpointsAction
 
     private function getReport(Connection $connection)
     {
-        return GoogleAnalyticsData::fetchPageViews(
+        return GoogleAnalyticsData::fetchUsersByPagePath(
             connection: $connection, 
             startDate: '28daysAgo',
             endDate: 'today',

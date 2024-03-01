@@ -60,7 +60,7 @@ class GenerateFunnelStepsAction
     }
 
     private function validatePagePaths(Funnel $funnel, array $pagePaths) {
-        $report = GoogleAnalyticsData::fetchPageViews(
+        $report = GoogleAnalyticsData::fetchUsersByPagePath(
             connection: $funnel->connection, 
             startDate: '28daysAgo',
             endDate: 'today',

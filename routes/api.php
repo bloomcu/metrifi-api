@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
-        Route::post('page-views/{connection}', [GoogleAnalyticsDataController::class, 'fetchPageViews']);
+        Route::post('users-by-pagepath/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByPagePath']);
         Route::post('outbound-clicks/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicks']);
         Route::post('outbound-clicks-by-page-path/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicksByPagePath']);
         // Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);

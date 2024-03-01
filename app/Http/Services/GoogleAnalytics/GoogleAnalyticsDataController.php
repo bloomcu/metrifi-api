@@ -9,9 +9,9 @@ use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
-    public function fetchPageViews(Connection $connection, PageViewsRequest $request)
+    public function fetchUsersByPagePath(Connection $connection, PageViewsRequest $request)
     {   
-        $report = GoogleAnalyticsData::fetchPageViews(
+        $report = GoogleAnalyticsData::fetchUsersByPagePath(
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
