@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PageViewsRequest extends FormRequest
+class VirtualPageUsersRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class PageViewsRequest extends FormRequest
         return [
             'startDate' => 'string',
             'endDate' => 'string',
-            'pagePaths' => 'nullable|array',
+            'virtualPages' => 'nullable|array',
         ];
     }
 

@@ -20,10 +20,11 @@ class MeasurablesCast implements CastsAttributes
     {
         return collect(json_decode($value, true))->map(function ($metric) {
             $defaults = [
-                'connection_id' => null,
+                // 'connection_id' => null,
                 'metric' => 'pageViews',
-                'pagePath' => null,
+                // 'pagePath' => null,
                 'measurable' => null,
+                'contains' => [],
             ];
 
             return array_merge($defaults, $metric);

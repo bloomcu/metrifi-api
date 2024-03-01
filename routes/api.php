@@ -28,8 +28,13 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
+        Route::post('page-users/{connection}', [GoogleAnalyticsDataController::class, 'pageUsers']);
+        Route::post('page-users-with-query-string/{connection}', [GoogleAnalyticsDataController::class, 'pageUsersWithQueryString']);
+
+
         Route::post('users-by-pagepath/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByPagePath']);
-        Route::post('outbound-clicks/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicks']);
+        Route::post('users-by-pagepath-query-string/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByPagePathQueryString']);
+        Route::post('users-by-outbound-link/{connection}', [GoogleAnalyticsDataController::class, 'fetchUsersByOutboundLink']);
         Route::post('outbound-clicks-by-page-path/{connection}', [GoogleAnalyticsDataController::class, 'fetchOutboundClicksByPagePath']);
         // Route::post('report/{connection}', [GoogleAnalyticsDataController::class, 'runReport']);
         // Route::post('funnel/{connection}', [GoogleAnalyticsDataController::class, 'runFunnelReport']);
