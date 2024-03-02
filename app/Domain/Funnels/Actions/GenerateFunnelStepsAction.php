@@ -60,11 +60,11 @@ class GenerateFunnelStepsAction
     }
 
     private function validatePagePaths(Funnel $funnel, array $pagePaths) {
-        $report = GoogleAnalyticsData::fetchPageViews(
+        $report = GoogleAnalyticsData::pageUsers(
             connection: $funnel->connection, 
             startDate: '28daysAgo',
             endDate: 'today',
-            pagePaths: null,
+            measurables: null,
         );
 
         // Filter out paths not present in GA pageviews report
