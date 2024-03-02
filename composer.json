@@ -38,7 +38,9 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "pestphp/pest-plugin-laravel": "^1.4",
-        "spatie/laravel-ignition": "^2.0"
+        "spatie/laravel-ignition": "^2.0",
+        "jasonmccreary/laravel-test-assertions": "^2.4",
+        "laravel-shift/factory-generator": "dev-master"
     },
     "autoload": {
         "psr-4": {
