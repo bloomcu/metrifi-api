@@ -2,20 +2,19 @@
 namespace DDD\Http\Services\GoogleAnalytics;
 
 use Illuminate\Http\Request;
-use DDD\Http\Services\GoogleAnalytics\Requests\PageViewsRequest;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
-    public function fetchPageViews(Connection $connection, PageViewsRequest $request)
+    public function pageUsers(Connection $connection, Request $request)
     {   
-        $report = GoogleAnalyticsData::fetchPageViews(
+        $report = GoogleAnalyticsData::pageUsers(
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            pagePaths: $request->pagePaths,
+            measurables: $request->measurables,
         );
 
         return response()->json([
@@ -23,9 +22,23 @@ class GoogleAnalyticsDataController extends Controller
         ], 200);
     }
 
-    public function fetchOutboundClicks(Connection $connection, Request $request)
+    public function pagePlusQueryStringUsers(Connection $connection, Request $request)
+    {   
+        $report = GoogleAnalyticsData::pagePlusQueryStringUsers(
+            connection: $connection, 
+            startDate: $request->startDate,
+            endDate: $request->endDate,
+            measurables: $request->measurables,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
+    public function outboundLinkUsers(Connection $connection, Request $request)
     {
-        $report = GoogleAnalyticsData::fetchOutboundClicks(
+        $report = GoogleAnalyticsData::outboundLinkUsers(
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
@@ -37,9 +50,9 @@ class GoogleAnalyticsDataController extends Controller
         ], 200);
     }
 
-    public function fetchOutboundClicksByPagePath(Connection $connection, Request $request)
+    public function outboundLinkByPagePathUsers(Connection $connection, Request $request)
     {
-        $report = GoogleAnalyticsData::fetchOutboundClicksByPagePath(
+        $report = GoogleAnalyticsData::outboundLinkByPagePathUsers(
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
@@ -51,22 +64,4 @@ class GoogleAnalyticsDataController extends Controller
             'data' => $report
         ], 200);
     }
-
-    // public function runReport(Connection $connection, Request $request)
-    // {   
-    //     $report = GoogleAnalyticsData::runReport($connection, $request);
-
-    //     return response()->json([
-    //         'data' => $report
-    //     ], 200);
-    // }
-
-    // public function runFunnelReport(Connection $connection)
-    // {   
-    //     $report = GoogleAnalyticsData::runFunnelReport($connection);
-
-    //     return response()->json([
-    //         'data' => $report
-    //     ], 200);
-    // }
 }

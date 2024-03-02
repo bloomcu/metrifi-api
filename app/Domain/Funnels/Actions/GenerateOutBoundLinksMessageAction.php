@@ -38,7 +38,7 @@ class GenerateOutBoundLinksMessageAction
     }
 
     private function getOutboundLinksReport(Connection $connection) {
-        return GoogleAnalyticsData::fetchOutboundClicks(
+        return GoogleAnalyticsData::outboundLinkUsers(
             connection: $connection, 
             startDate: '28daysAgo',
             endDate: 'today',
