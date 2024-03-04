@@ -20,7 +20,7 @@ class FunnelStepsSeeder extends Seeder
                 'description' => 'The first step',
                 'measurables' => [
                     [
-                        'metric' => 'pageViews',
+                        'metric' => 'pageUsers',
                         'measurable' => '/',
                     ],
                 ],
@@ -32,7 +32,7 @@ class FunnelStepsSeeder extends Seeder
                 'description' => 'The second step',
                 'measurables' => [
                     [
-                        'metric' => 'pageViews',
+                        'metric' => 'pageUsers',
                         'measurable' => '/page',
                     ],
                 ],
