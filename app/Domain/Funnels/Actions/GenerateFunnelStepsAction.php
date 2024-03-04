@@ -26,7 +26,7 @@ class GenerateFunnelStepsAction
                 'name' => $pagePath,
                 'measurables' => [
                     [
-                        'metric' => 'pageViews',
+                        'metric' => 'pageUsers',
                         'measurable' => $pagePath,
                     ]
                 ]
@@ -67,7 +67,7 @@ class GenerateFunnelStepsAction
             measurables: null,
         );
 
-        // Filter out paths not present in GA pageviews report
+        // Filter out paths not present in GA pageUsers report
         $validPaths = [];
         foreach ($report['rows'] as $row) {
             if (isset($row['dimensionValues']) && in_array($row['dimensionValues'][0]['value'], $pagePaths)) {
