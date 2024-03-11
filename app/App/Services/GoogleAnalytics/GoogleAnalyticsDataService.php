@@ -68,7 +68,7 @@ class GoogleAnalyticsDataService
                     'expressions' => $filters
                 ]
             ],
-            'limit' => '250',
+            'limit' => '500',
             'metricAggregations' => ['TOTAL'],
         ]);
     }
@@ -133,7 +133,7 @@ class GoogleAnalyticsDataService
                     'expressions' => $filters
                 ]
             ],
-            'limit' => '250',
+            'limit' => '500',
             'metricAggregations' => ['TOTAL'],
         ]);
     }
@@ -183,7 +183,7 @@ class GoogleAnalyticsDataService
                     ]
                 ]
             ],
-            'limit' => '250',
+            'limit' => '500',
             'metricAggregations' => ['TOTAL'],
         ]);
     }
