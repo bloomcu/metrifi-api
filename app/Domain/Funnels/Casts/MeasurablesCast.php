@@ -18,13 +18,23 @@ class MeasurablesCast implements CastsAttributes
     public function get($model, string $key, $value, array $attributes)
     {
         return collect(json_decode($value, true))->map(function ($metric) {
-            $defaults = [
-                // 'connection_id' => null,
-                'metric' => 'pageUsers',
-                'pagePath' => null,
-                'measurable' => null,
-                // 'contains' => [],
+            $metricAttributes = [
+                'pageUsers' => [
+                    'metric' => 'pageUsers',
+                    'pagePath' => null,
+                ],
+                'pagePlusQueryStringUsers' => [
+                    'metric' => 'pagePlusQueryStringUsers',
+                    'pagePathPlusQueryString' => null,
+                ],
+                'outboundLinkUsers' => [
+                    'metric' => 'outboundLinkUsers',
+                    'sourcePagePath' => null,
+                    'linkUrl' => null,
+                ],
             ];
+
+            $defaults = $metricAttributes[$metric['metric']];
 
             return array_merge($defaults, $metric);
         });

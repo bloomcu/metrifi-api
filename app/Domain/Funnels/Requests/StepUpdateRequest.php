@@ -31,6 +31,11 @@ class StepUpdateRequest extends FormRequest
             'name' => 'nullable|string',
             'description' => 'nullable|string',
             'measurables' => 'nullable|array',
+            'measurables.*.metric' => 'nullable|string',
+            'measurables.*.pagePath' => 'nullable|string',
+            'measurables.*.sourcePagePath' => 'nullable|string',
+            'measurables.*.pagePathPlusQueryString' => 'nullable|string',
+            'measurables.*.linkUrl' => 'nullable|string',
         ];
     }
 

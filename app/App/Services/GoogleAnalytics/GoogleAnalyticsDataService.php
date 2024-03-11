@@ -8,7 +8,7 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
-    public function pageUsers(Connection $connection, $startDate, $endDate, $measurables = [])
+    public function pageUsers(Connection $connection, $startDate, $endDate, $pagePaths = [])
     {
         // Default filter expression
         // $filters = [
@@ -25,15 +25,15 @@ class GoogleAnalyticsDataService
         // $filters = [];
 
         // If page path is specified, filter on it
-        if ($measurables && count($measurables)) {
-            foreach ($measurables as $measurable) {
+        if ($pagePaths && count($pagePaths)) {
+            foreach ($pagePaths as $pagePath) {
                 $filters[] = [
                     'filter' => [
                         'fieldName' => 'pagePath',
                         'stringFilter' => [
                             'matchType' => 'EXACT',
                             'caseSensitive' => true,
-                            'value' => $measurable
+                            'value' => $pagePath
                         ]
                     ]
                 ];
@@ -73,7 +73,7 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $measurables = [])
+    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $pagePathPlusQueryStrings = [])
     {
         // Default filter expression
         // $filters = [
@@ -90,15 +90,15 @@ class GoogleAnalyticsDataService
         // $filters = [];
 
         // If contains array are specified, filter on them
-        if ($measurables && count($measurables)) {
-            foreach($measurables as $measurable) {
+        if ($pagePathPlusQueryStrings && count($pagePathPlusQueryStrings)) {
+            foreach($pagePathPlusQueryStrings as $pagePathPlusQueryString) {
                 $filters[] = [
                     'filter' => [
                         'fieldName' => 'pagePathPlusQueryString',
                         'stringFilter' => [
                             'matchType' => 'CONTAINS',
                             'caseSensitive' => true,
-                            'value' => $measurable
+                            'value' => $pagePathPlusQueryString
                         ]
                     ]
                 ];
@@ -138,7 +138,7 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null)
+    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $linkUrls = null)
     {
         // By default, return all outbound link clicks
         $expressions = [
@@ -152,8 +152,8 @@ class GoogleAnalyticsDataService
         ];
 
         // If outbound link urls are specified, filter on them
-        if ($outboundLinkUrls) {
-            $expressions = collect($outboundLinkUrls)->map(fn ($linkUrl) => [
+        if ($linkUrls) {
+            $expressions = collect($linkUrls)->map(fn ($linkUrl) => [
                 'filter' => [
                     'fieldName' => 'linkUrl',
                     'stringFilter' => [
@@ -188,9 +188,9 @@ class GoogleAnalyticsDataService
         ]);
     }
 
-    public function outboundLinkByPagePathUsers(Connection $connection, $startDate, $endDate, $outboundLinkUrls = null, $pagePath)
+    public function outboundLinkByPagePathUsers(Connection $connection, $startDate, $endDate, $linkUrls = null, $sourcePagePath)
     {
-        $fullReport = $this->outboundLinkUsers($connection, $startDate, $endDate, $outboundLinkUrls);
+        $fullReport = $this->outboundLinkUsers($connection, $startDate, $endDate, $linkUrls);
 
         $report = [
             'links' => [],
@@ -210,7 +210,7 @@ class GoogleAnalyticsDataService
             
             if (count($dimensionValues) == 2) {
                 // The third item in "dimensionValues" represents the page path
-                if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] === $pagePath) {
+                if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] === $sourcePagePath) {
                     // The metric value represents the event count
                     $eventCount = isset($metricValues[0]['value']) ? $metricValues[0]['value'] : 0;
 
