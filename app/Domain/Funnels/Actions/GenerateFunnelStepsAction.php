@@ -27,7 +27,7 @@ class GenerateFunnelStepsAction
                 'measurables' => [
                     [
                         'metric' => 'pageUsers',
-                        'measurable' => $pagePath,
+                        'pagePath' => $pagePath,
                     ]
                 ]
             ]);
@@ -64,7 +64,7 @@ class GenerateFunnelStepsAction
             connection: $funnel->connection, 
             startDate: '28daysAgo',
             endDate: 'today',
-            measurables: null,
+            pagePaths: null,
         );
 
         // Filter out paths not present in GA pageUsers report

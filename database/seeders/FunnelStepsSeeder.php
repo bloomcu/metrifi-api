@@ -21,7 +21,7 @@ class FunnelStepsSeeder extends Seeder
                 'measurables' => [
                     [
                         'metric' => 'pageUsers',
-                        'measurable' => '/',
+                        'pagePath' => '/',
                     ],
                 ],
             ],
@@ -33,7 +33,7 @@ class FunnelStepsSeeder extends Seeder
                 'measurables' => [
                     [
                         'metric' => 'pageUsers',
-                        'measurable' => '/page',
+                        'pagePath' => '/page',
                     ],
                 ],
             ],
