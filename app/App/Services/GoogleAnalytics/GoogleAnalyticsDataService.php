@@ -8,6 +8,119 @@ use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
+    /**
+     * Run a funnel report
+     * 
+     * Not available in PHP SDK yet. Must use v1alpha version of the Google Analytics Data API.
+     * Docs: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels
+     * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
+     * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
+     */
+    public function funnelReport(Connection $connection, $startDate, $endDate)
+    {
+        $accessToken = $this->setupAccessToken($connection);
+
+        $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken;
+
+        $funnelSteps = [
+            [
+                'name' => 'Rec vehicle loan',
+                'filterExpression' => [
+                    'funnelFieldFilter' => [
+                        'fieldName' => 'pagePath',
+                        'stringFilter' => [
+                            'value' => '/loans/recreational-vehicle-loans/',
+                            'matchType' => 'EXACT'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Lead capture page',
+                'filterExpression' => [
+                    'funnelFieldFilter' => [
+                        'fieldName' => 'pagePath',
+                        'stringFilter' => [
+                            'value' => '/application/',
+                            'matchType' => 'EXACT'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Lead form submitted',
+                'filterExpression' => [
+                    'funnelEventFilter' => [
+                        'eventName' => 'onsiteFormSubmission',
+                        'funnelParameterFilterExpression' => [
+                            'andGroup' => [
+                                'expressions' => [
+                                    [
+                                        'funnelParameterFilter' => [
+                                            'eventParameterName' => 'pageLocation',
+                                            'stringFilter' => [
+                                                'matchType' => 'EXACT',
+                                                'value' => 'https://cuofga.org/application/'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // $funnelSteps = [
+        //     [
+        //         'name' => 'Homepage',
+        //         'filterExpression' => [
+        //             'funnelFieldFilter' => [
+        //                 'fieldName' => 'pageLocation',
+        //                 'stringFilter' => [
+        //                     'value' => 'https://www.lbsfcu.org/',
+        //                     'matchType' => 'EXACT'
+        //                 ]
+        //             ]
+        //         ]
+        //     ],
+        //     [
+        //         'name' => 'Auto Loan',
+        //         'filterExpression' => [
+        //             'funnelFieldFilter' => [
+        //                 'fieldName' => 'pageLocation',
+        //                 'stringFilter' => [
+        //                     'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
+        //                     'matchType' => 'EXACT'
+        //                 ]
+        //             ]
+        //         ]
+        //     ]
+        // ];
+
+        $params = [
+            'dateRanges' => [
+                [
+                    'startDate' => $startDate, 
+                    'endDate' => $endDate
+                ]
+            ],
+            'funnel' => [
+                'isOpenFunnel' => false,
+                'steps' => $funnelSteps
+            ]
+        ];
+
+        try {
+            $response = Http::post($endpoint, $params)->json();
+
+            return $response;
+        } catch (ApiException $ex) {
+            abort(500, 'Call failed with message: %s' . $ex->getMessage());
+        }
+    }
+    
     public function pageUsers(Connection $connection, $startDate, $endDate, $pagePaths = [])
     {
         // Default filter expression
@@ -262,60 +375,4 @@ class GoogleAnalyticsDataService
 
         return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
     }
-
-    /**
-     * Run a funnel report
-     * 
-     * Not available in PHP SDK yet. Must use v1alpha version of the Google Analytics Data API.
-     * Docs: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels
-     * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
-     * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
-     */
-    // public function runFunnelReport(Connection $connection)
-    // {
-    //     $accessToken = $this->setupAccessToken($connection);
-
-    //     try {
-    //         $response = Http::post('https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken, 
-    //         [
-    //             'dateRanges' => [
-    //                 'startDate' => '7daysAgo',
-    //                 'endDate' => 'today'
-    //             ],
-    //             'funnel' => [
-    //                 'isOpenFunnel' => false,
-    //                 'steps' => [
-    //                     [
-    //                         'name' => 'Homepage',
-    //                         'filterExpression' => [
-    //                             'funnelFieldFilter' => [
-    //                                 'fieldName' => 'pageLocation',
-    //                                 'stringFilter' => [
-    //                                     'value' => 'https://www.lbsfcu.org/',
-    //                                     'matchType' => 'EXACT'
-    //                                 ]
-    //                             ]
-    //                         ]
-    //                     ],
-    //                     [
-    //                         'name' => 'Auto Loan',
-    //                         'filterExpression' => [
-    //                             'funnelFieldFilter' => [
-    //                                 'fieldName' => 'pageLocation',
-    //                                 'stringFilter' => [
-    //                                     'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
-    //                                     'matchType' => 'EXACT'
-    //                                 ]
-    //                             ]
-    //                         ]
-    //                     ]
-    //                 ]
-    //             ]
-    //         ])->json();
-
-    //         return $response;
-    //     } catch (ApiException $ex) {
-    //         abort(500, 'Call failed with message: %s' . $ex->getMessage());
-    //     }
-    // }
 }

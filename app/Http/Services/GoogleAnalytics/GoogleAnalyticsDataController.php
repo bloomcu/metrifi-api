@@ -8,6 +8,20 @@ use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
+    public function funnelReport(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::funnelReport(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate,
+            // funnelSteps: $request->funnelSteps,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
     public function pageUsers(Connection $connection, Request $request)
     {   
         $report = GoogleAnalyticsData::pageUsers(
