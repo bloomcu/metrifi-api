@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\App\Services\Google;
+namespace DDD\App\Services\GoogleAuth;
 
 use Google\Client;
 use DDD\Domain\Connections\Connection;

@@ -1,5 +1,5 @@
 <?php
-namespace DDD\App\Services\GoogleAnalytics;
+namespace DDD\App\Services\GoogleAnalyticsData;
 
 use Illuminate\Support\Facades\Http;
 use Google\ApiCore\ApiException;
