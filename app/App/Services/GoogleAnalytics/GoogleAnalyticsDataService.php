@@ -26,11 +26,22 @@ class GoogleAnalyticsDataService
             [
                 'name' => 'Rec vehicle loan',
                 'filterExpression' => [
-                    'funnelFieldFilter' => [
-                        'fieldName' => 'pagePath',
-                        'stringFilter' => [
-                            'value' => '/loans/recreational-vehicle-loans/',
-                            'matchType' => 'EXACT'
+                    'andGroup' => [
+                        'expressions' => [
+                            'funnelFieldFilter' => [
+                                'fieldName' => 'unifiedPagePathScreen',
+                                'stringFilter' => [
+                                    'value' => '/loans/',
+                                    'matchType' => 'EXACT'
+                                ]
+                            ],
+                            'funnelFieldFilter' => [
+                                'fieldName' => 'unifiedPagePathScreen',
+                                'stringFilter' => [
+                                    'value' => '/loans/recreational-vehicle-loans/',
+                                    'matchType' => 'EXACT'
+                                ]
+                            ],
                         ]
                     ]
                 ]
@@ -39,7 +50,7 @@ class GoogleAnalyticsDataService
                 'name' => 'Lead capture page',
                 'filterExpression' => [
                     'funnelFieldFilter' => [
-                        'fieldName' => 'pagePath',
+                        'fieldName' => 'unifiedPagePathScreen',
                         'stringFilter' => [
                             'value' => '/application/',
                             'matchType' => 'EXACT'
@@ -51,19 +62,13 @@ class GoogleAnalyticsDataService
                 'name' => 'Lead form submitted',
                 'filterExpression' => [
                     'funnelEventFilter' => [
-                        'eventName' => 'onsiteFormSubmission',
+                        'eventName' => 'onsite_form_submission',
                         'funnelParameterFilterExpression' => [
-                            'andGroup' => [
-                                'expressions' => [
-                                    [
-                                        'funnelParameterFilter' => [
-                                            'eventParameterName' => 'pageLocation',
-                                            'stringFilter' => [
-                                                'matchType' => 'EXACT',
-                                                'value' => 'https://cuofga.org/application/'
-                                            ]
-                                        ]
-                                    ]
+                            'funnelParameterFilter' => [
+                                'eventParameterName' => 'page_location',
+                                'stringFilter' => [
+                                    'matchType' => 'EXACT',
+                                    'value' => 'https://cuofga.org/application/'
                                 ]
                             ]
                         ]
