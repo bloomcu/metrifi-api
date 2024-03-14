@@ -14,7 +14,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
-            // funnelSteps: $request->funnelSteps,
+            steps: $request->steps,
         );
 
         return response()->json([

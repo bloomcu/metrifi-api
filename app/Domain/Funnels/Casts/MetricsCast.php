@@ -4,7 +4,7 @@ namespace DDD\Domain\Funnels\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class MeasurablesCast implements CastsAttributes
+class MetricsCast implements CastsAttributes
 {
     /**
      * Cast the given value.
@@ -17,24 +17,28 @@ class MeasurablesCast implements CastsAttributes
      */
     public function get($model, string $key, $value, array $attributes)
     {
-        return collect(json_decode($value, true))->map(function ($metric) {
-            $metricAttributes = [
-                'pageUsers' => [
-                    'metric' => 'pageUsers',
-                    'pagePath' => null,
-                ],
-                'pagePlusQueryStringUsers' => [
-                    'metric' => 'pagePlusQueryStringUsers',
-                    'pagePathPlusQueryString' => null,
-                ],
-                'outboundLinkUsers' => [
-                    'metric' => 'outboundLinkUsers',
-                    'sourcePagePath' => null,
-                    'linkUrl' => null,
-                ],
-            ];
+        $defaultMetricAttributes = [
+            'pageUsers' => [
+                'metric' => 'pageUsers',
+                'pagePath' => null,
+            ],
+            'pagePlusQueryStringUsers' => [
+                'metric' => 'pagePlusQueryStringUsers',
+                'pagePathPlusQueryString' => null,
+            ],
+            'outboundLinkUsers' => [
+                'metric' => 'outboundLinkUsers',
+                'pagePath' => null,
+                'linkUrl' => null,
+            ],
+            'formUsers' => [
+                'metric' => 'formUsers',
+                'pagePath' => null,
+            ],
+        ];
 
-            $defaults = $metricAttributes[$metric['metric']];
+        return collect(json_decode($value, true))->map(function ($metric) use ($defaultMetricAttributes) {
+            $defaults = $defaultMetricAttributes[$metric['metric']];
 
             return array_merge($defaults, $metric);
         });

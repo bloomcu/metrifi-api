@@ -26,16 +26,14 @@ class StepUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'metric' => 'nullable|string',
             'order' => 'nullable|numeric',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
-            'measurables' => 'nullable|array',
-            'measurables.*.metric' => 'nullable|string',
-            'measurables.*.pagePath' => 'nullable|string',
-            'measurables.*.sourcePagePath' => 'nullable|string',
-            'measurables.*.pagePathPlusQueryString' => 'nullable|string',
-            'measurables.*.linkUrl' => 'nullable|string',
+            'metrics' => 'nullable|array',
+            'metrics.*.metric' => 'nullable|string',
+            'metrics.*.pagePath' => 'nullable|string',
+            'metrics.*.pagePathPlusQueryString' => 'nullable|string',
+            'metrics.*.linkUrl' => 'nullable|string',
         ];
     }
 

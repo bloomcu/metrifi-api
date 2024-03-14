@@ -16,98 +16,71 @@ class GoogleAnalyticsDataService
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
      * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
      */
-    public function funnelReport(Connection $connection, $startDate, $endDate)
+    public function funnelReport(Connection $connection, String $startDate, String $endDate, Array $steps)
     {
         $accessToken = $this->setupAccessToken($connection);
-
         $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken;
+        
+        /**
+         * Generate a GA funnelReport request from our app's funnel steps
+         * TODO: Refactor this using Factory and Builder patterns
+         * 
+         */
 
-        $funnelSteps = [
-            [
-                'name' => 'Rec vehicle loan',
-                'filterExpression' => [
-                    'andGroup' => [
-                        'expressions' => [
-                            'funnelFieldFilter' => [
-                                'fieldName' => 'unifiedPagePathScreen',
-                                'stringFilter' => [
-                                    'value' => '/loans/',
-                                    'matchType' => 'EXACT'
-                                ]
-                            ],
-                            'funnelFieldFilter' => [
-                                'fieldName' => 'unifiedPagePathScreen',
-                                'stringFilter' => [
-                                    'value' => '/loans/recreational-vehicle-loans/',
-                                    'matchType' => 'EXACT'
-                                ]
-                            ],
+        // Initialize an array to hold the structured funnel steps for the API request.
+        $funnelSteps = [];
+
+        // Iterate through each raw funnel step to structure it for the API request.
+        foreach ($steps as $step) {
+            $funnelFilterExpressionList = [];
+
+            // Process each metric within the step.
+            foreach ($step['metrics'] as $metric) {
+                // Structure the metric based on its type.
+                if ($metric['metric'] === 'pageUsers') {
+                    $funnelFilterExpressionList[] = [
+                        'funnelFieldFilter' => [
+                            'fieldName' => 'unifiedPagePathScreen',
+                            'stringFilter' => [
+                                'value' => $metric['pagePath'],
+                                'matchType' => 'EXACT'
+                            ]
                         ]
-                    ]
-                ]
-            ],
-            [
-                'name' => 'Lead capture page',
-                'filterExpression' => [
-                    'funnelFieldFilter' => [
-                        'fieldName' => 'unifiedPagePathScreen',
-                        'stringFilter' => [
-                            'value' => '/application/',
-                            'matchType' => 'EXACT'
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'name' => 'Lead form submitted',
-                'filterExpression' => [
-                    'funnelEventFilter' => [
-                        'eventName' => 'onsite_form_submission',
-                        'funnelParameterFilterExpression' => [
-                            'funnelParameterFilter' => [
-                                'eventParameterName' => 'page_location',
-                                'stringFilter' => [
-                                    'matchType' => 'EXACT',
-                                    'value' => 'https://cuofga.org/application/'
+                    ];
+                } elseif ($metric['metric'] === 'formSubmissions') {
+                    $funnelFilterExpressionList[] = [
+                        'funnelEventFilter' => [
+                            'eventName' => 'onsite_form_submission',
+                            'funnelParameterFilterExpression' => [
+                                'funnelParameterFilter' => [
+                                    'eventParameterName' => 'page_location',
+                                    'stringFilter' => [
+                                        'matchType' => 'EXACT',
+                                        'value' => $metric['pageLocation']
+                                    ]
                                 ]
                             ]
                         ]
+                    ];
+                }
+            }
+
+            // Add the structured step to the funnel steps array.
+            $funnelSteps[] = [
+                'name' => $step['name'],
+                'filterExpression' => [
+                    'orGroup' => [
+                        'expressions' => $funnelFilterExpressionList
                     ]
                 ]
-            ]
-        ];
+            ];
+        }
 
-        // $funnelSteps = [
-        //     [
-        //         'name' => 'Homepage',
-        //         'filterExpression' => [
-        //             'funnelFieldFilter' => [
-        //                 'fieldName' => 'pageLocation',
-        //                 'stringFilter' => [
-        //                     'value' => 'https://www.lbsfcu.org/',
-        //                     'matchType' => 'EXACT'
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     [
-        //         'name' => 'Auto Loan',
-        //         'filterExpression' => [
-        //             'funnelFieldFilter' => [
-        //                 'fieldName' => 'pageLocation',
-        //                 'stringFilter' => [
-        //                     'value' => 'https://www.lbsfcu.org/loans/auto/auto-loans/',
-        //                     'matchType' => 'EXACT'
-        //                 ]
-        //             ]
-        //         ]
-        //     ]
-        // ];
-
-        $params = [
+        // Prepare the full funnel structure for the API request.
+        $funnelReportRequest = [
             'dateRanges' => [
                 [
-                    'startDate' => $startDate, 
+                    'startDate' => $startDate,
                     'endDate' => $endDate
                 ]
             ],
@@ -118,9 +91,111 @@ class GoogleAnalyticsDataService
         ];
 
         try {
-            $response = Http::post($endpoint, $params)->json();
+            $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
+            
+            /**
+             * Format the funnel report
+             * TODO: Refactor this using a design pattern such as Strategy or Factory
+             * 
+             */
 
-            return $response;
+            // Initialize the report array
+            $report = [
+                'steps' => [],
+                'overallConversionRate' => ''
+            ];
+
+            // Variables to store first and last step users for overall conversion calculation
+            $firstStepUsers = 0;
+            $lastStepUsers = 0;
+
+            // Store the previous step's completion rate
+            $previousRate = 0;
+
+            // Iterate through each step in the funnel
+            foreach ($gaFunnelReport['funnelTable']['rows'] as $index => $row) {
+                $name = $row['dimensionValues'][0]['value'];
+                $users = $row['metricValues'][0]['value'];
+                $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '';
+                
+                // Add the step information to the report
+                $report['steps'][] = [
+                    'name' => $name,
+                    'users' => $users,
+                    'conversionRate' => $conversionRate,
+                ];
+
+                // Set first step users
+                if ($index === 0) {
+                    $firstStepUsers = $row['metricValues'][0]['value'];
+                }
+
+                // Update last step users with every iteration
+                $lastStepUsers = $users;
+
+                // Update the previous rate for the next iteration
+                $previousRate = $row['metricValues'][1]['value'];
+            }
+
+            // Calculate the overall conversion rate
+            if ($firstStepUsers > 0) {
+                $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
+                $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
+            }
+
+            return $report;
+
+            // /**
+            //  * Format the funnel report
+            //  * TODO: Refactor this using a design pattern such as Strategy or Factory
+            //  * 
+            //  */
+
+            // // Initialize the report array
+            // $report = [
+            //     'steps' => [],
+            //     'overallConversionRate' => ''
+            // ];
+
+            // // Variables to store first and last step users for overall conversion calculation
+            // $firstStepUsers = 0;
+            // $lastStepUsers = 0;
+
+            // // Iterate through each step in the funnel
+            // foreach ($gaFunnelReport['funnelTable']['rows'] as $index => $row) {
+            //     $stepName = $row['dimensionValues'][0]['value'];
+            //     $users = (int)$row['metricValues'][0]['value']; // Cast users to int for accurate formatting
+            //     $conversionRate = ''; // Initialize as empty string
+
+            //     // Check if there is a conversion rate value and format it as a percentage
+            //     if (isset($row['metricValues'][1]['value'])) {
+            //         $conversionRateValue = floatval($row['metricValues'][1]['value']) * 100;
+            //         $conversionRate = number_format($conversionRateValue, 2) . '%';
+            //     }
+
+            //     // Add the step information to the report
+            //     $report['steps'][] = [
+            //         'name' => $stepName,
+            //         'users' => $users,
+            //         'conversionRate' => $conversionRate,
+            //     ];
+
+            //     // Set first step users
+            //     if ($index === 0) {
+            //         $firstStepUsers = (int)$users;
+            //     }
+
+            //     // Update last step users with every iteration
+            //     $lastStepUsers = (int)$users;
+            // }
+
+            // // Calculate the overall conversion rate
+            // if ($firstStepUsers > 0) {
+            //     $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
+            //     $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
+            // }
+
+            // return $report;
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
