@@ -34,6 +34,11 @@ class GoogleAnalyticsDataService
         foreach ($steps as $step) {
             $funnelFilterExpressionList = [];
 
+            // If the step has no metrics, skip it.
+            if (!isset($step['metrics']) || !count($step['metrics'])) {
+                continue;
+            }
+
             // Process each metric within the step.
             foreach ($step['metrics'] as $metric) {
                 // Structure the metric based on its type.

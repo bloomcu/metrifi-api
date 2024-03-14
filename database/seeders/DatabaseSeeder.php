@@ -13,12 +13,17 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SubscriptionPlansSeeder::class,
-            OrganizationsSeeder::class,
-            UsersSeeder::class,
-            ConnectionsSeeder::class,
-            FunnelsSeeder::class,
-            FunnelStepsSeeder::class,
-            DashboardsSeeder::class,
         ]);
+
+        if (app()->environment('local')) {
+            $this->call([
+                LocalOrganizationsSeeder::class,
+                LocalUsersSeeder::class,
+                LocalConnectionsSeeder::class,
+                LocalFunnelsSeeder::class,
+                LocalFunnelStepsSeeder::class,
+                LocalDashboardsSeeder::class,
+            ]);
+        }
     }
 }
