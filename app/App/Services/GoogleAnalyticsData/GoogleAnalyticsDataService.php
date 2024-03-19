@@ -97,7 +97,7 @@ class GoogleAnalyticsDataService
 
         try {
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
-            // return $gaFunnelReport;
+            
             /**
              * Format the funnel report
              * TODO: Refactor this using a design pattern such as Strategy or Factory
@@ -118,21 +118,37 @@ class GoogleAnalyticsDataService
             $previousRate = 0;
 
             // Iterate through each step in the funnel
-            foreach ($gaFunnelReport['funnelTable']['rows'] as $index => $row) {
-                $name = $row['dimensionValues'][0]['value'];
+            // TODO: Check if we have any rows, if not, zero out all the original steps
+            foreach ($steps as $index => $step) {
+
+                if (!isset($gaFunnelReport['funnelTable']['rows'][$index])) {
+                    $report['steps'][] = [
+                        'name' => $step['name'],
+                        'users' => '0',
+                        'conversionRate' => '0%'
+                    ];
+                    continue;
+                };
+
+                $row = $gaFunnelReport['funnelTable']['rows'][$index];
+
+                // Get users for the step
                 $users = $row['metricValues'][0]['value'];
-                $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '';
+
+                // Check if there is a conversion rate value and format it as a percentage
+                // First step will always not have a conversion rate
+                // $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : 0;
                 
                 // Add the step information to the report
                 $report['steps'][] = [
-                    'name' => $name,
+                    'name' => $step['name'],
                     'users' => $users,
-                    'conversionRate' => $conversionRate,
+                    'conversionRate' => $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '0%',
                 ];
 
                 // Set first step users
                 if ($index === 0) {
-                    $firstStepUsers = $row['metricValues'][0]['value'];
+                    $firstStepUsers = $users;
                 }
 
                 // Update last step users with every iteration
