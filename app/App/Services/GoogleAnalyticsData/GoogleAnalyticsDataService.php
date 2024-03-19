@@ -34,7 +34,7 @@ class GoogleAnalyticsDataService
         foreach ($steps as $step) {
             $funnelFilterExpressionList = [];
 
-            // If the step has no metrics, skip it.
+            // If the step has no metrics setup, skip it.
             if (!isset($step['metrics']) || !count($step['metrics'])) {
                 continue;
             }
@@ -52,7 +52,7 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } elseif ($metric['metric'] === 'formSubmissions') {
+                } elseif ($metric['metric'] === 'outboundLinkUsers') {
                     $funnelFilterExpressionList[] = [
                         'funnelEventFilter' => [
                             'eventName' => 'onsite_form_submission',
@@ -70,7 +70,7 @@ class GoogleAnalyticsDataService
                 }
             }
 
-            // Add the structured step to the funnel steps array.
+            // Add the structured step to the funnel report API request as a filter expression
             $funnelSteps[] = [
                 'name' => $step['name'],
                 'filterExpression' => [
@@ -81,7 +81,7 @@ class GoogleAnalyticsDataService
             ];
         }
 
-        // Prepare the full funnel structure for the API request.
+        // Prepare the full structure for the funnel report API request.
         $funnelReportRequest = [
             'dateRanges' => [
                 [
@@ -97,7 +97,7 @@ class GoogleAnalyticsDataService
 
         try {
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
-            
+            // return $gaFunnelReport;
             /**
              * Format the funnel report
              * TODO: Refactor this using a design pattern such as Strategy or Factory
