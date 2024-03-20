@@ -29,7 +29,7 @@ class GoogleAnalyticsDataService
 
         // Initialize an array to hold the structured funnel steps for the API request.
         $funnelSteps = [];
-
+        
         // Iterate through each raw funnel step to structure it for the API request.
         foreach ($steps as $step) {
             $funnelFilterExpressionList = [];
@@ -45,10 +45,20 @@ class GoogleAnalyticsDataService
                 if ($metric['metric'] === 'pageUsers') {
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
-                            'fieldName' => 'unifiedPagePathScreen',
+                            'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                             'stringFilter' => [
                                 'value' => $metric['pagePath'],
                                 'matchType' => 'EXACT'
+                            ]
+                        ]
+                    ];
+                } elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
+                    $funnelFilterExpressionList[] = [
+                        'funnelFieldFilter' => [
+                            'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
+                            'stringFilter' => [
+                                'value' => $metric['pagePathPlusQueryString'],
+                                'matchType' => 'EXACT',
                             ]
                         ]
                     ];
@@ -97,7 +107,7 @@ class GoogleAnalyticsDataService
 
         try {
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
-            
+            // return $gaFunnelReport;
             /**
              * Format the funnel report.
              * TODO: Refactor this using a design pattern such as Strategy or Factory.
