@@ -127,7 +127,8 @@ class GoogleAnalyticsDataService
                     $report['steps'][] = [
                         'name' => $step['name'],
                         'users' => '0',
-                        'conversionRate' => '0%'
+                        'conversionRate' => '0%',
+                        'metrics' => $step['metrics']
                     ];
                     continue;
                 };
@@ -147,6 +148,7 @@ class GoogleAnalyticsDataService
                     'name' => $step['name'],
                     'users' => $users,
                     'conversionRate' => $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '0%',
+                    'metrics' => $step['metrics']
                 ];
 
                 // Set first step users.
