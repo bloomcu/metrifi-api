@@ -52,7 +52,8 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
+                } 
+                elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
@@ -62,22 +63,34 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } elseif ($metric['metric'] === 'outboundLinkUsers') {
-                    $funnelFilterExpressionList[] = [
-                        'funnelEventFilter' => [
-                            'eventName' => 'onsite_form_submission',
-                            'funnelParameterFilterExpression' => [
-                                'funnelParameterFilter' => [
-                                    'eventParameterName' => 'page_location',
-                                    'stringFilter' => [
-                                        'matchType' => 'EXACT',
-                                        'value' => $metric['pageLocation']
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ];
-                }
+                } 
+                // elseif ($metric['metric'] === 'outboundLinkUsers') {
+                //     $funnelFilterExpressionList[] = [
+                //         'funnelFieldFilter' => [
+                //             'fieldName' => 'linkUrl', // Synonymous with pagePathPlusQueryString in GA4 reports
+                //             'stringFilter' => [
+                //                 'value' => $metric['pagePathPlusQueryString'],
+                //                 'matchType' => 'EXACT',
+                //             ]
+                //         ]
+                //     ];
+                // } 
+                // elseif ($metric['metric'] === 'formUsers') {
+                //     $funnelFilterExpressionList[] = [
+                //         'funnelEventFilter' => [
+                //             'eventName' => 'onsite_form_submission',
+                //             'funnelParameterFilterExpression' => [
+                //                 'funnelParameterFilter' => [
+                //                     'eventParameterName' => 'page_location',
+                //                     'stringFilter' => [
+                //                         'matchType' => 'EXACT',
+                //                         'value' => $metric['pageLocation']
+                //                     ]
+                //                 ]
+                //             ]
+                //         ]
+                //     ];
+                // }
             }
 
             // Add the structured step to the funnel report API request as a filter expression.
