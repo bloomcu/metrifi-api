@@ -64,33 +64,48 @@ class GoogleAnalyticsDataService
                         ]
                     ];
                 } 
-                // elseif ($metric['metric'] === 'outboundLinkUsers') {
-                //     $funnelFilterExpressionList[] = [
-                //         'funnelFieldFilter' => [
-                //             'fieldName' => 'linkUrl', // Synonymous with pagePathPlusQueryString in GA4 reports
-                //             'stringFilter' => [
-                //                 'value' => $metric['pagePathPlusQueryString'],
-                //                 'matchType' => 'EXACT',
-                //             ]
-                //         ]
-                //     ];
-                // } 
-                // elseif ($metric['metric'] === 'formUsers') {
-                //     $funnelFilterExpressionList[] = [
-                //         'funnelEventFilter' => [
-                //             'eventName' => 'onsite_form_submission',
-                //             'funnelParameterFilterExpression' => [
-                //                 'funnelParameterFilter' => [
-                //                     'eventParameterName' => 'page_location',
-                //                     'stringFilter' => [
-                //                         'matchType' => 'EXACT',
-                //                         'value' => $metric['pageLocation']
-                //                     ]
-                //                 ]
-                //             ]
-                //         ]
-                //     ];
-                // }
+                elseif ($metric['metric'] === 'outboundLinkUsers') {
+                    $funnelFilterExpressionList[] = [
+                        'andGroup' => [
+                            'expressions' => [
+                                [
+                                    'funnelFieldFilter' => [
+                                        'fieldName' => 'linkUrl',
+                                        'stringFilter' => [
+                                            'value' => $metric['linkUrl'],
+                                            'matchType' => 'EXACT',
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'funnelFieldFilter' => [
+                                        'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
+                                        'stringFilter' => [
+                                            'value' => $metric['pagePath'],
+                                            'matchType' => 'EXACT',
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ];
+                } 
+                elseif ($metric['metric'] === 'formUsers') {
+                    $funnelFilterExpressionList[] = [
+                        'funnelEventFilter' => [
+                            'eventName' => 'form_submit',
+                            'funnelParameterFilterExpression' => [
+                                'funnelParameterFilter' => [
+                                    'eventParameterName' => 'page_location',
+                                    'stringFilter' => [
+                                        'matchType' => 'EXACT',
+                                        'value' => $metric['pageLocation']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ];
+                }
             }
 
             // Add the structured step to the funnel report API request as a filter expression.
@@ -253,6 +268,15 @@ class GoogleAnalyticsDataService
         }
     }
     
+    /**
+     * Get a list of pages and the number of users who visited them
+     *
+     * @param Connection $connection
+     * @param [type] $startDate
+     * @param [type] $endDate
+     * @param array $pagePaths
+     * @return void
+     */
     public function pageUsers(Connection $connection, $startDate, $endDate, $pagePaths = [])
     {
         // Default filter expression
@@ -318,6 +342,15 @@ class GoogleAnalyticsDataService
         ]);
     }
 
+    /**
+     * Get a list of pages with query strings and the number of users who visited them
+     *
+     * @param Connection $connection
+     * @param [type] $startDate
+     * @param [type] $endDate
+     * @param array $pagePathPlusQueryStrings
+     * @return void
+     */
     public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $pagePathPlusQueryStrings = [])
     {
         // Default filter expression
@@ -334,7 +367,7 @@ class GoogleAnalyticsDataService
         // ];
         // $filters = [];
 
-        // If contains array are specified, filter on them
+        // If page paths plus query strings are specified, filter on them
         if ($pagePathPlusQueryStrings && count($pagePathPlusQueryStrings)) {
             foreach($pagePathPlusQueryStrings as $pagePathPlusQueryString) {
                 $filters[] = [
@@ -383,6 +416,15 @@ class GoogleAnalyticsDataService
         ]);
     }
 
+    /**
+     * Get a list of pages with outbound link clicks
+     *
+     * @param Connection $connection
+     * @param [type] $startDate
+     * @param [type] $endDate
+     * @param [type] $linkUrls
+     * @return void
+     */
     public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $linkUrls = null)
     {
         // By default, return all outbound link clicks
@@ -433,6 +475,16 @@ class GoogleAnalyticsDataService
         ]);
     }
 
+    /**
+     * Get number of users who clicked on an outbound link from a specific page
+     *
+     * @param Connection $connection
+     * @param [string] $startDate
+     * @param [string] $endDate
+     * @param [type] $linkUrls
+     * @param [type] $sourcePagePath
+     * @return void
+     */
     public function outboundLinkByPagePathUsers(Connection $connection, $startDate, $endDate, $linkUrls = null, $sourcePagePath)
     {
         $fullReport = $this->outboundLinkUsers($connection, $startDate, $endDate, $linkUrls);
