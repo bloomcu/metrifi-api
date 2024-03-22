@@ -78,4 +78,17 @@ class GoogleAnalyticsDataController extends Controller
             'data' => $report
         ], 200);
     }
+
+    public function formUserSubmissions(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::formUserSubmissions(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
 }

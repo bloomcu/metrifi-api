@@ -90,16 +90,31 @@ class GoogleAnalyticsDataService
                         ]
                     ];
                 } 
-                elseif ($metric['metric'] === 'formUsers') {
+                elseif ($metric['metric'] === 'formUserSubmissions') {
                     $funnelFilterExpressionList[] = [
-                        'funnelEventFilter' => [
-                            'eventName' => 'form_submit',
-                            'funnelParameterFilterExpression' => [
-                                'funnelParameterFilter' => [
-                                    'eventParameterName' => 'page_location',
-                                    'stringFilter' => [
-                                        'matchType' => 'EXACT',
-                                        'value' => $metric['pageLocation']
+                        'andGroup' => [
+                            'expressions' => [
+                                [
+                                    'funnelFieldFilter' => [
+                                        'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
+                                        'stringFilter' => [
+                                            'value' => $metric['pagePath'],
+                                            'matchType' => 'EXACT',
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'funnelEventFilter' => [
+                                        'eventName' => 'form_submit',
+                                        'funnelParameterFilterExpression' => [
+                                            'funnelParameterFilter' => [
+                                                'eventParameterName' => 'form_destination',
+                                                'stringFilter' => [
+                                                    'matchType' => 'EXACT',
+                                                    'value' => $metric['formDestination']
+                                                ]
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
@@ -132,6 +147,8 @@ class GoogleAnalyticsDataService
                 'steps' => $funnelSteps
             ]
         ];
+        
+        // return $funnelReportRequest;
 
         try {
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
@@ -439,17 +456,17 @@ class GoogleAnalyticsDataService
         ];
 
         // If outbound link urls are specified, filter on them
-        if ($linkUrls) {
-            $expressions = collect($linkUrls)->map(fn ($linkUrl) => [
-                'filter' => [
-                    'fieldName' => 'linkUrl',
-                    'stringFilter' => [
-                        'matchType' => 'EXACT',
-                        'value' => $linkUrl
-                    ]
-                ]
-            ])->toArray();
-        }
+        // if ($linkUrls) {
+        //     $expressions = collect($linkUrls)->map(fn ($linkUrl) => [
+        //         'filter' => [
+        //             'fieldName' => 'linkUrl',
+        //             'stringFilter' => [
+        //                 'matchType' => 'EXACT',
+        //                 'value' => $linkUrl
+        //             ]
+        //         ]
+        //     ])->toArray();
+        // }
         
         return $this->runReport($connection, [
             'dateRanges' => [
@@ -524,6 +541,55 @@ class GoogleAnalyticsDataService
         }
 
         return $report;
+    }
+    
+    /**
+     * Get a list of all pages with user form submissions by form id
+     *
+     * Enhanced measurement events and parameters: https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=13367566&sjid=3386798091051746172-NC
+     * Tracking form submissions: https://ezsegment.com/automatic-form-interaction-tracking-in-ga4/
+     * 
+     * 
+     * @param Connection $connection
+     * @param [string] $startDate
+     * @param [string] $endDate
+     * @return void
+     */
+    public function formUserSubmissions(Connection $connection, $startDate, $endDate)
+    {
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                // ['name' => 'eventName'],
+                ['name' => 'pagePath'],
+                ['name' => 'customEvent:form_destination'],
+            ],
+            'metrics' => [
+                ['name' => 'totalUsers']
+            ],
+            'dimensionFilter' => [
+                // 'filter' => [
+                //     'fieldName' => 'eventName',
+                //     'stringFilter' => [
+                //         'matchType' => 'EXACT',
+                //         'value' => 'form_submit'
+                //     ]
+                // ],
+                'notExpression' => [ 
+                    'filter' => [
+                        'fieldName' => 'customEvent:form_destination',
+                        'stringFilter' => [
+                            'matchType' => 'EXACT',
+                            'value' => '(not set)' // Cannot contain "(not set)"
+                        ]
+                    ]
+                ]
+            ],
+            'limit' => '500',
+            'metricAggregations' => ['TOTAL'],
+        ]);
     }
 
     /**

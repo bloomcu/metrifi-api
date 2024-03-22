@@ -34,6 +34,7 @@ class StepUpdateRequest extends FormRequest
             'metrics.*.pagePath' => 'nullable|string',
             'metrics.*.pagePathPlusQueryString' => 'nullable|string',
             'metrics.*.linkUrl' => 'nullable|string',
+            'metrics.*.formDestination' => 'nullable|string',
         ];
     }
 
