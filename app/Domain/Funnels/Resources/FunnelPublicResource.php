@@ -19,6 +19,7 @@ class FunnelPublicResource extends JsonResource
             'id' => $this->id,
             'organization' => new OrganizationPublicResource($this->organization),
             'name' => $this->name,
+            'conversion_value' => $this->conversion_value,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

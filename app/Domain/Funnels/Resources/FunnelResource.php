@@ -28,6 +28,7 @@ class FunnelResource extends JsonResource
             // 'automating' => $this->automating,
             // 'automation_msg' => $this->automation_msg,
             'zoom' => $this->zoom,
+            'conversion_value' => $this->conversion_value,
             'steps' => FunnelStepResource::collection($this->steps),
             'messages' => $this->messages,
             'created_at' => $this->created_at,
