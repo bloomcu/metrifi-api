@@ -35,6 +35,9 @@ class StepCreateRequest extends FormRequest
             'metrics.*.pagePathPlusQueryString' => 'nullable|string',
             'metrics.*.linkUrl' => 'nullable|string',
             'metrics.*.formDestination' => 'nullable|string',
+            'metrics.*.formId' => 'nullable|string',
+            'metrics.*.formLength' => 'nullable|string',
+            'metrics.*.formSubmitText' => 'nullable|string',
         ];
     }
 

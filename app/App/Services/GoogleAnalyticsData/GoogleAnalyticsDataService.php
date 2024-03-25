@@ -96,6 +96,15 @@ class GoogleAnalyticsDataService
                             'expressions' => [
                                 [
                                     'funnelFieldFilter' => [
+                                        'fieldName' => 'eventName',
+                                        'stringFilter' => [
+                                            'value' => 'form_submit',
+                                            'matchType' => 'EXACT',
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'funnelFieldFilter' => [
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
                                             'value' => $metric['pagePath'],
@@ -116,12 +125,56 @@ class GoogleAnalyticsDataService
                                             ]
                                         ]
                                     ]
-                                ]
+                                ],
+                                [
+                                    'funnelEventFilter' => [
+                                        'eventName' => 'form_submit',
+                                        'funnelParameterFilterExpression' => [
+                                            'funnelParameterFilter' => [
+                                                'eventParameterName' => 'form_id',
+                                                'stringFilter' => [
+                                                    'matchType' => 'EXACT',
+                                                    'value' => $metric['formId']
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'funnelEventFilter' => [
+                                        'eventName' => 'form_submit',
+                                        'funnelParameterFilterExpression' => [
+                                            'funnelParameterFilter' => [
+                                                'eventParameterName' => 'form_length',
+                                                'stringFilter' => [
+                                                    'matchType' => 'EXACT',
+                                                    'value' => $metric['formLength']
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'funnelEventFilter' => [
+                                        'eventName' => 'form_submit',
+                                        'funnelParameterFilterExpression' => [
+                                            'funnelParameterFilter' => [
+                                                'eventParameterName' => 'form_submit_text',
+                                                'stringFilter' => [
+                                                    'matchType' => 'EXACT',
+                                                    'value' => $metric['formSubmitText']
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ],
                             ]
                         ]
                     ];
                 }
             }
+
+            // return $funnelFilterExpressionList;
 
             // Add the structured step to the funnel report API request as a filter expression.
             $funnelSteps[] = [
@@ -133,6 +186,8 @@ class GoogleAnalyticsDataService
                 ]
             ];
         }
+
+        // return $funnelSteps;
 
         // Prepare the full structure for the funnel report API request.
         $funnelReportRequest = [
@@ -153,6 +208,7 @@ class GoogleAnalyticsDataService
         try {
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
             // return $gaFunnelReport;
+            
             /**
              * Format the funnel report.
              * TODO: Refactor this using a design pattern such as Strategy or Factory.
@@ -562,27 +618,47 @@ class GoogleAnalyticsDataService
                 ['startDate' => $startDate, 'endDate' => $endDate]
             ],
             'dimensions' => [
-                // ['name' => 'eventName'],
+                ['name' => 'eventName'],
                 ['name' => 'pagePath'],
                 ['name' => 'customEvent:form_destination'],
+                ['name' => 'customEvent:form_id'],
+                ['name' => 'customEvent:form_length'],
+                ['name' => 'customEvent:form_submit_text'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
             ],
+            // 'dimensionFilter' => [
+            //     'filter' => [
+            //         'fieldName' => 'eventName',
+            //         'stringFilter' => [
+            //             'matchType' => 'EXACT',
+            //             'value' => 'form_submit'
+            //         ]
+            //     ]
+            // ],
             'dimensionFilter' => [
-                // 'filter' => [
-                //     'fieldName' => 'eventName',
-                //     'stringFilter' => [
-                //         'matchType' => 'EXACT',
-                //         'value' => 'form_submit'
-                //     ]
-                // ],
-                'notExpression' => [ 
-                    'filter' => [
-                        'fieldName' => 'customEvent:form_destination',
-                        'stringFilter' => [
-                            'matchType' => 'EXACT',
-                            'value' => '(not set)' // Cannot contain "(not set)"
+                'andGroup' => [
+                    'expressions' => [
+                        [
+                            'filter' => [
+                                'fieldName' => 'eventName',
+                                'stringFilter' => [
+                                    'matchType' => 'EXACT',
+                                    'value' => 'form_submit'
+                                ]
+                            ]
+                        ],
+                        [
+                            'notExpression' => [ 
+                                'filter' => [
+                                    'fieldName' => 'customEvent:form_destination',
+                                    'stringFilter' => [
+                                        'matchType' => 'EXACT',
+                                        'value' => '(not set)' // Cannot contain "(not set)"
+                                    ]
+                                ]
+                            ]
                         ]
                     ]
                 ]

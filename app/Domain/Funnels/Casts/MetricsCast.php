@@ -35,6 +35,9 @@ class MetricsCast implements CastsAttributes
                 'metric' => 'formUserSubmissions',
                 'pagePath' => null,
                 'formDestination' => null,
+                'formId' => null,
+                'formLength' => null,
+                'formSubmitText' => null,
             ],
         ];
 
