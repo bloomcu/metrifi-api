@@ -5,7 +5,7 @@ namespace DDD\Domain\Funnels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Traits\IsOrderable;
-use DDD\Domain\Funnels\Casts\MeasurablesCast;
+use DDD\Domain\Funnels\Casts\MetricsCast;
 use DDD\App\Traits\BelongsToFunnel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,6 +21,6 @@ class FunnelStep extends Model
     ];
 
     protected $casts = [
-        'measurables' => MeasurablesCast::class,
+        'metrics' => MetricsCast::class,
     ];
 }

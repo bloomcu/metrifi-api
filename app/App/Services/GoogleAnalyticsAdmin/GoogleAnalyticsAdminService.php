@@ -1,7 +1,7 @@
 <?php
 // TODO: Maybe move this to the Google Analytics service folder
 
-namespace DDD\App\Services\GoogleAnalytics;
+namespace DDD\App\Services\GoogleAnalyticsAdmin;
 
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\ApiException;

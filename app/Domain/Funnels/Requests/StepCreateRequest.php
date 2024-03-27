@@ -26,11 +26,18 @@ class StepCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'metric' => 'nullable|string',
             'order' => 'nullable|numeric',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
-            'measurables' => 'nullable|array',
+            'metrics' => 'nullable|array',
+            'metrics.*.metric' => 'nullable|string',
+            'metrics.*.pagePath' => 'nullable|string',
+            'metrics.*.pagePathPlusQueryString' => 'nullable|string',
+            'metrics.*.linkUrl' => 'nullable|string',
+            'metrics.*.formDestination' => 'nullable|string',
+            'metrics.*.formId' => 'nullable|string',
+            'metrics.*.formLength' => 'nullable|string',
+            'metrics.*.formSubmitText' => 'nullable|string',
         ];
     }
 

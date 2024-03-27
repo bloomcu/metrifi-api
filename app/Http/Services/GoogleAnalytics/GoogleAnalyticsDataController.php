@@ -8,13 +8,27 @@ use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
+    public function funnelReport(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::funnelReport(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate,
+            steps: $request->steps,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
     public function pageUsers(Connection $connection, Request $request)
     {   
         $report = GoogleAnalyticsData::pageUsers(
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            measurables: $request->measurables,
+            pagePaths: $request->pagePaths,
         );
 
         return response()->json([
@@ -28,7 +42,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            measurables: $request->measurables,
+            pagePathPlusQueryStrings: $request->pagePathPlusQueryStrings,
         );
 
         return response()->json([
@@ -42,7 +56,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
-            outboundLinkUrls: $request->outboundLinkUrls,
+            linkUrls: $request->linkUrls,
         );
 
         return response()->json([
@@ -56,8 +70,21 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
-            outboundLinkUrls: $request->outboundLinkUrls,
-            pagePath: $request->pagePath,
+            sourcePagePath: $request->sourcePagePath,
+            linkUrls: $request->linkUrls,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
+    public function formUserSubmissions(Connection $connection, Request $request)
+    {
+        $report = GoogleAnalyticsData::formUserSubmissions(
+            connection: $connection, 
+            startDate: $request->startDate, 
+            endDate: $request->endDate,
         );
 
         return response()->json([

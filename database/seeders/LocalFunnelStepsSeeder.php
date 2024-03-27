@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use DDD\Domain\Funnels\FunnelStep;
 
-class FunnelStepsSeeder extends Seeder
+class LocalFunnelStepsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,24 +16,33 @@ class FunnelStepsSeeder extends Seeder
             [
                 'funnel_id' => 1,
                 'order' => 1,
-                'name' => 'Step 1',
-                'description' => 'The first step',
-                'measurables' => [
+                'name' => 'Home loans',
+                'metrics' => [
                     [
                         'metric' => 'pageUsers',
-                        'measurable' => '/',
+                        'pagePath' => '/loans/home-loans/',
                     ],
                 ],
             ],
             [
                 'funnel_id' => 1,
                 'order' => 2,
-                'name' => 'Step 2',
-                'description' => 'The second step',
-                'measurables' => [
+                'name' => 'Home equity loan',
+                'metrics' => [
                     [
                         'metric' => 'pageUsers',
-                        'measurable' => '/page',
+                        'pagePath' => '/loans/home-loans/home-equity-loans/',
+                    ],
+                ],
+            ],
+            [
+                'funnel_id' => 1,
+                'order' => 3,
+                'name' => 'Home equity application',
+                'metrics' => [
+                    [
+                        'metric' => 'pageUsers',
+                        'pagePath' => '/loans/home-loans/home-equity-loans/application/',
                     ],
                 ],
             ],

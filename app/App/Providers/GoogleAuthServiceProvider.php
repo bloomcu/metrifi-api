@@ -3,7 +3,7 @@
 namespace DDD\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use DDD\App\Services\Google\GoogleAuthService;
+use DDD\App\Services\GoogleAuth\GoogleAuthService;
 
 class GoogleAuthServiceProvider extends ServiceProvider
 {
