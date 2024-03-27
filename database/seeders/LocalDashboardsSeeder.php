@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use DDD\Domain\Dashboards\Dashboard;
 
-class DashboardsSeeder extends Seeder
+class LocalDashboardsSeeder extends Seeder
 {
     /**
      * Run the database seeds.

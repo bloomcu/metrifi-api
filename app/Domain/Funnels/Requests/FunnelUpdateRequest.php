@@ -30,6 +30,7 @@ class FunnelUpdateRequest extends FormRequest
             'name' => 'nullable|string',
             'description' => 'nullable|string',
             'zoom' => 'nullable|numeric',
+            'conversion_value' => 'nullable|numeric',
         ];
     }
 

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use DDD\Domain\Funnels\Funnel;
 
-class FunnelsSeeder extends Seeder
+class LocalFunnelsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,9 +17,9 @@ class FunnelsSeeder extends Seeder
                 'organization_id' => 1,
                 'user_id' => 1,
                 'connection_id' => 1,
-                'name' => 'The funnel name',
-                'description' => 'The funnel description',
+                'name' => 'Home equity loan',
                 'zoom' => 0,
+                'user_value' => 100,
             ],
         ];
 

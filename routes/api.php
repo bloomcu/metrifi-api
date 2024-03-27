@@ -28,6 +28,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Google Analytics data
     Route::prefix('ga')->group(function() {
+        // Funnel report
+        Route::post('funnel-report/{connection}', [GoogleAnalyticsDataController::class, 'funnelReport']);
+        
         // Page users
         Route::post('page-users/{connection}', [GoogleAnalyticsDataController::class, 'pageUsers']);
         Route::post('page-plus-query-string-users/{connection}', [GoogleAnalyticsDataController::class, 'pagePlusQueryStringUsers']);
@@ -35,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function() {
         // Outbound link users
         Route::post('outbound-link-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkUsers']);
         Route::post('outbound-link-by-page-path-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkByPagePathUsers']);
+
+        // Form users
+        // Route::post('form-start-users/{connection}', [GoogleAnalyticsDataController::class, 'formStartUsers']);
+        Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {

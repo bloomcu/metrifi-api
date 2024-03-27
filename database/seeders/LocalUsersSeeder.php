@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use DDD\Domain\Base\Users\User;
 
-class UsersSeeder extends Seeder
+class LocalUsersSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,7 +18,7 @@ class UsersSeeder extends Seeder
                 'email' => 'john@doe.com',
                 'role' => 'editor',
                 'organization_id' => 1,
-                'password' => bcrypt('8;lkqthn35k;j6ltng3q5k;sG2'),
+                'password' => bcrypt(config('seeding.user_password')),
             ],
         ];
 
