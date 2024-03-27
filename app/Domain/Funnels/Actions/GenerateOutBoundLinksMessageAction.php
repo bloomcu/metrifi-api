@@ -48,7 +48,7 @@ class GenerateOutBoundLinksMessageAction
     private function getFunnelLastStepTerminalPagePath(Funnel $funnel) {
         $max = $funnel->steps()->max('order');
         $lastStep = $funnel->steps()->where('order', $max)->first();
-        $lastStepPath = $lastStep->measurables[0]['measurable'];
+        $lastStepPath = $lastStep->measurables[0]['pagePath'];
 
         return $lastStepPath;
     }

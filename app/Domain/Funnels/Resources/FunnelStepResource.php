@@ -17,10 +17,9 @@ class FunnelStepResource extends JsonResource
         return [
             'id' => $this->id,
             'order' => $this->order,
-            'metric' => $this->metric, // pageView, outboundLinkClick, elementClick, formSubmission
             'name' => $this->name,
-            'description' => $this->description,
-            'measurables' => $this->measurables, // Pages, Links, Elements, Forms.
+            // 'description' => $this->description,
+            'metrics' => $this->metrics,
             'total' => 0,
         ];
     }

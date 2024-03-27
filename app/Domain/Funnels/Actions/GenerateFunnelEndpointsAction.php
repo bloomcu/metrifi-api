@@ -58,7 +58,7 @@ class GenerateFunnelEndpointsAction
             connection: $connection, 
             startDate: '28daysAgo',
             endDate: 'today',
-            measurables: null,
+            pagePaths: null,
         );
     }
 }
