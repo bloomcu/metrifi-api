@@ -216,10 +216,10 @@ class GoogleAnalyticsDataService
              */
 
             // Initialize the report array.
-            $report = [
-                'steps' => [],
-                'overallConversionRate' => '0%'
-            ];
+            // $report = [
+            //     'steps' => [],
+            //     'overallConversionRate' => '0%'
+            // ];
 
             // Variables to store first and last step users for overall conversion calculation.
             // $firstStepUsers = 0;
@@ -235,12 +235,7 @@ class GoogleAnalyticsDataService
                 // If the step is not in the report, that means it has 0 users.
                 // Add it with 0 users and 0% conversion rate.
                 if (!isset($gaFunnelReport['funnelTable']['rows'][$index])) {
-                    $report['steps'][] = [
-                        'name' => $step['name'],
-                        'users' => '0',
-                        'conversionRate' => '0%',
-                        'metrics' => $step['metrics']
-                    ];
+                    $steps[$index]['users'] = '0';
                     continue;
                 };
 
@@ -255,12 +250,7 @@ class GoogleAnalyticsDataService
                 // $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : 0;
                 
                 // Add the step information to the report
-                $report['steps'][] = [
-                    'name' => $step['name'],
-                    'users' => $users,
-                    'conversionRate' => $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '0%',
-                    'metrics' => $step['metrics']
-                ];
+                $steps[$index]['users'] = $users;
 
                 // Set first step users.
                 // if ($index === 0) {
@@ -271,19 +261,19 @@ class GoogleAnalyticsDataService
                 // $lastStepUsers = $users;
 
                 // Update the previous rate for the next iteration.
-                $previousRate = $row['metricValues'][1]['value'];
+                // $previousRate = $row['metricValues'][1]['value'];
             }
 
             // Calculate the overall conversion rate.
-            $firstStepUsers = $report['steps'][0]['users'];
-            $lastStepUsers = end($report['steps'])['users'];
+            // $firstStepUsers = $report['steps'][0]['users'];
+            // $lastStepUsers = end($report['steps'])['users'];
 
-            if ($firstStepUsers > 0) {
-                $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
-                $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
-            }
+            // if ($firstStepUsers > 0) {
+            //     $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
+            //     $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
+            // }
 
-            return $report;
+            return $steps;
 
             // /**
             //  * Format the funnel report
