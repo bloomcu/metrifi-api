@@ -337,28 +337,15 @@ class GoogleAnalyticsDataService
      * @param Connection $connection
      * @param [type] $startDate
      * @param [type] $endDate
-     * @param array $pagePaths
+     * @param array $exact
+     * @param string $contains
      * @return void
      */
-    public function pageUsers(Connection $connection, $startDate, $endDate, $pagePaths = [])
+    public function pageUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
     {
-        // Default filter expression
-        // $filters = [
-        //     [
-        //         'filter' => [
-        //             'fieldName' => 'pagePath',
-        //             'stringFilter' => [
-        //                 'matchType' => 'BEGINS_WITH',
-        //                 'value' => '/' // Cannot be empty
-        //             ]
-        //         ]
-        //     ]
-        // ];
-        // $filters = [];
-
-        // If page path is specified, filter on it
-        if ($pagePaths && count($pagePaths)) {
-            foreach ($pagePaths as $pagePath) {
+        // Build filer expression(s)
+        if ($exact && count($exact)) {
+            foreach ($exact as $pagePath) {
                 $filters[] = [
                     'filter' => [
                         'fieldName' => 'pagePath',
@@ -370,6 +357,17 @@ class GoogleAnalyticsDataService
                     ]
                 ];
             }
+        } elseif ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'pagePath',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        'caseSensitive' => true,
+                        'value' => $contains
+                    ]
+                ]
+            ];
         } else {
             $filters = [
                 [
@@ -414,36 +412,20 @@ class GoogleAnalyticsDataService
      * @param array $pagePathPlusQueryStrings
      * @return void
      */
-    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $pagePathPlusQueryStrings = [])
+    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
-        // Default filter expression
-        // $filters = [
-        //     [
-        //         'filter' => [
-        //             'fieldName' => 'pagePathPlusQueryString',
-        //             'stringFilter' => [
-        //                 'matchType' => 'FULL_REGEXP',
-        //                 'value' => '.+' // Cannot be empty
-        //             ]
-        //         ]
-        //     ]
-        // ];
-        // $filters = [];
-
-        // If page paths plus query strings are specified, filter on them
-        if ($pagePathPlusQueryStrings && count($pagePathPlusQueryStrings)) {
-            foreach($pagePathPlusQueryStrings as $pagePathPlusQueryString) {
-                $filters[] = [
-                    'filter' => [
-                        'fieldName' => 'pagePathPlusQueryString',
-                        'stringFilter' => [
-                            'matchType' => 'CONTAINS',
-                            'caseSensitive' => true,
-                            'value' => $pagePathPlusQueryString
-                        ]
+        // Build filer expression(s)
+        if ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'pagePathPlusQueryString',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        // 'caseSensitive' => true,
+                        'value' => $contains
                     ]
-                ];
-            }
+                ]
+            ];
         } else {
             $filters = [
                 [
@@ -451,7 +433,7 @@ class GoogleAnalyticsDataService
                         'fieldName' => 'pagePathPlusQueryString',
                         'stringFilter' => [
                             'matchType' => 'FULL_REGEXP',
-                            'value' => '.+' // Result cannot be empty
+                            'value' => '.+' // Cannot be empty
                         ]
                     ]
                 ]
@@ -488,31 +470,32 @@ class GoogleAnalyticsDataService
      * @param [type] $linkUrls
      * @return void
      */
-    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $linkUrls = null)
+    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
-        // By default, return all outbound link clicks
-        $expressions = [
-            'filter' => [
-                'fieldName' => 'linkUrl',
-                'stringFilter' => [
-                    'matchType' => 'FULL_REGEXP',
-                    'value' => '.+' // Cannot be empty
+        // Build filer expression(s)
+        if ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'linkUrl',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        'value' => $contains
+                    ]
                 ]
-            ]
-        ];
-
-        // If outbound link urls are specified, filter on them
-        // if ($linkUrls) {
-        //     $expressions = collect($linkUrls)->map(fn ($linkUrl) => [
-        //         'filter' => [
-        //             'fieldName' => 'linkUrl',
-        //             'stringFilter' => [
-        //                 'matchType' => 'EXACT',
-        //                 'value' => $linkUrl
-        //             ]
-        //         ]
-        //     ])->toArray();
-        // }
+            ];
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'linkUrl',
+                        'stringFilter' => [
+                            'matchType' => 'FULL_REGEXP',
+                            'value' => '.+' // Cannot be empty
+                        ]
+                    ]
+                ]
+            ];
+        }
         
         return $this->runReport($connection, [
             'dateRanges' => [
@@ -528,9 +511,7 @@ class GoogleAnalyticsDataService
             ],
             'dimensionFilter' => [
                 'orGroup' => [
-                    'expressions' => [
-                        ...$expressions
-                    ]
+                    'expressions' => $filters
                 ]
             ],
             'limit' => '500',
