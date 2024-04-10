@@ -28,7 +28,8 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            pagePaths: $request->pagePaths,
+            exact: $request->exact,
+            contains: $request->contains,
         );
 
         return response()->json([
@@ -42,7 +43,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            pagePathPlusQueryStrings: $request->pagePathPlusQueryStrings,
+            contains: $request->contains,
         );
 
         return response()->json([
@@ -56,7 +57,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
-            linkUrls: $request->linkUrls,
+            contains: $request->contains,
         );
 
         return response()->json([
