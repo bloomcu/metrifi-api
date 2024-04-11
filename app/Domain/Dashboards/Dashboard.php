@@ -2,7 +2,6 @@
 
 namespace DDD\Domain\Dashboards;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Funnel;
@@ -12,7 +11,6 @@ use DDD\App\Traits\BelongsToOrganization;
 class Dashboard extends Model
 {
     use HasFactory,
-        SoftDeletes,
         BelongsToOrganization,
         BelongsToUser;
 
@@ -20,16 +18,14 @@ class Dashboard extends Model
         'id',
     ];
 
-    // public static function boot ()
-    // {
-    //     parent::boot();
+    public static function boot()
+    {
+        parent::boot();
 
-    //     self::updating(function (Dashboard $dashboard) {
-    //         if (request()->attachFunnels) {
-    //             $dashboard->funnels(request()->attachFunnels);
-    //         }
-    //     });
-    // }
+        self::deleting(function (Dashboard $dashboard) {
+            $dashboard->funnels()->detach();
+        });
+    }
 
     /**
      * Funnels associated with the dashboard.
