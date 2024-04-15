@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Domain\Base\Comments\Requests;
+namespace DDD\Domain\Base\Organizations\Requests;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Exception;
 
-class CommentStoreRequest extends FormRequest
+class UpdateOrganizationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class CommentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required|string|max:5000',
-            'group' => 'string',
+            'title' => 'string',
         ];
     }
 

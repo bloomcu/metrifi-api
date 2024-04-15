@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Domain\Base\Media\Requests;
+namespace DDD\Domain\Base\Organizations\Requests;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Exception;
 
-class StoreMediaRequest extends FormRequest
+class StoreOrganizationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,14 +22,8 @@ class StoreMediaRequest extends FormRequest
      */
     public function rules(): array
     {
-        if (! $this->has('collection')) {
-            $this->merge(['collection' => 'default']);
-        }
-
         return [
-            'file' => 'max:100000', // Max 100mb
-            'collection' => 'nullable|string',
-            'tags' => 'nullable|string',
+            'title' => 'required|string',
         ];
     }
 

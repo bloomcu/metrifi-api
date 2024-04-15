@@ -10,16 +10,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use DDD\App\Traits\HasSlug;
-use DDD\App\Traits\HasComments;
 
 class Organization extends Model
 {
     use Billable,
-        HasComments,
         HasFactory,
         HasSlug;
 
     protected $guarded = ['id', 'slug'];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::deleting(function (Organization $organization) {
+            $organization->invitations()->delete();
+            $organization->files()->delete();
+            $organization->teams()->delete();
+            $organization->users()->delete();
+        });
+    }
 
     /**
      * Users associated with the organization.
@@ -56,13 +66,13 @@ class Organization extends Model
     /**
      * Plan organization is subscribed to.
      */
-    public function plan(): HasOneThrough
-    {
-        return $this->hasOneThrough(
-            Plan::class, Subscription::class,
-            'organization_id', 'stripe_price_id', 'id', 'stripe_price'
-        )
-            ->whereNull('subscriptions.ends_at') // Not being cancelled
-            ->withDefault(Plan::free()->toArray());
-    }
+    // public function plan(): HasOneThrough
+    // {
+    //     return $this->hasOneThrough(
+    //         Plan::class, Subscription::class,
+    //         'organization_id', 'stripe_price_id', 'id', 'stripe_price'
+    //     )
+    //         ->whereNull('subscriptions.ends_at') // Not being cancelled
+    //         ->withDefault(Plan::free()->toArray());
+    // }
 }
