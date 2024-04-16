@@ -51,6 +51,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // public static function boot()
+    // {
+    //     parent::boot();
+
+    //     self::deleting(function (User $user) {
+    //         $user->connections()->delete();
+    //         $user->funnels()->delete();
+    //         $user->dashboards()->delete();
+    //     });
+    // }
+
     // TODO: Move to a one to many (user belongs to many orgs)
     public function organization(): BelongsTo
     {

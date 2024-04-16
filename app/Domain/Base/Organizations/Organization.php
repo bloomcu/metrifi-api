@@ -19,17 +19,17 @@ class Organization extends Model
 
     protected $guarded = ['id', 'slug'];
 
-    public static function boot()
-    {
-        parent::boot();
+    // public static function boot()
+    // {
+    //     parent::boot();
 
-        self::deleting(function (Organization $organization) {
-            $organization->invitations()->delete();
-            $organization->files()->delete();
-            $organization->teams()->delete();
-            $organization->users()->delete();
-        });
-    }
+    //     self::deleting(function (Organization $organization) {
+    //         $organization->invitations()->delete();
+    //         $organization->files()->delete();
+    //         $organization->teams()->delete();
+    //         $organization->users()->delete();
+    //     });
+    // }
 
     /**
      * Users associated with the organization.

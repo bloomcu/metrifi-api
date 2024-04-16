@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
@@ -14,6 +15,8 @@ use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 
 Route::middleware('auth:sanctum')->group(function() {
+    // Organizations
+    Route::delete('organizations/{organization:slug}', [OrganizationController::class, 'destroy']);
     
     // Google Auth
     Route::prefix('google')->group(function() {

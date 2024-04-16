@@ -50,10 +50,10 @@ class OrganizationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Organization $organization)
-    {
-        $organization->delete();
+    // public function destroy(Organization $organization)
+    // {
+    //     $organization->delete();
 
-        return new OrganizationResource($organization);
-    }
+    //     return new OrganizationResource($organization);
+    // }
 }

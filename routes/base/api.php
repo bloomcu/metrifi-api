@@ -85,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('organizations', [OrganizationController::class, 'store']);
     Route::get('organizations/{organization:slug}', [OrganizationController::class, 'show']);
     Route::put('organizations/{organization:slug}', [OrganizationController::class, 'update']);
-    Route::delete('organizations/{organization:slug}', [OrganizationController::class, 'destroy']);
+    // Route::delete('organizations/{organization:slug}', [OrganizationController::class, 'destroy']);
 
     // Categories
     Route::prefix('categories')->group(function () {

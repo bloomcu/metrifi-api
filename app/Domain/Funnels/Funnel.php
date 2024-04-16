@@ -35,23 +35,6 @@ class Funnel extends Model
         'projections' => ProjectionsCast::class,
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-
-        self::deleting(function (Funnel $funnel) {
-            $funnel->dashboards()->detach();
-        });
-    }
-
-    // public function cascadeDelete()
-    // {
-    //     $this->steps()->delete();
-    //     $this->messages()->delete();
-    //     $this->dashboards()->detach();
-    //     $this->delete();
-    // }
-
     // /**
     //  * Get the indexable data array for the model.
     //  *
