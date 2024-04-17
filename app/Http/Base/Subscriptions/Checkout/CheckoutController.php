@@ -4,7 +4,7 @@ namespace DDD\Http\Base\Subscriptions\Checkout;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
 class CheckoutController extends Controller

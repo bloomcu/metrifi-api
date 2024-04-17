@@ -3,7 +3,7 @@
 namespace DDD\Http\Base\Subscriptions\Intent;
 
 use DDD\Domain\Base\Subscriptions\Intent\Resources\IntentResource;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
 class IntentController extends Controller

@@ -21,6 +21,6 @@ trait BelongsToOrganization
      */
     public function organization(): BelongsTo
     {
-        return $this->belongsTo(\DDD\Domain\Base\Organizations\Organization::class);
+        return $this->belongsTo(\DDD\Domain\Organizations\Organization::class);
     }
 }

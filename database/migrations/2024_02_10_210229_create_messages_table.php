@@ -21,9 +21,7 @@ return new class extends Migration
             $table->text('content')->nullable();
             $table->json('json')->nullable();
             $table->timestamps();
-
-            // Foreign constraints
-            $table->foreign('funnel_id')->references('id')->on('funnels');
+            $table->softDeletes();
         });
     }
 
