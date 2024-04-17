@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
@@ -14,6 +16,15 @@ use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 
 Route::middleware('auth:sanctum')->group(function() {
+
+    // Organizations
+    Route::prefix('organizations')->group(function () {
+        Route::get('/', [OrganizationController::class, 'index']);
+        Route::post('/', [OrganizationController::class, 'store']);
+        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
+        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
+        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+    });
     
     // Google Auth
     Route::prefix('google')->group(function() {
@@ -45,6 +56,12 @@ Route::middleware('auth:sanctum')->group(function() {
     });
 
     Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
+        // Users
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::delete('/{user}', [UserController::class, 'destroy']);
+        });
+
         // Connections
         Route::prefix('connections')->group(function() {
             Route::get('', [ConnectionController::class, 'index']);

@@ -3,6 +3,7 @@
 namespace Database\Factories\Domain\Organizations;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use DDD\Domain\Organizations\Organization;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\DDD\Model>
@@ -14,7 +15,7 @@ class OrganizationFactory extends Factory
      *
      * @var string
      */
-    protected $model = \DDD\Domain\Base\Organizations\Organization::class;
+    protected $model = Organization::class;
 
     /**
      * Define the model's default state.

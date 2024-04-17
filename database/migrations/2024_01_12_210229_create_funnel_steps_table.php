@@ -16,15 +16,11 @@ return new class extends Migration
         Schema::create('funnel_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('funnel_id');
-            $table->string('type');
             $table->integer('order')->nullable();
             $table->string('name')->nullable();
-            $table->string('description')->nullable();
-            $table->json('expression')->nullable();
+            $table->json('metrics')->nullable();
             $table->timestamps();
-
-            // Foreign constraints
-            $table->foreign('funnel_id')->references('id')->on('funnels');
+            $table->softDeletes();
         });
     }
 

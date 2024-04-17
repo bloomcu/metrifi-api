@@ -19,7 +19,7 @@ class LocalFunnelsSeeder extends Seeder
                 'connection_id' => 1,
                 'name' => 'Home equity loan',
                 'zoom' => 0,
-                'user_value' => 100,
+                'conversion_value' => 100,
             ],
         ];
 

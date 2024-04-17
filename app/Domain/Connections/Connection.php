@@ -42,7 +42,7 @@ class Connection extends Model
     /**
      * Funnels associated with the connection.
      *
-     * @return hasMany
+     * @return HasMany
      */
     public function funnels()
     {

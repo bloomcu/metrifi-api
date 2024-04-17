@@ -5,7 +5,7 @@ namespace DDD\Domain\Dashboards\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
-use DDD\Domain\Base\Users\Resources\UserResource;
+use DDD\Domain\Users\Resources\UserResource;
 
 class DashboardResource extends JsonResource
 {

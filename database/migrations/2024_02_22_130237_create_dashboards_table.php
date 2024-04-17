@@ -19,12 +19,9 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->string('name')->nullable();
             $table->string('description')->nullable();
+            $table->integer('zoom')->default(0);
             $table->timestamps();
             $table->softDeletes();
-
-            // Foreign constraints
-            $table->foreign('organization_id')->references('id')->on('organizations');
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

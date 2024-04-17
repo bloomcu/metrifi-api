@@ -20,17 +20,6 @@ class Dashboard extends Model
         'id',
     ];
 
-    // public static function boot ()
-    // {
-    //     parent::boot();
-
-    //     self::updating(function (Dashboard $dashboard) {
-    //         if (request()->attachFunnels) {
-    //             $dashboard->funnels(request()->attachFunnels);
-    //         }
-    //     });
-    // }
-
     /**
      * Funnels associated with the dashboard.
      *

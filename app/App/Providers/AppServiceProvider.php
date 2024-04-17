@@ -2,7 +2,7 @@
 
 namespace DDD\App\Providers;
 
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 // Vendors
 use Illuminate\Support\ServiceProvider;
 // Domains

@@ -5,7 +5,7 @@ namespace DDD\Http\Base\Auth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 use DDD\Http\Base\Auth\Requests\AuthLoginRequest;
-use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
+use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\App\Controllers\Controller;
 
 class AuthLoginController extends Controller
@@ -29,6 +29,7 @@ class AuthLoginController extends Controller
             'message' => 'Login successful',
             'data' => [
                 'access_token' => $token,
+                'id' => Auth::id(),
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role,

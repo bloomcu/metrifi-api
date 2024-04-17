@@ -18,14 +18,12 @@ return new class extends Migration
             $table->foreignId('organization_id');
             $table->foreignId('user_id');
             $table->string('service');
+            $table->string('account_name')->nullable();
             $table->string('name');
             $table->string('uid');
             $table->json('token');
             $table->timestamps();
-
-            // Foreign constraints
-            $table->foreign('organization_id')->references('id')->on('organizations');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->softDeletes();
         });
     }
 

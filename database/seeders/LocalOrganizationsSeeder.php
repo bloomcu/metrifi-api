@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 // Models
 use Illuminate\Database\Seeder;
 
@@ -14,7 +14,7 @@ class LocalOrganizationsSeeder extends Seeder
     public function run(): void
     {
         $organizations = [
-            ['title' => 'MetriFi'],
+            ['title' => 'Acme'],
         ];
 
         foreach ($organizations as $organization) {

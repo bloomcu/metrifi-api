@@ -4,7 +4,7 @@ namespace DDD\Domain\Base\Invitations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use DDD\Domain\Base\Users\Enums\RoleEnum;
+use DDD\Domain\Users\Enums\RoleEnum;
 use DDD\App\Traits\HasUuid;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;

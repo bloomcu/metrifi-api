@@ -2,7 +2,7 @@
 
 namespace DDD\App\Console\Commands;
 
-use DDD\Domain\Base\Users\User;
+use DDD\Domain\Users\User;
 use Illuminate\Console\Command;
 
 class CountUsers extends Command
