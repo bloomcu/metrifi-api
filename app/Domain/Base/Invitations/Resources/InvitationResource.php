@@ -4,8 +4,8 @@ namespace DDD\Domain\Base\Invitations\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
-use DDD\Domain\Base\Users\Resources\UserResource;
-use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
+use DDD\Domain\Users\Resources\UserResource;
+use DDD\Domain\Organizations\Resources\OrganizationResource;
 
 class InvitationResource extends JsonResource
 {

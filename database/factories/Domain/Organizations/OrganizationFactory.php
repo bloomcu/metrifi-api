@@ -1,9 +1,9 @@
 <?php
 
-namespace Database\Factories\Domain\Base\Organizations;
+namespace Database\Factories\Domain\Organizations;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\DDD\Model>

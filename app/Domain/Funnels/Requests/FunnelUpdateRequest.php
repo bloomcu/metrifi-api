@@ -28,7 +28,6 @@ class FunnelUpdateRequest extends FormRequest
         return [
             'connection_id' => 'nullable|numeric',
             'name' => 'nullable|string',
-            'description' => 'nullable|string',
             'zoom' => 'nullable|numeric',
             'conversion_value' => 'nullable|numeric',
             'projections' => 'nullable|array',

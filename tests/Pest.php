@@ -1,6 +1,6 @@
 <?php
 
-use DDD\Domain\Base\Users\User;
+use DDD\Domain\Users\User;
 
 /*
 |--------------------------------------------------------------------------

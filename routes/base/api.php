@@ -11,14 +11,12 @@ use DDD\Http\Base\Categories\CategoryController;
 use DDD\Http\Base\Files\FileController;
 use DDD\Http\Base\Files\FileDownloadController;
 use DDD\Http\Base\Invitations\InvitationController;
-use DDD\Http\Base\Organizations\OrganizationController;
 use DDD\Http\Base\Subscriptions\Intent\IntentController;
 use DDD\Http\Base\Subscriptions\Plans\PlanController;
 use DDD\Http\Base\Subscriptions\Plans\PlanSwapAvailabilityController;
 use DDD\Http\Base\Subscriptions\Subscriptions\SubscriptionController;
 use DDD\Http\Base\Tags\TagController;
 use DDD\Http\Base\Teams\TeamController;
-use DDD\Http\Base\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Public - Auth
@@ -73,19 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{team:slug}', [TeamController::class, 'update']);
             Route::delete('/{team:slug}', [TeamController::class, 'destroy']);
         });
-
-        // Users
-        Route::prefix('users')->group(function () {
-            Route::get('/', [UserController::class, 'index']);
-        });
     });
-
-    // Organizations
-    Route::get('organizations', [OrganizationController::class, 'index']);
-    Route::post('organizations', [OrganizationController::class, 'store']);
-    Route::get('organizations/{organization:slug}', [OrganizationController::class, 'show']);
-    Route::put('organizations/{organization:slug}', [OrganizationController::class, 'update']);
-    // Route::delete('organizations/{organization:slug}', [OrganizationController::class, 'destroy']);
 
     // Categories
     Route::prefix('categories')->group(function () {

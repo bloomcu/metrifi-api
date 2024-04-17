@@ -7,7 +7,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Exception;
-use DDD\Domain\Base\Users\Enums\RoleEnum;
+use DDD\Domain\Users\Enums\RoleEnum;
 
 class InvitationStoreRequest extends FormRequest
 {

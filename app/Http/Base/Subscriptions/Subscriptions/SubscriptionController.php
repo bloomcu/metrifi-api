@@ -5,7 +5,7 @@ namespace DDD\Http\Base\Subscriptions\Subscriptions;
 use DDD\Domain\Base\Subscriptions\Subscriptions\Requests\SubscriptionUpdateRequest;
 use DDD\Domain\Base\Subscriptions\Subscriptions\Requests\SubscriptionStoreRequest;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
 class SubscriptionController extends Controller

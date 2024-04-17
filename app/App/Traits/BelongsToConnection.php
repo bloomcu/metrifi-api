@@ -9,7 +9,7 @@ trait BelongsToConnection
     /**
      * Connection this model belongs to.
      *
-     * @return belongsTo
+     * @return BelongsTo
      */
     public function connection()
     {

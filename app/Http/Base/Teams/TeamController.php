@@ -4,7 +4,7 @@ namespace DDD\Http\Base\Teams;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Base\Teams\Team;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
 class TeamController extends Controller

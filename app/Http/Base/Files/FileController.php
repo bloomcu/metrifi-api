@@ -6,7 +6,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Base\Files\Resources\FileResource;
 use DDD\Domain\Base\Files\Requests\StoreFileRequest;
 use DDD\Domain\Base\Files\File;

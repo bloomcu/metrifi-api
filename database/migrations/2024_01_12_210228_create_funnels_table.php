@@ -19,13 +19,11 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('connection_id')->nullable();
             $table->string('name')->nullable();
-            $table->string('description')->nullable();
+            $table->integer('zoom')->default(0);
+            $table->integer('conversion_value')->default(0);
+            $table->json('projections')->nullable();
             $table->timestamps();
-
-            // Foreign constraints
-            $table->foreign('organization_id')->references('id')->on('organizations');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('connection_id')->references('id')->on('connections');
+            $table->softDeletes();
         });
     }
 

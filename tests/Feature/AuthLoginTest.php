@@ -1,6 +1,6 @@
 <?php
 
-use DDD\Domain\Base\Users\User;
+use DDD\Domain\Users\User;
 
 it('logs the user in', function () {
     $user = User::factory()->create([

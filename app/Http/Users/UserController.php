@@ -1,11 +1,10 @@
 <?php
 
-namespace DDD\Http\Base\Users;
+namespace DDD\Http\Users;
 
-use Illuminate\Http\Request;
-use DDD\Domain\Base\Users\User;
-use DDD\Domain\Base\Users\Resources\UserResource;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Users\User;
+use DDD\Domain\Users\Resources\UserResource;
+use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 
 class UserController extends Controller
@@ -28,11 +27,11 @@ class UserController extends Controller
     //
     //     return response()->json($user);
     // }
-
-    // public function destroy(Organization $organization, User $user)
-    // {
-    //     $user->delete();
-    //
-    //     return new UserResource($user);
-    // }
+    
+    public function destroy(Organization $organization, User $user)
+    {
+        $user->delete();
+    
+        return new UserResource($user);
+    }
 }

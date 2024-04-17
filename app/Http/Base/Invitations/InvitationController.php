@@ -3,7 +3,7 @@
 namespace DDD\Http\Base\Invitations;
 
 use Illuminate\Support\Facades\Mail;
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Base\Invitations\Resources\InvitationResource;
 use DDD\Domain\Base\Invitations\Requests\InvitationStoreRequest;
 use DDD\Domain\Base\Invitations\Mail\InvitationEmail;

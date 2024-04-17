@@ -28,7 +28,6 @@ class StepCreateRequest extends FormRequest
         return [
             'order' => 'nullable|numeric',
             'name' => 'nullable|string',
-            'description' => 'nullable|string',
             'metrics' => 'nullable|array',
             'metrics.*.metric' => 'nullable|string',
             'metrics.*.pagePath' => 'nullable|string',

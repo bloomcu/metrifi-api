@@ -54,7 +54,7 @@ class Funnel extends Model
     /**
      * Steps associated with the funnel.
      *
-     * @return hasMany
+     * @return HasMany
      */
     public function steps()
     {
@@ -64,7 +64,7 @@ class Funnel extends Model
     /**
      * Messages associated with the funnel.
      *
-     * @return hasMany
+     * @return HasMany
      */
     public function messages()
     {

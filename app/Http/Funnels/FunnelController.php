@@ -22,7 +22,6 @@ class FunnelController extends Controller
             'user_id' => $request->user()->id,
             'connection_id' => $organization->connections->first()->id,
             'name' => $request->name,
-            'description' => $request->description,
             'zoom' => 0,
             'conversion_value' => $request->conversion_value,
             'projections' => $request->projections,

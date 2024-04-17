@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Organizations\Organization;
 // Models
 use Illuminate\Database\Seeder;
 
