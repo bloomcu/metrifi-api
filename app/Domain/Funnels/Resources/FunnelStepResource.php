@@ -20,7 +20,8 @@ class FunnelStepResource extends JsonResource
             'name' => $this->name,
             // 'description' => $this->description,
             'metrics' => $this->metrics,
-            'total' => 0,
+            'users' => '0',
+            'conversionRate' => '0.00'
         ];
     }
 }

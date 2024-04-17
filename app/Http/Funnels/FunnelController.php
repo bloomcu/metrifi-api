@@ -25,6 +25,7 @@ class FunnelController extends Controller
             'description' => $request->description,
             'zoom' => 0,
             'conversion_value' => $request->conversion_value,
+            'projections' => $request->projections,
         ]);
 
         return new FunnelResource($funnel);

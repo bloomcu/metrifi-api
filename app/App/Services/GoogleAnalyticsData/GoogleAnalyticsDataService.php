@@ -216,10 +216,10 @@ class GoogleAnalyticsDataService
              */
 
             // Initialize the report array.
-            $report = [
-                'steps' => [],
-                'overallConversionRate' => '0%'
-            ];
+            // $report = [
+            //     'steps' => [],
+            //     'overallConversionRate' => '0%'
+            // ];
 
             // Variables to store first and last step users for overall conversion calculation.
             // $firstStepUsers = 0;
@@ -235,12 +235,7 @@ class GoogleAnalyticsDataService
                 // If the step is not in the report, that means it has 0 users.
                 // Add it with 0 users and 0% conversion rate.
                 if (!isset($gaFunnelReport['funnelTable']['rows'][$index])) {
-                    $report['steps'][] = [
-                        'name' => $step['name'],
-                        'users' => '0',
-                        'conversionRate' => '0%',
-                        'metrics' => $step['metrics']
-                    ];
+                    $steps[$index]['users'] = '0';
                     continue;
                 };
 
@@ -255,12 +250,7 @@ class GoogleAnalyticsDataService
                 // $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : 0;
                 
                 // Add the step information to the report
-                $report['steps'][] = [
-                    'name' => $step['name'],
-                    'users' => $users,
-                    'conversionRate' => $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : '0%',
-                    'metrics' => $step['metrics']
-                ];
+                $steps[$index]['users'] = $users;
 
                 // Set first step users.
                 // if ($index === 0) {
@@ -271,19 +261,19 @@ class GoogleAnalyticsDataService
                 // $lastStepUsers = $users;
 
                 // Update the previous rate for the next iteration.
-                $previousRate = $row['metricValues'][1]['value'];
+                // $previousRate = $row['metricValues'][1]['value'];
             }
 
             // Calculate the overall conversion rate.
-            $firstStepUsers = $report['steps'][0]['users'];
-            $lastStepUsers = end($report['steps'])['users'];
+            // $firstStepUsers = $report['steps'][0]['users'];
+            // $lastStepUsers = end($report['steps'])['users'];
 
-            if ($firstStepUsers > 0) {
-                $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
-                $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
-            }
+            // if ($firstStepUsers > 0) {
+            //     $overallConversionRate = ($lastStepUsers / $firstStepUsers) * 100;
+            //     $report['overallConversionRate'] = number_format($overallConversionRate, 2) . '%';
+            // }
 
-            return $report;
+            return $steps;
 
             // /**
             //  * Format the funnel report
@@ -347,28 +337,15 @@ class GoogleAnalyticsDataService
      * @param Connection $connection
      * @param [type] $startDate
      * @param [type] $endDate
-     * @param array $pagePaths
+     * @param array $exact
+     * @param string $contains
      * @return void
      */
-    public function pageUsers(Connection $connection, $startDate, $endDate, $pagePaths = [])
+    public function pageUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
     {
-        // Default filter expression
-        // $filters = [
-        //     [
-        //         'filter' => [
-        //             'fieldName' => 'pagePath',
-        //             'stringFilter' => [
-        //                 'matchType' => 'BEGINS_WITH',
-        //                 'value' => '/' // Cannot be empty
-        //             ]
-        //         ]
-        //     ]
-        // ];
-        // $filters = [];
-
-        // If page path is specified, filter on it
-        if ($pagePaths && count($pagePaths)) {
-            foreach ($pagePaths as $pagePath) {
+        // Build filer expression(s)
+        if ($exact && count($exact)) {
+            foreach ($exact as $pagePath) {
                 $filters[] = [
                     'filter' => [
                         'fieldName' => 'pagePath',
@@ -380,6 +357,17 @@ class GoogleAnalyticsDataService
                     ]
                 ];
             }
+        } elseif ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'pagePath',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        'caseSensitive' => true,
+                        'value' => $contains
+                    ]
+                ]
+            ];
         } else {
             $filters = [
                 [
@@ -424,36 +412,20 @@ class GoogleAnalyticsDataService
      * @param array $pagePathPlusQueryStrings
      * @return void
      */
-    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $pagePathPlusQueryStrings = [])
+    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
-        // Default filter expression
-        // $filters = [
-        //     [
-        //         'filter' => [
-        //             'fieldName' => 'pagePathPlusQueryString',
-        //             'stringFilter' => [
-        //                 'matchType' => 'FULL_REGEXP',
-        //                 'value' => '.+' // Cannot be empty
-        //             ]
-        //         ]
-        //     ]
-        // ];
-        // $filters = [];
-
-        // If page paths plus query strings are specified, filter on them
-        if ($pagePathPlusQueryStrings && count($pagePathPlusQueryStrings)) {
-            foreach($pagePathPlusQueryStrings as $pagePathPlusQueryString) {
-                $filters[] = [
-                    'filter' => [
-                        'fieldName' => 'pagePathPlusQueryString',
-                        'stringFilter' => [
-                            'matchType' => 'CONTAINS',
-                            'caseSensitive' => true,
-                            'value' => $pagePathPlusQueryString
-                        ]
+        // Build filer expression(s)
+        if ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'pagePathPlusQueryString',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        // 'caseSensitive' => true,
+                        'value' => $contains
                     ]
-                ];
-            }
+                ]
+            ];
         } else {
             $filters = [
                 [
@@ -461,7 +433,7 @@ class GoogleAnalyticsDataService
                         'fieldName' => 'pagePathPlusQueryString',
                         'stringFilter' => [
                             'matchType' => 'FULL_REGEXP',
-                            'value' => '.+' // Result cannot be empty
+                            'value' => '.+' // Cannot be empty
                         ]
                     ]
                 ]
@@ -498,31 +470,32 @@ class GoogleAnalyticsDataService
      * @param [type] $linkUrls
      * @return void
      */
-    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $linkUrls = null)
+    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
-        // By default, return all outbound link clicks
-        $expressions = [
-            'filter' => [
-                'fieldName' => 'linkUrl',
-                'stringFilter' => [
-                    'matchType' => 'FULL_REGEXP',
-                    'value' => '.+' // Cannot be empty
+        // Build filer expression(s)
+        if ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'linkUrl',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        'value' => $contains
+                    ]
                 ]
-            ]
-        ];
-
-        // If outbound link urls are specified, filter on them
-        // if ($linkUrls) {
-        //     $expressions = collect($linkUrls)->map(fn ($linkUrl) => [
-        //         'filter' => [
-        //             'fieldName' => 'linkUrl',
-        //             'stringFilter' => [
-        //                 'matchType' => 'EXACT',
-        //                 'value' => $linkUrl
-        //             ]
-        //         ]
-        //     ])->toArray();
-        // }
+            ];
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'linkUrl',
+                        'stringFilter' => [
+                            'matchType' => 'FULL_REGEXP',
+                            'value' => '.+' // Cannot be empty
+                        ]
+                    ]
+                ]
+            ];
+        }
         
         return $this->runReport($connection, [
             'dateRanges' => [
@@ -538,9 +511,7 @@ class GoogleAnalyticsDataService
             ],
             'dimensionFilter' => [
                 'orGroup' => [
-                    'expressions' => [
-                        ...$expressions
-                    ]
+                    'expressions' => $filters
                 ]
             ],
             'limit' => '500',

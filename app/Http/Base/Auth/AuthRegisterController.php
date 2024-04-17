@@ -2,16 +2,13 @@
 
 namespace DDD\Http\Base\Auth;
 
-use DDD\App\Controllers\Controller;
-use DDD\Domain\Base\Organizations\Organization;
-use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
-// Models
-use DDD\Domain\Base\Users\User;
-use DDD\Http\Base\Auth\Requests\AuthRegisterRequest;
-// Requests
-use Illuminate\Http\JsonResponse;
-// Resources
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\JsonResponse;
+use DDD\Http\Base\Auth\Requests\AuthRegisterRequest;
+use DDD\Domain\Base\Users\User;
+use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
+use DDD\Domain\Base\Organizations\Organization;
+use DDD\App\Controllers\Controller;
 
 class AuthRegisterController extends Controller
 {
