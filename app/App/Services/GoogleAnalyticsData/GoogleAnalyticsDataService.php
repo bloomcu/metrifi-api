@@ -241,7 +241,7 @@ class GoogleAnalyticsDataService
                 //     $steps[$index]['users'] = '0';
                 //     continue;
                 // };
-
+                
                 $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
 
                 if ($users) {
@@ -338,7 +338,8 @@ class GoogleAnalyticsDataService
 
     private function getReportRowUsers($reportRows, $name) {
         foreach ($reportRows as $row) {
-            if (str_contains($row['dimensionValues'][0]['value'], $name)) {
+            // return $row['dimensionValues'][0]['value'];
+            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
                 // Get users count
                 $users = $row['metricValues'][0]['value'];
 
