@@ -338,11 +338,8 @@ class GoogleAnalyticsDataService
 
     private function getReportRowUsers($reportRows, $name) {
         foreach ($reportRows as $row) {
-            // return $row['dimensionValues'][0]['value'];
             if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
-                // Get users count
                 $users = $row['metricValues'][0]['value'];
-
                 return $users;
             }
         }
