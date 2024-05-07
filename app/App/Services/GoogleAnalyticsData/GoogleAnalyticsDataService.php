@@ -34,8 +34,10 @@ class GoogleAnalyticsDataService
         foreach ($steps as $step) {
             $funnelFilterExpressionList = [];
 
-            // If the step has no metrics setup, skip it.
-            if (!isset($step['metrics']) || !count($step['metrics'])) {
+            // If the step has no metrics, skip it.
+            if (!$step['metrics']) {
+                $index = $this->getStepIndex($steps, $step['id']);
+                array_splice($steps, $index, 1);
                 continue;
             }
 
@@ -226,43 +228,46 @@ class GoogleAnalyticsDataService
             // $lastStepUsers = 0;
 
             // Store the previous step's completion rate.
-            $previousRate = 0;
-
+            // $previousRate = 0;
+            
             // Iterate through each step in the funnel.
             // TODO: Check if we have any rows, if not, zero out all the original steps.
             foreach ($steps as $index => $step) {
-                
+            
                 // If the step is not in the report, that means it has 0 users.
                 // Add it with 0 users and 0% conversion rate.
-                if (!isset($gaFunnelReport['funnelTable']['rows'][$index])) {
-                    $steps[$index]['users'] = '0';
-                    continue;
-                };
-
-                // Get the row for the step.
-                $row = $gaFunnelReport['funnelTable']['rows'][$index];
-
-                // Get users for the step.
-                $users = $row['metricValues'][0]['value'];
-
-                // Check if there is a conversion rate value and format it as a percentage.
-                // First step will always not have a conversion rate.
-                // $conversionRate = $previousRate > 0 ? number_format($previousRate * 100, 2) . '%' : 0;
+                // if (!isset($gaFunnelReport['funnelTable']['rows'][$index])) {
+                //     // $steps[$index]['invalid'] = true;
+                //     $steps[$index]['users'] = '0';
+                //     continue;
+                // };
                 
-                // Add the step information to the report
-                $steps[$index]['users'] = $users;
+                $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
 
-                // Set first step users.
-                // if ($index === 0) {
-                //     $firstStepUsers = $users;
-                // }
-
-                // Update last step users with every iteration.
-                // $lastStepUsers = $users;
-
-                // Update the previous rate for the next iteration.
-                // $previousRate = $row['metricValues'][1]['value'];
+                if ($users) {
+                    $steps[$index]['users'] = $users;
+                } else {
+                    $steps[$index]['users'] = '0';
+                }
             }
+
+            // Iterate through each step in the funnel.
+            // TODO: Check if we have any rows, if not, zero out all the original steps.
+            // foreach ($steps as $index => $step) {
+
+            //     // Find the step in the report
+            //     foreach ($gaFunnelReport['funnelTable']['rows'] as $key => $row) {
+            //         if (str_contains($row['dimensionValues'][0]['value'], $step['name'])) {
+            //             // Get users count
+            //             $users = $row['metricValues'][0]['value'];
+    
+            //             // Add users count to step
+            //             $steps[$index]['users'] = $users;
+
+            //             continue;
+            //         }
+            //     }
+            // }
 
             // Calculate the overall conversion rate.
             // $firstStepUsers = $report['steps'][0]['users'];
@@ -328,6 +333,23 @@ class GoogleAnalyticsDataService
             // return $report;
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
+        }
+    }
+
+    private function getReportRowUsers($reportRows, $name) {
+        foreach ($reportRows as $row) {
+            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
+                $users = $row['metricValues'][0]['value'];
+                return $users;
+            }
+        }
+    }
+
+    private function getStepIndex($steps, $id) {
+        foreach ($steps as $index => $step) {
+            if (str_contains($step['id'], $id)) {
+                return $index;
+            }
         }
     }
     
