@@ -29,6 +29,7 @@ class AuthRegisterWithInvitationRequest extends FormRequest
                     ->symbols()
                     ->uncompromised(),
             ],
+            'accept_terms' => ['accepted'],
         ];
     }
 
