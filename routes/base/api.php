@@ -77,9 +77,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::post('/', [CategoryController::class, 'store']);
-        Route::get('/{category:slug}', [CategoryController::class, 'show']);
-        Route::put('/{category:slug}', [CategoryController::class, 'update']);
-        Route::delete('/{category:slug}', [CategoryController::class, 'destroy']);
+        Route::get('/{category}', [CategoryController::class, 'show']);
+        Route::put('/{category}', [CategoryController::class, 'update']);
+        Route::delete('/{category}', [CategoryController::class, 'destroy']);
     });
 
     // Tags

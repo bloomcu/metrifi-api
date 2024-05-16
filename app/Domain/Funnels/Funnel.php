@@ -11,6 +11,7 @@ use DDD\Domain\Messages\Message;
 use DDD\Domain\Funnels\FunnelStep;
 use DDD\Domain\Funnels\Casts\ProjectionsCast;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\Domain\Base\Categories\Category;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToConnection;
@@ -79,5 +80,13 @@ class Funnel extends Model
     public function dashboards()
     {
         return $this->belongsToMany(Dashboard::class);
+    }
+
+    /**
+     * Category this funnel belongs to.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }
