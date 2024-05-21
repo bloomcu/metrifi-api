@@ -2,6 +2,7 @@
 
 namespace DDD\Http\Funnels;
 
+use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Resources\FunnelPublicResource;
@@ -13,12 +14,10 @@ class FunnelSearchController extends Controller
 {
     public function search(Organization $organization, Request $request)
     {
-        // $funnels = Funnel::search($request->term)->get();
-        // $funnels = Funnel::search($request->term)->paginate(10);
-
-        $funnels = Funnel::search($request->term)->query(function ($query) {
-            return $query->orderBy('name', 'desc');
-        })->get();
+        $funnels = QueryBuilder::for(Funnel::class)
+            ->allowedFilters(['name', 'category.id'])
+            ->defaultSort('name')
+            ->get();
 
         return FunnelPublicResource::collection($funnels);
     }

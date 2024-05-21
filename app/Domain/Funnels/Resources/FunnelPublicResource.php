@@ -4,6 +4,7 @@ namespace DDD\Domain\Funnels\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Organizations\Resources\OrganizationPublicResource;
+use DDD\Domain\Base\Categories\Resources\CategoryResource;
 
 class FunnelPublicResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class FunnelPublicResource extends JsonResource
         return [
             'id' => $this->id,
             'organization' => new OrganizationPublicResource($this->organization),
+            'category' => new CategoryResource($this->category),
             'name' => $this->name,
             'conversion_value' => $this->conversion_value,
             'created_at' => $this->created_at,
