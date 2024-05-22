@@ -7,6 +7,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
+use DDD\Http\Funnels\FunnelSnapshotController;
 use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
 use DDD\Http\Funnels\FunnelGenerationController;
@@ -82,6 +83,11 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/', [FunnelStepController::class, 'store']);
                 Route::put('/{step}', [FunnelStepController::class, 'update']);
                 Route::delete('/{step}', [FunnelStepController::class, 'destroy']);
+            });
+
+            // Funnel snapshot
+            Route::prefix('{funnel}/snapshot')->group(function() {
+                Route::get('/refresh', [FunnelSnapshotController::class, 'refresh']);
             });
         });
 
