@@ -3,8 +3,6 @@
 namespace DDD\Domain\Funnels\Commands;
 
 use Illuminate\Console\Command;
-use DDD\Domain\Locations\Location;
-use DDD\Domain\Locations\Actions\GetScreenshotAction;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 
@@ -31,7 +29,11 @@ class BatchFunnelSnapshots extends Command
      */
     public function handle()
     {
-        $periods = ['yesterday', 'last7Days', 'last28Days'];
+        $periods = [
+            // 'yesterday', 
+            // 'last7Days', 
+            'last28Days'
+        ];
 
         $funnels = Funnel::all();
         
@@ -40,10 +42,6 @@ class BatchFunnelSnapshots extends Command
                 FunnelSnapshotAction::dispatch($funnel, $period);
             }
         }
-
-        // foreach ($funnels as $funnel) {
-        //     FunnelSnapshotAction::dispatch($funnel, 'last7Days');
-        // }
 
         $this->info('Snapshot jobs dispatched.');
     }

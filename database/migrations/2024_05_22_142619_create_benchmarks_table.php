@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_id')->nullable();
             $table->string('name')->nullable();
-            $table->integer('median')->nullable();
             $table->integer('bottom')->nullable();
+            $table->integer('median')->nullable();
             $table->integer('top')->nullable();
             $table->integer('count')->nullable();
             $table->json('funnels')->nullable();

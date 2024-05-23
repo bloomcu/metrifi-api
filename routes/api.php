@@ -1,5 +1,6 @@
 <?php
 
+use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
@@ -26,6 +27,11 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('/{benchmark}', [BenchmarkController::class, 'show']);
         Route::put('/{benchmark}', [BenchmarkController::class, 'update']);
         Route::delete('/{benchmark}', [BenchmarkController::class, 'destroy']);
+
+        // Calculate
+        Route::prefix('{benchmark}/calculate')->group(function() {
+            Route::get('/', [BenchmarkCalculateController::class, 'calculate']);
+        });
     });
 
     // Organizations
