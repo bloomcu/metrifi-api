@@ -15,8 +15,18 @@ use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Benchmarks\BenchmarkController;
 
 Route::middleware('auth:sanctum')->group(function() {
+
+    // Benchmarks
+    Route::prefix('benchmarks')->group(function () {
+        Route::get('/', [BenchmarkController::class, 'index']);
+        Route::post('/', [BenchmarkController::class, 'store']);
+        Route::get('/{benchmark}', [BenchmarkController::class, 'show']);
+        Route::put('/{benchmark}', [BenchmarkController::class, 'update']);
+        Route::delete('/{benchmark}', [BenchmarkController::class, 'destroy']);
+    });
 
     // Organizations
     Route::prefix('organizations')->group(function () {

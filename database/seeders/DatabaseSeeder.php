@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
             $this->call([
                 LocalOrganizationsSeeder::class,
                 LocalUsersSeeder::class,
-                LocalConnectionsSeeder::class,
-                LocalFunnelsSeeder::class,
-                LocalFunnelStepsSeeder::class,
-                LocalDashboardsSeeder::class,
+                // LocalConnectionsSeeder::class,
+                // LocalFunnelsSeeder::class,
+                // LocalFunnelStepsSeeder::class,
+                // LocalDashboardsSeeder::class,
             ]);
         }
     }
