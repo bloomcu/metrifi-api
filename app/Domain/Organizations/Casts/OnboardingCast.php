@@ -24,9 +24,10 @@ class OnboardingCast implements CastsAttributes
             'enable-enhanced-measurement' => 'incomplete',
             'extend-data-retention-period' => 'incomplete',
             'setup-cross-domain-tracking' => 'incomplete',
-            'add-custom-dimensions' => 'incomplete',
             'filter-out-internal-traffic' => 'incomplete',
+            'add-custom-dimensions' => 'incomplete',
             'onboardingComplete' => false,
+            'hideOnboarding' => false,
         ];
 
         return array_merge($defaults, $value);
