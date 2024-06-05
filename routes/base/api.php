@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public - Auth
 Route::post('auth/login', AuthLoginController::class);
-Route::post('auth/register', AuthRegisterController::class);
+// Route::post('auth/register', AuthRegisterController::class);
 Route::post('auth/register/invitation/{invitation:uuid}', AuthRegisterWithInvitationController::class);
 Route::post('auth/password/forgot', AuthPasswordForgotController::class);
 Route::post('auth/password/reset', AuthPasswordResetController::class);
