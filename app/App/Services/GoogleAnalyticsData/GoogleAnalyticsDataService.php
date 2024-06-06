@@ -438,7 +438,6 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'linkUrl'],
-                // ['name' => 'linkDomain'],
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
@@ -517,8 +516,57 @@ class GoogleAnalyticsDataService
      * @param [string] $endDate
      * @return void
      */
-    public function formUserSubmissions(Connection $connection, $startDate, $endDate)
+    public function formUserSubmissions(Connection $connection, $startDate, $endDate, $contains = '')
     {
+        // Build filer expression(s)
+        if ($contains) {
+            $filters[] = [
+                [
+                    'filter' => [
+                        'fieldName' => 'pagePath',
+                        'stringFilter' => [
+                            'matchType' => 'CONTAINS',
+                            'value' => $contains
+                        ]
+                    ]
+                ],
+                [
+                    'notExpression' => [ 
+                        'filter' => [
+                            'fieldName' => 'customEvent:form_destination',
+                            'stringFilter' => [
+                                'matchType' => 'EXACT',
+                                'value' => '(not set)' // Cannot contain "(not set)"
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'eventName',
+                        'stringFilter' => [
+                            'matchType' => 'EXACT',
+                            'value' => 'form_submit'
+                        ]
+                    ]
+                ],
+                [
+                    'notExpression' => [ 
+                        'filter' => [
+                            'fieldName' => 'customEvent:form_destination',
+                            'stringFilter' => [
+                                'matchType' => 'EXACT',
+                                'value' => '(not set)' // Cannot contain "(not set)"
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        }
+
         return $this->runReport($connection, [
             'dateRanges' => [
                 ['startDate' => $startDate, 'endDate' => $endDate]
@@ -534,6 +582,7 @@ class GoogleAnalyticsDataService
             'metrics' => [
                 ['name' => 'totalUsers']
             ],
+            // VERSION 1
             // 'dimensionFilter' => [
             //     'filter' => [
             //         'fieldName' => 'eventName',
@@ -543,30 +592,37 @@ class GoogleAnalyticsDataService
             //         ]
             //     ]
             // ],
+            // VERSION 2
+            // 'dimensionFilter' => [
+            //     'andGroup' => [
+            //         'expressions' => [
+            //             [
+            //                 'filter' => [
+            //                     'fieldName' => 'eventName',
+            //                     'stringFilter' => [
+            //                         'matchType' => 'EXACT',
+            //                         'value' => 'form_submit'
+            //                     ]
+            //                 ]
+            //             ],
+            //             [
+            //                 'notExpression' => [ 
+            //                     'filter' => [
+            //                         'fieldName' => 'customEvent:form_destination',
+            //                         'stringFilter' => [
+            //                             'matchType' => 'EXACT',
+            //                             'value' => '(not set)' // Cannot contain "(not set)"
+            //                         ]
+            //                     ]
+            //                 ]
+            //             ]
+            //         ]
+            //     ]
+            // ],
+            // VERSION 3
             'dimensionFilter' => [
                 'andGroup' => [
-                    'expressions' => [
-                        [
-                            'filter' => [
-                                'fieldName' => 'eventName',
-                                'stringFilter' => [
-                                    'matchType' => 'EXACT',
-                                    'value' => 'form_submit'
-                                ]
-                            ]
-                        ],
-                        [
-                            'notExpression' => [ 
-                                'filter' => [
-                                    'fieldName' => 'customEvent:form_destination',
-                                    'stringFilter' => [
-                                        'matchType' => 'EXACT',
-                                        'value' => '(not set)' // Cannot contain "(not set)"
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
+                    'expressions' => $filters
                 ]
             ],
             'limit' => '500',
