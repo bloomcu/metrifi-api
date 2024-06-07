@@ -1,12 +1,11 @@
 <?php
 
-namespace DDD\Domain\Funnels\Resources;
+namespace DDD\Domain\Benchmarks\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use DDD\Domain\Organizations\Resources\OrganizationPublicResource;
 use DDD\Domain\Base\Categories\Resources\CategoryResource;
 
-class FunnelPublicResource extends JsonResource
+class BenchmarkResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,10 +17,14 @@ class FunnelPublicResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'organization' => new OrganizationPublicResource($this->organization),
             'category' => new CategoryResource($this->category),
             'name' => $this->name,
-            'conversion_value' => $this->conversion_value,
+            'median' => $this->median,
+            'bottom' => $this->bottom,
+            'top' => $this->top,
+            'count' => $this->count,
+            'funnels' => $this->funnels,
+            'calculated_at' => $this->calculated_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

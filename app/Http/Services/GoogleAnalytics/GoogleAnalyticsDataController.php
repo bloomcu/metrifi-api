@@ -86,6 +86,7 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate, 
             endDate: $request->endDate,
+            contains: $request->contains,
         );
 
         return response()->json([

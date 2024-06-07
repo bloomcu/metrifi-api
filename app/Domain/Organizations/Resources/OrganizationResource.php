@@ -21,6 +21,7 @@ class OrganizationResource extends JsonResource
             'slug' => $this->slug,
             'automating' => $this->automating,
             'automation_msg' => $this->automation_msg,
+            'onboarding' => $this->onboarding,
             // 'subscribed' => $this->subscribed('default'),
             // 'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
             // 'plan' => new PlanResource($this->plan),

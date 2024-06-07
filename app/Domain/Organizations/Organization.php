@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use DDD\Domain\Users\User;
+use DDD\Domain\Organizations\Casts\OnboardingCast;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Connections\Connection;
@@ -32,6 +33,10 @@ class Organization extends Model {
     protected $guarded = ['id', 'slug'];
 
     protected $cascadeDeletes = ['connections', 'funnels', 'dashboards'];
+
+    protected $casts = [
+        'onboarding' => OnboardingCast::class,
+    ];
 
     public static function boot()
     {
