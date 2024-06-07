@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public - Auth
 Route::post('auth/login', AuthLoginController::class);
-Route::post('auth/register', AuthRegisterController::class);
+// Route::post('auth/register', AuthRegisterController::class);
 Route::post('auth/register/invitation/{invitation:uuid}', AuthRegisterWithInvitationController::class);
 Route::post('auth/password/forgot', AuthPasswordForgotController::class);
 Route::post('auth/password/reset', AuthPasswordResetController::class);
@@ -77,9 +77,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::post('/', [CategoryController::class, 'store']);
-        Route::get('/{category:slug}', [CategoryController::class, 'show']);
-        Route::put('/{category:slug}', [CategoryController::class, 'update']);
-        Route::delete('/{category:slug}', [CategoryController::class, 'destroy']);
+        Route::get('/{category}', [CategoryController::class, 'show']);
+        Route::put('/{category}', [CategoryController::class, 'update']);
+        Route::delete('/{category}', [CategoryController::class, 'destroy']);
     });
 
     // Tags

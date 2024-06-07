@@ -2,6 +2,8 @@
 
 namespace DDD\Http\Funnels;
 
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Resources\FunnelResource;
@@ -13,7 +15,14 @@ class FunnelController extends Controller
 {
     public function index(Organization $organization)
     {
-        return FunnelResource::collection($organization->funnels);
+        $funnels = QueryBuilder::for(Funnel::class)
+            ->where('organization_id', $organization->id)
+            ->allowedFilters([
+                AllowedFilter::exact('category.id')
+            ])
+            ->get();
+
+        return FunnelResource::collection($funnels);
     }
 
     public function store(Organization $organization, Request $request)

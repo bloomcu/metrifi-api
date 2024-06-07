@@ -1,12 +1,12 @@
 <?php
 
-namespace DDD\Domain\Funnels\Requests;
+namespace DDD\Domain\Benchmarks\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class FunnelUpdateRequest extends FormRequest
+class BenchmarkStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,12 +26,8 @@ class FunnelUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'connection_id' => 'nullable|numeric',
             'category_id' => 'nullable|numeric',
             'name' => 'nullable|string',
-            'zoom' => 'nullable|numeric',
-            'conversion_value' => 'nullable|numeric',
-            'projections' => 'nullable|array',
         ];
     }
 

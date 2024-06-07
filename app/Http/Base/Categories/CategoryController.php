@@ -11,7 +11,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::parents()->latest()->get();
+        // $categories = Category::parents()->latest()->get();
+        $categories = Category::parents()->get();
 
         return CategoryResource::collection($categories);
     }

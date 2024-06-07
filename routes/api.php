@@ -1,5 +1,6 @@
 <?php
 
+use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
@@ -7,6 +8,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
+use DDD\Http\Funnels\FunnelSnapshotController;
 use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
 use DDD\Http\Funnels\FunnelGenerationController;
@@ -14,8 +16,23 @@ use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Benchmarks\BenchmarkController;
 
 Route::middleware('auth:sanctum')->group(function() {
+
+    // Benchmarks
+    Route::prefix('benchmarks')->group(function () {
+        Route::get('/', [BenchmarkController::class, 'index']);
+        Route::post('/', [BenchmarkController::class, 'store']);
+        Route::get('/{benchmark}', [BenchmarkController::class, 'show']);
+        Route::put('/{benchmark}', [BenchmarkController::class, 'update']);
+        Route::delete('/{benchmark}', [BenchmarkController::class, 'destroy']);
+
+        // Calculate
+        Route::prefix('{benchmark}/calculate')->group(function() {
+            Route::get('/', [BenchmarkCalculateController::class, 'calculate']);
+        });
+    });
 
     // Organizations
     Route::prefix('organizations')->group(function () {
@@ -82,6 +99,11 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/', [FunnelStepController::class, 'store']);
                 Route::put('/{step}', [FunnelStepController::class, 'update']);
                 Route::delete('/{step}', [FunnelStepController::class, 'destroy']);
+            });
+
+            // Funnel snapshot
+            Route::prefix('{funnel}/snapshot')->group(function() {
+                Route::get('/refresh', [FunnelSnapshotController::class, 'refresh']);
             });
         });
 

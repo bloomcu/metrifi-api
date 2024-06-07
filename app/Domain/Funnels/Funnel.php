@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use DDD\Domain\Messages\Message;
 use DDD\Domain\Funnels\FunnelStep;
+use DDD\Domain\Funnels\Casts\SnapshotsCast;
 use DDD\Domain\Funnels\Casts\ProjectionsCast;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\Domain\Base\Categories\Category;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToConnection;
@@ -32,6 +34,7 @@ class Funnel extends Model
     protected $cascadeDeletes = ['steps', 'messages'];
 
     protected $casts = [
+        'snapshots' => SnapshotsCast::class,
         'projections' => ProjectionsCast::class,
     ];
 
@@ -79,5 +82,13 @@ class Funnel extends Model
     public function dashboards()
     {
         return $this->belongsToMany(Dashboard::class);
+    }
+
+    /**
+     * Category this funnel belongs to.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }
