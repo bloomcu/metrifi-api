@@ -19,6 +19,7 @@ class OrganizationResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
+            'is_private' => $this->is_private,
             'automating' => $this->automating,
             'automation_msg' => $this->automation_msg,
             'onboarding' => $this->onboarding,

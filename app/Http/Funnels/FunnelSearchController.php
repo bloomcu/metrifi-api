@@ -16,6 +16,7 @@ class FunnelSearchController extends Controller
     {
         $funnels = QueryBuilder::for(Funnel::class)
             ->allowedFilters(['name', 'category.id'])
+            ->whereRelation('organization', 'is_private', false)
             ->defaultSort('name')
             ->get();
 
