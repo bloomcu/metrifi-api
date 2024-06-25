@@ -13,12 +13,22 @@ use DDD\App\Controllers\Controller;
 class FunnelSearchController extends Controller
 {
     public function search(Organization $organization, Request $request)
-    {
-        $funnels = QueryBuilder::for(Funnel::class)
-            ->allowedFilters(['name', 'category.id'])
-            ->whereRelation('organization', 'is_private', false)
-            ->defaultSort('name')
-            ->get();
+    {   
+         // Only orgs set to anonymous can view anonymous funnels
+        if ($organization->is_private) {
+            $funnels = QueryBuilder::for(Funnel::class)
+                ->allowedFilters(['name', 'category.id'])
+                ->where('organization_id', $organization->id)
+                ->defaultSort('name')
+                ->get();
+                
+        } else {
+            $funnels = QueryBuilder::for(Funnel::class)
+                ->allowedFilters(['name', 'category.id'])
+                ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
+                ->defaultSort('name')
+                ->get();
+        }
 
         return FunnelPublicResource::collection($funnels);
     }
