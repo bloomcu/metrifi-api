@@ -14,14 +14,14 @@ class FunnelSearchController extends Controller
 {
     public function search(Organization $organization, Request $request)
     {   
-         // Only orgs set to anonymous can view anonymous funnels
+        // Private organization cannot see other funnels
         if ($organization->is_private) {
             $funnels = QueryBuilder::for(Funnel::class)
                 ->allowedFilters(['name', 'category.id'])
                 ->where('organization_id', $organization->id)
                 ->defaultSort('name')
                 ->get();
-                
+
         } else {
             $funnels = QueryBuilder::for(Funnel::class)
                 ->allowedFilters(['name', 'category.id'])

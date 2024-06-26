@@ -28,6 +28,18 @@ class Dashboard extends Model
     public function funnels()
     {
         // return $this->belongsToMany(Funnel::class)->orderBy('order');
-        return $this->belongsToMany(Funnel::class)->withTimestamps();
+        
+
+        // Private organization cannot see other funnels
+        if ($this->organization->is_private) {
+            return $this->belongsToMany(Funnel::class)
+                ->where('organization_id', $this->organization->id) // Only return funnels from the same organization
+                ->withTimestamps();
+
+        } else {
+            return $this->belongsToMany(Funnel::class)
+                ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
+                ->withTimestamps();
+        }
     }
 }
