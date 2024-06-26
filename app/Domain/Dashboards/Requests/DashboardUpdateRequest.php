@@ -27,6 +27,7 @@ class DashboardUpdateRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
+            'notes' => 'nullable|string',
             'description' => 'nullable|string',
             'zoom' => 'nullable|numeric',
         ];
