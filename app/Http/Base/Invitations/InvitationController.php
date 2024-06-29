@@ -32,7 +32,8 @@ class InvitationController extends Controller
         return new InvitationResource($invitation);
     }
 
-    public function show(Organization $organization, Invitation $invitation)
+    // TODO: Move this to a public only controller
+    public function show(Invitation $invitation)
     {
         return new InvitationResource($invitation->load(['organization', 'user']));
     }
