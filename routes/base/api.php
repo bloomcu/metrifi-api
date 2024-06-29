@@ -27,7 +27,7 @@ Route::post('auth/password/forgot', AuthPasswordForgotController::class);
 Route::post('auth/password/reset', AuthPasswordResetController::class);
 
 // Public - Invitations
-Route::get('{organization:slug}/invitations/{invitation:uuid}', [InvitationController::class, 'show']);
+Route::get('/invitations/{invitation:uuid}', [InvitationController::class, 'show']);
 
 // Public - Files Download
 Route::get('/files/{file}', [FileDownloadController::class, 'download']);

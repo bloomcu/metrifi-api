@@ -22,6 +22,7 @@ class DashboardResource extends JsonResource
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
             'name' => $this->name,
+            'notes' => $this->notes,
             'description' => $this->description,
             'zoom' => $this->zoom,
             'funnels' => FunnelResource::collection($this->funnels),
