@@ -218,19 +218,25 @@ class GoogleAnalyticsDataService
                 return $report;
             }
             
+            // Track metrics from previous steps.
+            // $lastStepUsers = 0;
+            $lastStepConversionRate = '100%';
+
             // Iterate through each step in the funnel.
             // TODO: Check if we have any rows, if not, zero out all the original steps.
             foreach ($steps as $index => $step) {
                 $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
+                $conversionRate = $this->getReportRowConversion($gaFunnelReport['funnelTable']['rows'], $step['name']);
 
+                // If the step is not in the report, that means it has 0 users.
                 if ($users) {
                     $steps[$index]['users'] = $users;
+                    $steps[$index]['conversion'] = $lastStepConversionRate;
+                    $lastStepConversionRate = $conversionRate;
                 } else {
                     $steps[$index]['users'] = '0';
+                    $steps[$index]['conversion'] = '0%';
                 }
-
-                // Calculate the step conversion rate
-                
 
                 // Add to report
                 $report['steps'][] = $steps[$index];
@@ -257,6 +263,17 @@ class GoogleAnalyticsDataService
             if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
                 $users = $row['metricValues'][0]['value'];
                 return $users;
+            }
+        }
+    }
+
+    private function getReportRowConversion($reportRows, $name) {
+        foreach ($reportRows as $row) {
+            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
+                $conversion = $row['metricValues'][1]['value'];
+                $percentage = $conversion * 100;
+                $formattedPercentage = number_format($percentage, 2);
+                return $formattedPercentage . '%';
             }
         }
     }

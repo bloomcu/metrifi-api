@@ -48,16 +48,17 @@ class RunAnalysisAction
             endDate: $p['endDate'],
             steps: $analysis->subjectFunnel->steps->toArray(),
         );
+        // return $subjectFunnelReport;
 
         $subjectFunnelAssets = number_format(($analysis->subjectFunnel->conversion_value / 100), 2, '.', '');
 
         $subjectFunnelSteps = array_map(function($step) {
-            return "<li>Step {$step['order']}: {$step['name']}, {$step['users']} users</li>";
+            return "<li>Step {$step['order']}: {$step['name']}, {$step['users']} users ({$step['conversion']} conversion rate)</li>";
         }, $subjectFunnelReport['steps']);
 
         $html = "";
         foreach ($analysis->dashboard->funnels as $key => $funnel) {
-            $index = $key + 1;
+            if ($key === 0) continue; // Skip subject funnel (already processed above)
 
             $report = GoogleAnalyticsData::funnelReport(
                 connection: $funnel->connection, 
@@ -65,17 +66,18 @@ class RunAnalysisAction
                 endDate: $p['endDate'],
                 steps: $funnel->steps->toArray(),
             );
+            // return $report;
 
             $assets = number_format(($funnel->conversion_value / 100), 2, '.', '');
 
             $steps = array_map(function($step) {
-                return "<li>Step {$step['order']}: {$step['name']}, {$step['users']} users</li>";
+                return "<li>Step {$step['order']}: {$step['name']}, {$step['users']} users ({$step['conversion']} conversion rate)</li>";
             }, $report['steps']);
 
             $html .= "
-                <h3>Comparison funnel {$index}: {$funnel['name']}</h3>
+                <h3>Comparison funnel {$key}: {$funnel['name']}</h3>
                 <p>Assets: $ {$assets}</p>
-                <p>Conversion: {$funnel['overallConversionRate']}%</p>
+                <p>Conversion: {$report['overallConversionRate']}%</p>
                 <h4>Funnel steps:</h4>
                 <ol>
                 ".
@@ -105,7 +107,13 @@ class RunAnalysisAction
 
         $threadRun = $this->createAndRunThread($assistantId, $messageContent);
 
-        return $this->retrieveFinalMessage($threadRun);
+        $response = $this->retrieveFinalMessage($threadRun);
+
+        $analysis->update([
+            'content' => $response,
+        ]);
+
+        return $analysis;
     }
 
     private function createAndRunThread(string $assistantId, string $messageContent)
@@ -136,7 +144,6 @@ class RunAnalysisAction
     private function retrieveFinalMessage(ThreadRunResponse $threadRun)
     {
         while(in_array($threadRun->status, ['queued', 'in_progress'])) {
-            usleep(500000); // Sleep for 0.5 seconds (500,000 microseconds)
             $threadRun = $this->retrieveThreadRun($threadRun->threadId, $threadRun->id);
         }
 
@@ -145,7 +152,7 @@ class RunAnalysisAction
         }
 
         $messages = $this->listThreadMessages($threadRun->threadId);
-
+        
         return json_decode($messages->data[0]->content[0]->text->value);
     }
 }
