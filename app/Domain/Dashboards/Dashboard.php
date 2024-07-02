@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Analysis\Analysis;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 
@@ -27,9 +28,6 @@ class Dashboard extends Model
      */
     public function funnels()
     {
-        // return $this->belongsToMany(Funnel::class)->orderBy('order');
-        
-
         // Private organization cannot see other funnels
         if ($this->organization->is_private) {
             return $this->belongsToMany(Funnel::class)
@@ -41,5 +39,15 @@ class Dashboard extends Model
                 ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
                 ->withTimestamps();
         }
+    }
+
+    /**
+     * Analyses associated with the dashboard.
+     *
+     * @return HasMany
+     */
+    public function analyses()
+    {
+        return $this->hasMany(Analysis::class);
     }
 }
