@@ -1,17 +1,16 @@
 <?php
 
-namespace DDD\Http\Dashboards;
+namespace DDD\Http\Analyses;
 
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Dashboards\Dashboard;
-use DDD\Domain\Analysis\Resources\AnalysisResource;
+use DDD\Domain\Analyses\Resources\AnalysisResource;
+use DDD\Domain\Analyses\Analysis;
+use DDD\Domain\Analyses\Actions\RunAnalysisAction;
 use DDD\App\Controllers\Controller;
-use DDD\Domain\Analysis\Actions\RunAnalysisAction;
-use DDD\Domain\Analysis\Analysis;
 
-class DashboardAnalysisController extends Controller
+class AnalysisController extends Controller
 {
     public function index(Organization $organization, Dashboard $dashboard)
     {
@@ -25,7 +24,7 @@ class DashboardAnalysisController extends Controller
             'in_progress' => 1,
         ]);
 
-        // RunAnalysisAction::run($analysis);
+        return RunAnalysisAction::run($analysis);
 
         return new AnalysisResource($analysis);
     }

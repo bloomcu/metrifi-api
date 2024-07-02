@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Funnel;
-use DDD\Domain\Analysis\Analysis;
+use DDD\Domain\Analyses\Analysis;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 

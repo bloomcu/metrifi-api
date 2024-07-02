@@ -229,6 +229,9 @@ class GoogleAnalyticsDataService
                     $steps[$index]['users'] = '0';
                 }
 
+                // Calculate the step conversion rate
+                
+
                 // Add to report
                 $report['steps'][] = $steps[$index];
             }

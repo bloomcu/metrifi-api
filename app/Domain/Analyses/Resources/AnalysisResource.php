@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\Domain\Analysis\Resources;
+namespace DDD\Domain\Analyses\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
