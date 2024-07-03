@@ -4,7 +4,7 @@ namespace DDD\App\Services\OpenAI;
 
 use OpenAI;
 
-class OpenAIService
+class GPTService
 {
     protected $client;
 

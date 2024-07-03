@@ -6,18 +6,18 @@ use OpenAI\Responses\Threads\Runs\ThreadRunResponse;
 use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
-use DDD\App\Services\OpenAI\OpenAIService;
+use DDD\App\Services\OpenAI\GPTService;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
 class RunAnalysisAction
 {
     use AsAction;
 
-    protected $openAIService;
+    protected $GPTService;
 
-    public function __construct(OpenAIService $openAIService)
+    public function __construct(GPTService $GPTService)
     {
-        $this->openAIService = $openAIService;
+        $this->GPTService = $GPTService;
     }
 
     function handle(Analysis $analysis, string $period = 'last28Days')
@@ -48,7 +48,7 @@ class RunAnalysisAction
         };
 
         // Setup assistant
-        $assistantId = 'asst_yqvvZ2mCJtcvkjT6i0ozqN70'; // Funnel Analyzer V0.0.1
+        // $assistantId = 'asst_yqvvZ2mCJtcvkjT6i0ozqN70'; // Funnel Analyzer V0.0.1
 
         $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
             connection: $analysis->subjectFunnel->connection, 
@@ -122,7 +122,7 @@ class RunAnalysisAction
         // $response = $this->retrieveFinalMessage($threadRun);
 
         // New
-        $response = $this->openAIService->getResponse($messageContent);
+        $response = $this->GPTService->getResponse($messageContent);
         // return $response;
 
         // Update the analysis
