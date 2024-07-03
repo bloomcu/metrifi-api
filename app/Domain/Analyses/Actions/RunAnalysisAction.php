@@ -6,11 +6,19 @@ use OpenAI\Responses\Threads\Runs\ThreadRunResponse;
 use OpenAI\Laravel\Facades\OpenAI;
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
+use DDD\App\Services\OpenAI\OpenAIService;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
 class RunAnalysisAction
 {
     use AsAction;
+
+    protected $openAIService;
+
+    public function __construct(OpenAIService $openAIService)
+    {
+        $this->openAIService = $openAIService;
+    }
 
     function handle(Analysis $analysis, string $period = 'last28Days')
     {
@@ -88,6 +96,11 @@ class RunAnalysisAction
         }
 
         $messageContent = "
+            <h1>Instructions</h1>
+            <p>Your job is to compare conversion funnels. I will give you a Subject Funnel and one or more Comparison Funnels. I want to know how well the Subject is doing in terms of overall conversion rate compared to the Comparisons. I also want you to tell me which step in the Subject funnel has the biggest opportunity for improvement based on the performance of the Comparisons.
+            <p>Format your response in html headings, paragraphs and lists. You can use only the following headings: h2, h3, h4. You can use the following lists: ol, ul. You can use the following tags: p, a, strong, em.</p>
+            <p>I will give you the data you need to complete the analysis.</p>
+
             <h2>Funnel data</h2>
             <p>Time period: {$p['startDate']} - {$p['endDate']}</p>
 
@@ -102,13 +115,17 @@ class RunAnalysisAction
             </ol>
             {$html}
         ";
-
         // return $messageContent;
 
-        $threadRun = $this->createAndRunThread($assistantId, $messageContent);
+        // Old
+        // $threadRun = $this->createAndRunThread($assistantId, $messageContent);
+        // $response = $this->retrieveFinalMessage($threadRun);
 
-        $response = $this->retrieveFinalMessage($threadRun);
+        // New
+        $response = $this->openAIService->getResponse($messageContent);
+        // return $response;
 
+        // Update the analysis
         $analysis->update([
             'content' => $response,
         ]);
@@ -116,43 +133,43 @@ class RunAnalysisAction
         return $analysis;
     }
 
-    private function createAndRunThread(string $assistantId, string $messageContent)
-    {
-        return OpenAI::threads()->createAndRun([
-            'assistant_id' => $assistantId,
-            'thread' => [
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => $messageContent,
-                    ],
-                ],
-            ],
-        ]);
-    }
+    // private function createAndRunThread(string $assistantId, string $messageContent)
+    // {
+    //     return OpenAI::threads()->createAndRun([
+    //         'assistant_id' => $assistantId,
+    //         'thread' => [
+    //             'messages' => [
+    //                 [
+    //                     'role' => 'user',
+    //                     'content' => $messageContent,
+    //                 ],
+    //             ],
+    //         ],
+    //     ]);
+    // }
 
-    private function retrieveThreadRun(string $threadId, string $runId)
-    {
-        return OpenAI::threads()->runs()->retrieve($threadId, $runId);
-    }
+    // private function retrieveThreadRun(string $threadId, string $runId)
+    // {
+    //     return OpenAI::threads()->runs()->retrieve($threadId, $runId);
+    // }
 
-    private function listThreadMessages(string $threadId)
-    {
-        return OpenAI::threads()->messages()->list($threadId);
-    }
+    // private function listThreadMessages(string $threadId)
+    // {
+    //     return OpenAI::threads()->messages()->list($threadId);
+    // }
 
-    private function retrieveFinalMessage(ThreadRunResponse $threadRun)
-    {
-        while(in_array($threadRun->status, ['queued', 'in_progress'])) {
-            $threadRun = $this->retrieveThreadRun($threadRun->threadId, $threadRun->id);
-        }
+    // private function retrieveFinalMessage(ThreadRunResponse $threadRun)
+    // {
+    //     while(in_array($threadRun->status, ['queued', 'in_progress'])) {
+    //         $threadRun = $this->retrieveThreadRun($threadRun->threadId, $threadRun->id);
+    //     }
 
-        if ($threadRun->status !== 'completed') {
-            throw new \Exception('Request failed, please try again');
-        }
+    //     if ($threadRun->status !== 'completed') {
+    //         throw new \Exception('Request failed, please try again');
+    //     }
 
-        $messages = $this->listThreadMessages($threadRun->threadId);
+    //     $messages = $this->listThreadMessages($threadRun->threadId);
         
-        return json_decode($messages->data[0]->content[0]->text->value);
-    }
+    //     return json_decode($messages->data[0]->content[0]->text->value);
+    // }
 }

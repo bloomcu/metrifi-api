@@ -3,9 +3,10 @@
 namespace DDD\Domain\Dashboards\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use DDD\Domain\Users\Resources\UserResource;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
-use DDD\Domain\Users\Resources\UserResource;
+use DDD\Domain\Analyses\Resources\AnalysisResource;
 
 class DashboardResource extends JsonResource
 {
@@ -22,6 +23,8 @@ class DashboardResource extends JsonResource
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
             'name' => $this->name,
+            // 'latest_analysis' => new AnalysisResource($this->latestAnalysis),
+            'latest_analysis' => $this->latestAnalysis,
             'notes' => $this->notes,
             'description' => $this->description,
             'zoom' => $this->zoom,

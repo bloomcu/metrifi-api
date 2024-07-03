@@ -50,4 +50,14 @@ class Dashboard extends Model
     {
         return $this->hasMany(Analysis::class);
     }
+
+    /**
+     * Latest analyses associated with the dashboard.
+     *
+     * @return HasOne
+     */
+    public function latestAnalysis()
+    {
+        return $this->hasOne(Analysis::class)->latestOfMany();
+    }
 }
