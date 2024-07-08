@@ -85,7 +85,7 @@ class AnalyzeConversionRate
         $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . number_format($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
         
         $analysis->update([
-            'content' => '<p><strong>Conversion rate:</strong> ' . $formattedPercentageDifference . ' than comparisons</p>',
+            'content' => '<p><strong>Conversion rate:</strong><br>' . $formattedPercentageDifference . ' than comparisons</p>',
         ]);
 
         return $analysis;

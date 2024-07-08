@@ -9,6 +9,7 @@ use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\RunAnalysisAction;
 use DDD\Domain\Analyses\Actions\AnalyzeConversionRate;
+use DDD\Domain\Analyses\Actions\AnalyzeBiggestOpportunity;
 use DDD\App\Controllers\Controller;
 
 class AnalysisController extends Controller
@@ -25,7 +26,8 @@ class AnalysisController extends Controller
             'in_progress' => 1,
         ]);
 
-        return AnalyzeConversionRate::run($analysis);
+        AnalyzeConversionRate::run($analysis);
+        AnalyzeBiggestOpportunity::run($analysis);
 
         return new AnalysisResource($analysis);
     }
