@@ -8,6 +8,7 @@ use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\RunAnalysisAction;
+use DDD\Domain\Analyses\Actions\AnalyzeConversionRate;
 use DDD\App\Controllers\Controller;
 
 class AnalysisController extends Controller
@@ -24,7 +25,7 @@ class AnalysisController extends Controller
             'in_progress' => 1,
         ]);
 
-        return RunAnalysisAction::run($analysis);
+        return AnalyzeConversionRate::run($analysis);
 
         return new AnalysisResource($analysis);
     }
