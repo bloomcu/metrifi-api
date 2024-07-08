@@ -102,6 +102,8 @@ class RunAnalysisAction
             Your task is to analyze and compare website conversion funnels. You will be provided with data for a Subject Funnel (Subject) and one or more Comparison Funnels (Comparisons). Follow the stages below. <strong>IMPORTANT: DO NOT OUTPUT ANYTHING OTHER THAN THESE THREE STATEMENTS EXPLAINED IN STAGE 5.</strong>
             </p>
 
+            <p>Format your response in html headings, paragraphs and lists. You can use only the following headings: h2, h3, h4. You can use the following lists: ol, ul. You can use the following tags: p, a, strong, em.</p>
+
             <h2>Example data</h2>
 
             <h3>Date range: June 4 - July 1</h3>
@@ -279,13 +281,10 @@ class RunAnalysisAction
 
             <h4>Example output</h4>
             <p>
-            <strong>Conversion rate:</strong> -56.92% lower than comparisons<br>
-            <strong>Biggest opportunity:</strong> Step 1 of your funnel is -70.18% lower than comparisons<br>
-            <strong>Potential assets:</strong> +$785,860 every 28 days if you get Step 1 on par with comparisons
+            Conversion rate: -56.92% lower than comparisons<br>
+            Biggest opportunity: Step 1 of your funnel is -70.18% lower than comparisons<br>
+            Potential assets: +$785,860 every 28 days if you get Step 1 on par with comparisons
             </p>
-
-            <p>Format your response using the following tags: p, strong, br.</p>
-            <p>Now I will give you the data you need to complete the analysis.</p>
 
             <h2>Funnel data</h2>
             <p>Time period: {$p['startDate']} - {$p['endDate']}</p>
