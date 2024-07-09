@@ -79,11 +79,17 @@ class AnalyzeConversionRate
          */
         $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
 
+        // Update dashboard
+        $analysis->dashboard->update([
+            'subject_funnel_performance' => number_format($percentageDifference, 2),
+        ]);
+
         /**
          * Format the percentage difference to include a + or - sign
          */
         $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . number_format($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
         
+        // Update analysis
         $analysis->update([
             'content' => '<p><strong>Conversion rate:</strong><br>' . $formattedPercentageDifference . ' than comparisons</p>',
         ]);
