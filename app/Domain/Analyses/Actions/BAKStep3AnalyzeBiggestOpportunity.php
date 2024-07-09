@@ -9,7 +9,7 @@ use DDD\Domain\Analyses\Analysis;
 use DDD\App\Services\OpenAI\GPTService;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class AnalyzeBiggestOpportunity
+class Step3AnalyzeBiggestOpportunity
 {
     use AsAction;
 

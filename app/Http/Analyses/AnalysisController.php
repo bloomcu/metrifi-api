@@ -7,9 +7,9 @@ use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Analysis;
-use DDD\Domain\Analyses\Actions\RunAnalysisAction;
-use DDD\Domain\Analyses\Actions\AnalyzeConversionRate;
-use DDD\Domain\Analyses\Actions\AnalyzeBiggestOpportunity;
+use DDD\Domain\Analyses\Actions\Step3AnalyzeBiggestOpportunity;
+use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
+use DDD\Domain\Analyses\Actions\Step1AnalyzeConversionRate;
 use DDD\App\Controllers\Controller;
 
 class AnalysisController extends Controller
@@ -26,8 +26,9 @@ class AnalysisController extends Controller
             'in_progress' => 1,
         ]);
 
-        AnalyzeConversionRate::run($analysis);
-        AnalyzeBiggestOpportunity::run($analysis);
+        Step1AnalyzeConversionRate::run($analysis);
+        Step2NormalizeFunnelSteps::run($analysis);
+        Step3AnalyzeBiggestOpportunity::run($analysis);
 
         return new AnalysisResource($analysis);
     }

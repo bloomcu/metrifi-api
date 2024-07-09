@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class AnalyzeConversionRate
+class Step1AnalyzeConversionRate
 {
     use AsAction;
 
