@@ -4,51 +4,16 @@ namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
-use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
 class Step1AnalyzeConversionRate
 {
     use AsAction;
 
-    function handle(Analysis $analysis, string $period = 'last28Days')
+    function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
     {
-        // Bail early if dashboard has no funnels
-        if (count($analysis->dashboard->funnels) === 0) {
-            throw new \Exception('Dashboard has no funnels.');
-        }
-
-        // Bail early if subject funnel has no steps
-        if (count($analysis->subjectFunnel->steps) === 0) {
-            throw new \Exception('Subject funnel has no steps.');
-        }
-
-        $p = match ($period) {
-            'yesterday' => [
-                'startDate' => now()->subDays(1)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last7Days' => [
-                'startDate' => now()->subDays(7)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last28Days' => [
-                'startDate' => now()->subDays(28)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ]
-        };
-
         /**
          * Get the conversion rate for the subject funnel
          */
-        $subjectFunnelConversionRate = '';
-
-        $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
-            connection: $analysis->subjectFunnel->connection, 
-            startDate: $p['startDate'], 
-            endDate: $p['endDate'],
-            steps: $analysis->subjectFunnel->steps->toArray(),
-        );
-
         $subjectFunnelConversionRate = $subjectFunnelReport['overallConversionRate'];
 
         /**
@@ -56,16 +21,7 @@ class Step1AnalyzeConversionRate
          */
         $comparisonFunnelsConversionRates = [];
 
-        foreach ($analysis->dashboard->funnels as $key => $funnel) {
-            if ($key === 0) continue; // Skip subject funnel (already processed above)
-
-            $report = GoogleAnalyticsData::funnelReport(
-                connection: $funnel->connection, 
-                startDate: $p['startDate'], 
-                endDate: $p['endDate'],
-                steps: $funnel->steps->toArray(),
-            );
-
+        foreach ($comparisonFunnelReports as $key => $report) {
             array_push($comparisonFunnelsConversionRates, $report['overallConversionRate']);
         }
 

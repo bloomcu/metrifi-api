@@ -5,7 +5,6 @@ namespace DDD\Domain\Analyses\Actions;
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
 use DDD\App\Services\OpenAI\GPTService;
-use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
 class Step2NormalizeFunnelSteps
 {
@@ -18,62 +17,21 @@ class Step2NormalizeFunnelSteps
         $this->GPTService = $GPTService;
     }
 
-    function handle(Analysis $analysis, string $period = 'last28Days')
+    function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
     {
-        // Bail early if subject funnel has no steps
-        if (count($analysis->subjectFunnel->steps) === 0) {
-            return;
-        }
-
-        // Bail early if dashboard has no funnels
-        if (count($analysis->dashboard->funnels) === 0) {
-            return;
-        }
-
-        $p = match ($period) {
-            'yesterday' => [
-                'startDate' => now()->subDays(1)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last7Days' => [
-                'startDate' => now()->subDays(7)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last28Days' => [
-                'startDate' => now()->subDays(28)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ]
-        };
-
-        $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
-            connection: $analysis->subjectFunnel->connection, 
-            startDate: $p['startDate'], 
-            endDate: $p['endDate'],
-            steps: $analysis->subjectFunnel->steps->toArray(),
-        );
-
         $subjectFunnelSteps = array_map(function($step) {
             return "<li>Step {$step['order']}: {$step['name']}, {$step['users']} users ({$step['conversion']} conversion rate)</li>";
         }, $subjectFunnelReport['steps']);
 
         // Comparison funnels
         $html = "";
-        foreach ($analysis->dashboard->funnels as $key => $funnel) {
-            if ($key === 0) continue; // Skip subject funnel (already processed above)
-
-            $report = GoogleAnalyticsData::funnelReport(
-                connection: $funnel->connection, 
-                startDate: $p['startDate'], 
-                endDate: $p['endDate'],
-                steps: $funnel->steps->toArray(),
-            );
-
+        foreach ($comparisonFunnelReports as $key => $report) {
             $steps = array_map(function($step) {
                 return "<li>Step {$step['order']} ({$step['name']}): {$step['users']} users ({$step['conversion']} conversion rate)</li>";
             }, $report['steps']);
 
             $html .= "
-                <h3>Comparison funnel {$key}: {$funnel['name']}</h3>
+                <h3>Comparison funnel {$key}: {$report['funnel_name']}</h3>
                 <p>Conversion: {$report['overallConversionRate']}%</p>
                 <h4>Funnel steps:</h4>
                 <ol>
@@ -174,7 +132,7 @@ class Step2NormalizeFunnelSteps
             Normalize the steps for the following funnels. 
 
             <h2>Funnel data</h2>
-            <p>Time period: {$p['startDate']} - {$p['endDate']}</p>
+            <p>Time period: {$report['period']}</p>
 
             <h3>Subject Funnel</h3>
             <p>Conversion: {$subjectFunnelReport['overallConversionRate']}%</p>

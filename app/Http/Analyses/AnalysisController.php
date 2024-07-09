@@ -10,6 +10,7 @@ use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\Step3AnalyzeBiggestOpportunity;
 use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
 use DDD\Domain\Analyses\Actions\Step1AnalyzeConversionRate;
+use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
 class AnalysisController extends Controller
@@ -20,15 +21,68 @@ class AnalysisController extends Controller
     }
 
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
-    {
+    {   
+        // Create a new analysis
         $analysis = $dashboard->analyses()->create([
             'subject_funnel_id' => $request->subjectFunnelId,
             'in_progress' => 1,
         ]);
 
-        Step1AnalyzeConversionRate::run($analysis);
-        Step2NormalizeFunnelSteps::run($analysis);
-        Step3AnalyzeBiggestOpportunity::run($analysis);
+        // Bail early if subject funnel has no steps
+        if (count($analysis->subjectFunnel->steps) === 0) {
+            return;
+        }
+
+        // Bail early if dashboard has no funnels
+        if (count($analysis->dashboard->funnels) === 0) {
+            return;
+        }
+
+        // Setup time period (later accrept this as a parameter from the request)
+        $period = match ('last28Days') {
+            'yesterday' => [
+                'startDate' => now()->subDays(1)->format('Y-m-d'),
+                'endDate' => now()->subDays(1)->format('Y-m-d'),
+            ],
+            'last7Days' => [
+                'startDate' => now()->subDays(7)->format('Y-m-d'),
+                'endDate' => now()->subDays(1)->format('Y-m-d'),
+            ],
+            'last28Days' => [
+                'startDate' => now()->subDays(28)->format('Y-m-d'),
+                'endDate' => now()->subDays(1)->format('Y-m-d'),
+            ]
+        };
+
+        // Get subject funnel report
+        $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
+            connection: $analysis->subjectFunnel->connection, 
+            startDate: $period['startDate'], 
+            endDate: $period['endDate'],
+            steps: $analysis->subjectFunnel->steps->toArray(),
+        );
+
+        // Build array of comparison funnel reports
+        $comparisonFunnelReports = [];
+        foreach ($analysis->dashboard->funnels as $key => $funnel) {
+            if ($key === 0) continue; // Skip subject funnel (already processed above)
+
+            $report = GoogleAnalyticsData::funnelReport(
+                connection: $funnel->connection, 
+                startDate: $period['startDate'], 
+                endDate: $period['endDate'],
+                steps: $funnel->steps->toArray(),
+            );
+
+            $report['funnel_name'] = $funnel['name'];
+            $report['period'] = $period['startDate'] . ' - ' . $period['endDate'];
+
+            array_push($comparisonFunnelReports, $report);
+        }
+
+        Step1AnalyzeConversionRate::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+        Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+        Step3AnalyzeBiggestOpportunity::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
 
         return new AnalysisResource($analysis);
     }
