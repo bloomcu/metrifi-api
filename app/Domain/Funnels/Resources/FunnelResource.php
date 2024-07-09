@@ -22,6 +22,9 @@ class FunnelResource extends JsonResource
             'id' => $this->id,
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
+            'order' => $this->whenPivotLoaded('dashboard_funnel', function() {
+                return $this->pivot->order;
+            }),
             'connection_id' => $this->connection_id,
             'connection' => new ConnectionResource($this->connection),
             'category' => new CategoryResource($this->category),

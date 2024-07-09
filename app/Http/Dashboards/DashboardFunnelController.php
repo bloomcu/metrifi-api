@@ -23,6 +23,8 @@ class DashboardFunnelController extends Controller
 
         $dashboard->funnels()->syncWithoutDetaching($request->funnel_ids);
 
+        // $dashboard->funnels()->updateExistingPivot($funnel->id, ['order' => 1]);
+
         return response()->json([
             'message' => 'Funnel(s) attached to dashboard successfully'
         ], 200);

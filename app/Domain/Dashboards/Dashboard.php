@@ -9,13 +9,15 @@ use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Analyses\Analysis;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
+use DDD\Domain\Dashboards\Traits\DashboardIsOrderable;
 
 class Dashboard extends Model
 {
     use HasFactory,
         SoftDeletes,
         BelongsToOrganization,
-        BelongsToUser;
+        BelongsToUser,
+        DashboardIsOrderable;
 
     protected $guarded = [
         'id',
@@ -32,11 +34,15 @@ class Dashboard extends Model
         if ($this->organization->is_private) {
             return $this->belongsToMany(Funnel::class)
                 ->where('organization_id', $this->organization->id) // Only return funnels from the same organization
+                ->withPivot('order')
+                ->orderBy('order')
                 ->withTimestamps();
 
         } else {
             return $this->belongsToMany(Funnel::class)
                 ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
+                ->withPivot('order')
+                ->orderBy('order')
                 ->withTimestamps();
         }
     }

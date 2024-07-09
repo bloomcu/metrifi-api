@@ -20,6 +20,7 @@ class DashboardResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'order' => $this->order,
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
             'name' => $this->name,
