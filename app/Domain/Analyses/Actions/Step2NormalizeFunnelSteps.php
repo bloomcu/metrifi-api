@@ -43,6 +43,10 @@ class Step2NormalizeFunnelSteps
         } // End comparison funnels loop
 
         $messageContent = "
+            I have a job for you. Read my instructions below and then normalize the funnel steps that I provide below the instructions.
+
+            -----
+
             <h1>Instructions: Normalize funnel steps</h1>
 
             <h2>Introduction</h2>
@@ -129,7 +133,7 @@ class Step2NormalizeFunnelSteps
             </p>
             -----
 
-            Normalize the steps for the following funnels. 
+            Normalize the steps for the following funnels. IMPORTANT: DO NOT OUTPUT ANYTHING OTHER THAN YOUR ANALYSIS AS HTML USING ONLY <p> TAG, <h4> TAG, <br> TAG AND <strong> TAG WHERE NECESSARY. NO MARKUP SYNTAX.
 
             <h2>Funnel data</h2>
             <p>Time period: {$report['period']}</p>
@@ -147,7 +151,7 @@ class Step2NormalizeFunnelSteps
 
         $response = $this->GPTService->getResponse($messageContent);
 
-        $content = $analysis->content .= '<p><strong>Normalized steps:</strong><br>' . strip_tags($response) . '</p>';
+        $content = $analysis->content .= '<h3>Normalized steps:</h3>' . $response;
 
         $analysis->update([
             'content' => $content,

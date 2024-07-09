@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Analyses\Analysis;
 use DDD\App\Services\OpenAI\GPTService;
 
-class Step3AnalyzeBiggestOpportunity
+class Step5AnalyzeBiggestOpportunity
 {
     use AsAction;
 

@@ -7,7 +7,9 @@ use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Analysis;
-use DDD\Domain\Analyses\Actions\Step3AnalyzeBiggestOpportunity;
+use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
+use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
+use DDD\Domain\Analyses\Actions\Step3CalculateStepConversionRates;
 use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
 use DDD\Domain\Analyses\Actions\Step1AnalyzeConversionRate;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
@@ -82,7 +84,9 @@ class AnalysisController extends Controller
 
         Step1AnalyzeConversionRate::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
         Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
-        Step3AnalyzeBiggestOpportunity::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+        Step3CalculateStepConversionRates::run($analysis);
+        Step4CalculateStepRatios::run($analysis);
+        Step5AnalyzeBiggestOpportunity::run($analysis);
 
         return new AnalysisResource($analysis);
     }
