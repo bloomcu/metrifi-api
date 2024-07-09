@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 trait DashboardIsOrderable
 {
-    protected static function DashboardIsOrderable(): void
+    protected static function bootDashboardIsOrderable(): void
     {
         static::creating(function (Model $model) {
             if (!request()->order) {
