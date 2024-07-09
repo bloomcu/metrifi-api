@@ -10,24 +10,10 @@ use InvalidArgumentException;
 
 trait DashboardFunnelIsOrderable
 {
-    protected static function DashboardFunnelIsOrderable(): void
-    {
-        static::creating(function (Model $model) {
-            if (!request()->order) {
-                $model->setHighestOrderNumber();
-            }
-        });
-
-        static::updating(function (Model $model) {
-            if (request()->order) {
-                $model->reorder(request()->order);
-            }
-        });
-    }
-
     public function setHighestOrderNumber(): void
     {
         $this->order = $this->buildSortQuery()->max('order') + 1;
+        $this->save();
     }
 
     public function reorder(string $order)
@@ -46,7 +32,7 @@ trait DashboardFunnelIsOrderable
     public function buildSortQuery(): Collection
     {
         return static::query()
-            ->where('dashboard_id', $this->dashboard->id)
+            ->where('dashboard_id', $this->dashboard_id)
             ->orderBy('order')
             ->get();
     }

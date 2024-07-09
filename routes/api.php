@@ -137,6 +137,7 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::prefix('{dashboard}/funnels')->group(function() {
                 Route::post('/attach', [DashboardFunnelController::class, 'attach']);
                 Route::post('/detach', [DashboardFunnelController::class, 'detach']);
+                Route::post('/reorder', [DashboardFunnelController::class, 'reorder']);
             });
         });
 
