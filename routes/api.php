@@ -1,6 +1,5 @@
 <?php
 
-use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
@@ -15,8 +14,10 @@ use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
+use DDD\Http\Dashboards\DashboardAnalysisController;
 use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Benchmarks\BenchmarkController;
+use DDD\Http\Benchmarks\BenchmarkCalculateController;
 
 Route::middleware('auth:sanctum')->group(function() {
 
@@ -131,11 +132,18 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{dashboard}', [DashboardController::class, 'show']);
             Route::put('/{dashboard}', [DashboardController::class, 'update']);
             Route::delete('/{dashboard}', [DashboardController::class, 'destroy']);
-
+            
             // Dashboard funnels
             Route::prefix('{dashboard}/funnels')->group(function() {
                 Route::post('/attach', [DashboardFunnelController::class, 'attach']);
                 Route::post('/detach', [DashboardFunnelController::class, 'detach']);
+            });
+
+            // Dashboard analyses
+            Route::prefix('{dashboard}/analyses')->group(function() {
+                Route::get('/', [DashboardAnalysisController::class, 'index']);
+                Route::post('/', [DashboardAnalysisController::class, 'store']);
+                Route::get('/{analysis}', [DashboardAnalysisController::class, 'show']);
             });
         });
     }); 
