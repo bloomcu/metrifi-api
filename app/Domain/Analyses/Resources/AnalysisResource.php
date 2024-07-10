@@ -19,9 +19,12 @@ class AnalysisResource extends JsonResource
         return [
             'id' => $this->id,
             'in_progress' => $this->in_progress,
+            'subject_funnel_performance' => $this->subject_funnel_performance,
             'content' => $this->content,
             // 'subject_funnel' => new FunnelResource($this->subjectFunnel),
             // 'dashboard' => new DashboardResource($this->dashboard),
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

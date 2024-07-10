@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
+use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
@@ -24,22 +25,6 @@ class AnalysisController extends Controller
 
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
-        // Create a new analysis
-        $analysis = $dashboard->analyses()->create([
-            'subject_funnel_id' => $request->subjectFunnelId,
-            'in_progress' => 1,
-        ]);
-
-        // Bail early if subject funnel has no steps
-        if (count($analysis->subjectFunnel->steps) === 0) {
-            return;
-        }
-
-        // Bail early if dashboard has no funnels
-        if (count($analysis->dashboard->funnels) === 0) {
-            return;
-        }
-
         // Setup time period (later accrept this as a parameter from the request)
         $period = match ('last28Days') {
             'yesterday' => [
@@ -56,6 +41,24 @@ class AnalysisController extends Controller
             ]
         };
 
+        // Create a new analysis
+        $analysis = $dashboard->analyses()->create([
+            'subject_funnel_id' => $request->subjectFunnelId,
+            'in_progress' => 1,
+            'start_date' => now()->subDays(28),
+            'end_date' => now()->subDays(1),
+        ]);
+
+        // Bail early if subject funnel has no steps
+        if (count($analysis->subjectFunnel->steps) === 0) {
+            return;
+        }
+
+        // Bail early if dashboard has no funnels
+        if (count($analysis->dashboard->funnels) === 0) {
+            return;
+        }
+
         // Get subject funnel report
         $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
             connection: $analysis->subjectFunnel->connection, 
@@ -64,7 +67,8 @@ class AnalysisController extends Controller
             steps: $analysis->subjectFunnel->steps->toArray(),
         );
 
-
+        // Add period to report
+        // $subjectFunnelReport['period'] = $period['startDate'] . ' - ' . $period['endDate'];
 
         // Build array of comparison funnel reports
         $comparisonFunnelReports = [];
@@ -99,12 +103,12 @@ class AnalysisController extends Controller
         return new AnalysisResource($analysis);
     }
 
-    // public function update(Organization $organization, Dashboard $dashboard, Analysis $analysis, AnalysisUpdateRequest $request)
-    // {
-    //     $analysis->update($request->validated());
+    public function update(Organization $organization, Dashboard $dashboard, Analysis $analysis, AnalysisUpdateRequest $request)
+    {
+        $analysis->update($request->validated());
 
-    //     return new AnalysisResource($analysis);
-    // }
+        return new AnalysisResource($analysis);
+    }
 
     // public function destroy(Organization $organization, Dashboard $dashboard, Analysis $analysis)
     // {
