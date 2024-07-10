@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\Domain\Analysis;
+namespace DDD\Domain\Analyses;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;

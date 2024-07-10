@@ -132,6 +132,6 @@ class Organization extends Model {
      */
     public function dashboards()
     {
-        return $this->hasMany(Dashboard::class)->latest();
+        return $this->hasMany(Dashboard::class)->orderBy('order');
     }
 }
