@@ -43,12 +43,12 @@ class Step1AnalyzeConversionRate
         /**
          * Format the percentage difference to include a + or - sign
          */
-        $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . number_format($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
+        // $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . number_format($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
         
         // Update analysis
-        $analysis->update([
-            'content' => '<h3>Subject funnel conversion rate:</h3><p>' . $formattedPercentageDifference . ' than comparisons</p>',
-        ]);
+        // $analysis->update([
+        //     'content' => '<h3>Subject funnel conversion rate:</h3><p>' . $formattedPercentageDifference . ' than comparisons</p>',
+        // ]);
 
         return $analysis;
     }

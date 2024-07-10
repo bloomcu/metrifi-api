@@ -64,6 +64,8 @@ class AnalysisController extends Controller
             steps: $analysis->subjectFunnel->steps->toArray(),
         );
 
+
+
         // Build array of comparison funnel reports
         $comparisonFunnelReports = [];
         foreach ($analysis->dashboard->funnels as $key => $funnel) {
@@ -83,10 +85,11 @@ class AnalysisController extends Controller
         }
 
         Step1AnalyzeConversionRate::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
-        Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
-        Step3CalculateStepConversionRates::run($analysis);
-        Step4CalculateStepRatios::run($analysis);
-        Step5AnalyzeBiggestOpportunity::run($analysis);
+        // Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+        // Step3CalculateStepConversionRates::run($analysis);
+        // Step4CalculateStepRatios::run($analysis);
+        Step5AnalyzeBiggestOpportunity::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+
 
         return new AnalysisResource($analysis);
     }
