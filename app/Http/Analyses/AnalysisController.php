@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
+use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
@@ -64,7 +65,8 @@ class AnalysisController extends Controller
             steps: $analysis->subjectFunnel->steps->toArray(),
         );
 
-
+        // Add period to report
+        // $subjectFunnelReport['period'] = $period['startDate'] . ' - ' . $period['endDate'];
 
         // Build array of comparison funnel reports
         $comparisonFunnelReports = [];
@@ -99,12 +101,12 @@ class AnalysisController extends Controller
         return new AnalysisResource($analysis);
     }
 
-    // public function update(Organization $organization, Dashboard $dashboard, Analysis $analysis, AnalysisUpdateRequest $request)
-    // {
-    //     $analysis->update($request->validated());
+    public function update(Organization $organization, Dashboard $dashboard, Analysis $analysis, AnalysisUpdateRequest $request)
+    {
+        $analysis->update($request->validated());
 
-    //     return new AnalysisResource($analysis);
-    // }
+        return new AnalysisResource($analysis);
+    }
 
     // public function destroy(Organization $organization, Dashboard $dashboard, Analysis $analysis)
     // {

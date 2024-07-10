@@ -35,36 +35,39 @@ class Step1AnalyzeConversionRate
          */
         $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
 
-        // Update dashboard
-        $analysis->dashboard->update([
-            'subject_funnel_performance' => number_format($percentageDifference, 2),
-        ]);
-
         /**
          * Format the percentage difference to include a + or - sign
          */
         // $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . number_format($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
-        
+        $formattedPercentageDifference = number_format($percentageDifference, 2);
+
+        // Update dashboard
+        $analysis->dashboard->update([
+            'subject_funnel_performance' => $formattedPercentageDifference,
+        ]);
+
         // Update analysis
-        // $analysis->update([
-        //     'content' => '<h3>Subject funnel conversion rate:</h3><p>' . $formattedPercentageDifference . ' than comparisons</p>',
-        // ]);
+        $analysis->update([
+            'content' => '
+                <p>' . $formattedPercentageDifference . ($formattedPercentageDifference <= 0 ? '% lower' : '% higher') . ' than comparisons</p>
+            ',
+        ]);
 
         return $analysis;
     }
 
-    function calculateMedian($data) {
-        sort($data); // Step 1: Sort the array
-        $count = count($data);
+    function calculateMedian($arrayOfNumbers) {
+        sort($arrayOfNumbers); // Step 1: Sort the array
+        $count = count($arrayOfNumbers);
         
         if ($count % 2 == 0) {
             // If the number of elements is even
-            $middle1 = $data[$count / 2 - 1];
-            $middle2 = $data[$count / 2];
+            $middle1 = $arrayOfNumbers[$count / 2 - 1];
+            $middle2 = $arrayOfNumbers[$count / 2];
             $median = ($middle1 + $middle2) / 2;
         } else {
             // If the number of elements is odd
-            $median = $data[floor($count / 2)];
+            $median = $arrayOfNumbers[floor($count / 2)];
         }
         
         return $median;
