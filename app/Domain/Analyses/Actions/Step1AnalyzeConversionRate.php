@@ -48,9 +48,10 @@ class Step1AnalyzeConversionRate
 
         // Update analysis
         $analysis->update([
-            'content' => '
-                <p>' . $formattedPercentageDifference . ($formattedPercentageDifference <= 0 ? '% lower' : '% higher') . ' than comparisons</p>
-            ',
+            'subject_funnel_performance' => $formattedPercentageDifference,
+            // 'content' => '
+            //     <p>' . $formattedPercentageDifference . ($formattedPercentageDifference <= 0 ? '% lower' : '% higher') . ' than comparisons</p>
+            // ',
         ]);
 
         return $analysis;
