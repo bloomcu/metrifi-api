@@ -26,6 +26,7 @@ class DashboardUpdateRequest extends FormRequest
     public function rules()
     {
         return [
+            'order' => 'nullable|numeric',
             'name' => 'nullable|string',
             'notes' => 'nullable|string',
             'description' => 'nullable|string',

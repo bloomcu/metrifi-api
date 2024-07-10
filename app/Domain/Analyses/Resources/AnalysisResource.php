@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\Domain\Analysis\Resources;
+namespace DDD\Domain\Analyses\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
@@ -20,8 +20,8 @@ class AnalysisResource extends JsonResource
             'id' => $this->id,
             'in_progress' => $this->in_progress,
             'content' => $this->content,
-            'subject_funnel' => new FunnelResource($this->subjectFunnel),
-            'dashboard' => new DashboardResource($this->dashboard),
+            // 'subject_funnel' => new FunnelResource($this->subjectFunnel),
+            // 'dashboard' => new DashboardResource($this->dashboard),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
