@@ -3,6 +3,7 @@
 namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use DivisionByZeroError;
 use DDD\Domain\Analyses\Analysis;
 
 class Step1AnalyzeConversionRate
@@ -33,7 +34,11 @@ class Step1AnalyzeConversionRate
         /**
          * Get subject funnel conversion rate percentage higher/lower
          */
-        $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
+        try {
+            $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
+        } catch(DivisionByZeroError $e){
+            $percentageDifference = 0;
+        }
 
         /**
          * Format the percentage difference to include a + or - sign
