@@ -16,6 +16,7 @@ class FunnelStepResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'funnel_id' => $this->funnel_id,
             'order' => $this->order,
             'name' => $this->name,
             'metrics' => $this->metrics,
