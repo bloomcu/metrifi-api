@@ -4,7 +4,7 @@ namespace DDD\Domain\Funnels\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class MetricsCast implements CastsAttributes
+class FunnelStepMetricsCast implements CastsAttributes
 {
     /**
      * Cast the given value.
