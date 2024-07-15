@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use DivisionByZeroError;
 use DDD\Domain\Analyses\Analysis;
 
-class Step1AnalyzeConversionRate
+class Step1AnalyzeOverallConversionRate
 {
     use AsAction;
 
