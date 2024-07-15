@@ -10,20 +10,20 @@ class Step1AnalyzeOverallConversionRate
 {
     use AsAction;
 
-    function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
+    function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
         /**
          * Get the conversion rate for the subject funnel
          */
-        $subjectFunnelConversionRate = $subjectFunnelReport['overallConversionRate'];
+        $subjectFunnelConversionRate = $subjectFunnel['report']['overallConversionRate'];
 
         /**
          * Get the conversion rates for the comparison funnels
          */
         $comparisonFunnelsConversionRates = [];
 
-        foreach ($comparisonFunnelReports as $key => $report) {
-            array_push($comparisonFunnelsConversionRates, $report['overallConversionRate']);
+        foreach ($comparisonFunnels as $key => $comparisonFunnel) {
+            array_push($comparisonFunnelsConversionRates, $comparisonFunnel['report']['overallConversionRate']);
         }
 
         /**

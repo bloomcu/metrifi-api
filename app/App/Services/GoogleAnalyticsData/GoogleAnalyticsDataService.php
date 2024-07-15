@@ -231,11 +231,11 @@ class GoogleAnalyticsDataService
                 // If the step is not in the report, that means it has 0 users.
                 if ($users) {
                     $steps[$index]['users'] = $users;
-                    $steps[$index]['conversion'] = $lastStepConversionRate;
+                    // $steps[$index]['conversion'] = $lastStepConversionRate;
                     $lastStepConversionRate = $conversionRate;
                 } else {
                     $steps[$index]['users'] = '0';
-                    $steps[$index]['conversion'] = '0%';
+                    // $steps[$index]['conversion'] = '0%';
                 }
 
                 // Add to report
