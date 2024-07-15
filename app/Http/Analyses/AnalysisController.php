@@ -12,7 +12,7 @@ use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
 use DDD\Domain\Analyses\Actions\Step3CalculateStepConversionRates;
 use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
-use DDD\Domain\Analyses\Actions\Step1AnalyzeConversionRate;
+use DDD\Domain\Analyses\Actions\Step1AnalyzeOverallConversionRate;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
@@ -88,7 +88,7 @@ class AnalysisController extends Controller
             array_push($comparisonFunnelReports, $report);
         }
 
-        Step1AnalyzeConversionRate::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
+        Step1AnalyzeOverallConversionRate::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
         // Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
         // Step3CalculateStepConversionRates::run($analysis);
         // Step4CalculateStepRatios::run($analysis);
