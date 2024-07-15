@@ -223,7 +223,7 @@ class GoogleAnalyticsDataService
             $lastStepConversionRate = '100%';
 
             // Iterate through each step in the funnel.
-            // TODO: Check if we have any rows, if not, zero out all the original steps.
+            // TODO: Check if we have any rows, if not, zero out the metrics
             foreach ($steps as $index => $step) {
                 $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
                 $conversionRate = $this->getReportRowConversion($gaFunnelReport['funnelTable']['rows'], $step['name']);

@@ -16,7 +16,8 @@ class DashboardFunnelResource extends JsonResource
     {
         return [
             'order' => $this->order,
-            'disabled_steps' => $this->disabled_steps ? $this->disabled_steps : [],
+            // 'disabled_steps' => $this->disabled_steps ? $this->disabled_steps : [],
+            'disabled_steps' => $this->disabled_steps ? json_decode($this->disabled_steps, true) : [],
         ];
     }
 }
