@@ -18,7 +18,8 @@ class Step5AnalyzeBiggestOpportunity
     }
 
     function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
-    {
+    {   
+        // Subject funnel
         $subjectFunnelSteps = array_map(function($step) {
             return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
         }, $subjectFunnelReport['steps']);
@@ -28,29 +29,6 @@ class Step5AnalyzeBiggestOpportunity
         foreach ($comparisonFunnelReports as $key => $report) {
             $steps = array_map(function($step) {
                 return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
-            }, $report['steps']);
-
-            $comparisonFunnels .= "
-                <h3>Comparison funnel: {$report['funnel_name']}</h3>
-                <p>Conversion: {$report['overallConversionRate']}%</p>
-                <h4>Funnel steps:</h4>
-                <ol>
-                ".
-                    implode('', $steps)
-                ."
-                </ol>
-            ";
-        } // End comparison funnels loop
-
-        $subjectFunnelSteps = array_map(function($step) {
-            return "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
-        }, $subjectFunnelReport['steps']);
-
-        // Comparison funnels
-        $comparisonFunnels = "";
-        foreach ($comparisonFunnelReports as $key => $report) {
-            $steps = array_map(function($step) {
-                return "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
             }, $report['steps']);
 
             $comparisonFunnels .= "
