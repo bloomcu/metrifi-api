@@ -5,6 +5,7 @@ namespace DDD\Domain\Funnels\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Users\Resources\UserResource;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
+use DDD\Domain\Dashboards\Resources\DashboardFunnelResource;
 use DDD\Domain\Connections\Resources\ConnectionResource;
 use DDD\Domain\Base\Categories\Resources\CategoryResource;
 
@@ -22,8 +23,8 @@ class FunnelResource extends JsonResource
             'id' => $this->id,
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
-            'order' => $this->whenPivotLoaded('dashboard_funnel', function() {
-                return $this->pivot->order;
+            'pivot' => $this->whenPivotLoaded('dashboard_funnel', function() {
+                return new DashboardFunnelResource($this->pivot);
             }),
             'connection_id' => $this->connection_id,
             'connection' => new ConnectionResource($this->connection),

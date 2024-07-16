@@ -138,6 +138,8 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/attach', [DashboardFunnelController::class, 'attach']);
                 Route::post('/detach', [DashboardFunnelController::class, 'detach']);
                 Route::post('/reorder', [DashboardFunnelController::class, 'reorder']);
+                Route::post('/{funnel}/toggle-step', [DashboardFunnelController::class, 'toggleStep']);
+                Route::post('/{funnel}/enable-steps', [DashboardFunnelController::class, 'enableSteps']);
             });
         });
 
