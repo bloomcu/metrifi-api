@@ -26,7 +26,8 @@ class Step5AnalyzeBiggestOpportunity
 
         $subjectFunnelStepsHTML = [];
         foreach ($subjectFunnel['report']['steps'] as $index => $step) {
-            $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
+            $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
+            // $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
             // $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . (array_key_exists($index + 1, $subjectFunnel['report']['steps']) ? "({$subjectFunnel['report']['steps'][$index + 1]['conversionRate']}% conversion rate)" : '') . "</li>";
         }
 
@@ -55,7 +56,8 @@ class Step5AnalyzeBiggestOpportunity
             $steps = array();
 
             foreach ($comparisonFunnel['report']['steps'] as $index => $step) {
-                $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
+                $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
+                // $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
                 // $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . (array_key_exists($index + 1, $comparisonFunnel['report']['steps']) ? "({$comparisonFunnel['report']['steps'][$index + 1]['conversionRate']}% conversion rate)" : '') . "</li>";
             }
 
@@ -138,11 +140,39 @@ class Step5AnalyzeBiggestOpportunity
         //     {$comparisonFunnelsHTML}
         // ";
 
+        /**
+         * V6.2
+         */
+        $messageContent = "
+            Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels. Calculate the conversion rate of each step in each funnel (conversion rate = previous step divided by subsequent step).
+
+            Begin your analysis with, \"The biggest opportunity for improvement is…\" Limit your analysis to 40 words.
+
+            I WANT TO KNOW WHICH TRANSITION (STEP TO STEP) IN MY FUNNEL HAS THE BIGGEST OPPORTUNITY FOR IMPROVEMENT COMPARED TO THE COMPARISON FUNNELS.
+            THE SUBJECT FUNNEL STEP YOU IDENTIFY MUST HAVE A LOWER CONVERSION RATE THAN THE COMPARISONS AT THAT STEP.
+            DON'T LIST COMPARISON FUNNEL STEPS WITH A LOWER CONVERSION RATE THAN THE SUBJECT FUNNEL STEP YOU IDENTIFY.
+            IF THE SUBJECT FUNNEL IS PERFORMING BETTER THAN THE COMPARISON FUNNELS ON ALL OF ITS STEPS, INDICATE THAT IT IS PERFORMING BETTER THAN THE COMPARISONS.
+
+            Now I will give you the data you need to complete the analysis:
+
+            <h2>Funnel data</h2>
+
+            <h3>Subject funnel: {$subjectFunnel['name']}</h3>
+            
+            <h4>Funnel steps:</h4>
+            <ol>
+            ".
+                implode('', $subjectFunnelStepsHTML)
+            ."
+            </ol>
+            {$comparisonFunnelsHTML}
+        ";
+
         // /**
-        //  * V6.2
+        //  * V6.3
         //  */
         // $messageContent = "
-        //     Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels. Calculate the conversion rate of each step in each funnel.
+        //     Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels.
 
         //     Begin your analysis with, \"The biggest opportunity for improvement is…\" Limit your analysis to 40 words.
 
@@ -153,7 +183,7 @@ class Step5AnalyzeBiggestOpportunity
         //     <h2>Funnel data</h2>
 
         //     <h3>Subject funnel: {$subjectFunnel['name']}</h3>
-        //     <p>Conversion: {$subjectFunnel['report']['overallConversionRate']}%</p>
+            
         //     <h4>Funnel steps:</h4>
         //     <ol>
         //     ".
@@ -162,32 +192,6 @@ class Step5AnalyzeBiggestOpportunity
         //     </ol>
         //     {$comparisonFunnelsHTML}
         // ";
-
-        /**
-         * V6.3
-         */
-        $messageContent = "
-            Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels.
-
-            Begin your analysis with, \"The biggest opportunity for improvement is…\" Limit your analysis to 40 words.
-
-            I WANT TO KNOW WHICH STEP IN THE SUBJECT FUNNEL HAS THE BIGGEST OPPORTUNITY FOR IMPROVEMENT COMPARED TO THE CORRESPONDING STEP IN COMPARISON FUNNELS. 
-            THE SUBJECT FUNNEL STEP YOU IDENTIFY MUST HAVE A LOWER CONVERSION RATE THUS REPRESENTING THE BIGGEST OPPORTUNITY FOR IMPROVEMENT.
-            IF THE SUBJECT FUNNEL IS PERFORMING BETTER THAN THE COMPARISON FUNNELS ON ALL OF ITS STEPS, INDICATE THAT NO IMPROVEMENT IS NEEDED.
-
-            Now I will give you the data you need to complete the analysis:
-
-            <h2>Funnel data</h2>
-
-            <h3>Subject funnel: {$subjectFunnel['name']}</h3>
-            <h4>Funnel steps:</h4>
-            <ol>
-            ".
-                implode('', $subjectFunnelStepsHTML)
-            ."
-            </ol>
-            {$comparisonFunnelsHTML}
-        ";
 
         // return $messageContent;
 
