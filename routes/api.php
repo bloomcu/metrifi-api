@@ -146,6 +146,7 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [AnalysisController::class, 'index']);
             Route::post('/', [AnalysisController::class, 'store']);
             Route::get('/{analysis}', [AnalysisController::class, 'show']);
+            Route::put('/{analysis}', [AnalysisController::class, 'update']);
         });
     }); 
 });
