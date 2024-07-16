@@ -3,26 +3,27 @@
 namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use DivisionByZeroError;
 use DDD\Domain\Analyses\Analysis;
 
-class Step1AnalyzeConversionRate
+class Step1AnalyzeOverallConversionRate
 {
     use AsAction;
 
-    function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
+    function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
         /**
          * Get the conversion rate for the subject funnel
          */
-        $subjectFunnelConversionRate = $subjectFunnelReport['overallConversionRate'];
+        $subjectFunnelConversionRate = $subjectFunnel['report']['overallConversionRate'];
 
         /**
          * Get the conversion rates for the comparison funnels
          */
         $comparisonFunnelsConversionRates = [];
 
-        foreach ($comparisonFunnelReports as $key => $report) {
-            array_push($comparisonFunnelsConversionRates, $report['overallConversionRate']);
+        foreach ($comparisonFunnels as $key => $comparisonFunnel) {
+            array_push($comparisonFunnelsConversionRates, $comparisonFunnel['report']['overallConversionRate']);
         }
 
         /**
@@ -33,7 +34,11 @@ class Step1AnalyzeConversionRate
         /**
          * Get subject funnel conversion rate percentage higher/lower
          */
-        $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
+        try {
+            $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
+        } catch(DivisionByZeroError $e){
+            $percentageDifference = 0;
+        }
 
         /**
          * Format the percentage difference to include a + or - sign

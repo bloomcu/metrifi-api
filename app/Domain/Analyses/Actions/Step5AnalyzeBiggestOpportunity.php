@@ -17,22 +17,50 @@ class Step5AnalyzeBiggestOpportunity
         $this->GPTService = $GPTService;
     }
 
-    function handle(Analysis $analysis, $subjectFunnelReport, $comparisonFunnelReports)
-    {
-        $subjectFunnelSteps = array_map(function($step) {
-            return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
-        }, $subjectFunnelReport['steps']);
+    function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
+    {   
+        // Subject funnel
+        // $subjectFunnelStepsHTML = array_map(function($step) {
+        //     return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
+        // }, $subjectFunnel['report']['steps']);
 
-        // Comparison funnels
-        $comparisonFunnels = "";
-        foreach ($comparisonFunnelReports as $key => $report) {
-            $steps = array_map(function($step) {
-                return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
-            }, $report['steps']);
+        $subjectFunnelStepsHTML = [];
+        foreach ($subjectFunnel['report']['steps'] as $index => $step) {
+            $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
+            // $subjectFunnelStepsHTML[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . (array_key_exists($index + 1, $subjectFunnel['report']['steps']) ? "({$subjectFunnel['report']['steps'][$index + 1]['conversionRate']}% conversion rate)" : '') . "</li>";
+        }
 
-            $comparisonFunnels .= "
-                <h3>Comparison funnel: {$report['funnel_name']}</h3>
-                <p>Conversion: {$report['overallConversionRate']}%</p>
+        // // Comparison funnels
+        // $comparisonFunnelsHTML = "";
+        // foreach ($comparisonFunnels as $key => $comparisonFunnel) {
+        //     $steps = array_map(function($step) {
+        //         return "<li>Step \"{$step['name']}\": {$step['users']} users ({$step['conversion']} conversion rate)</li>";
+        //     }, $comparisonFunnel['report']['steps']);
+
+        //     $comparisonFunnelsHTML .= "
+        //         <h3>Comparison funnel: {$comparisonFunnel['name']}</h3>
+        //         <p>Conversion: {$comparisonFunnel['report']['overallConversionRate']}%</p>
+        //         <h4>Funnel steps:</h4>
+        //         <ol>
+        //         ".
+        //             implode('', $steps)
+        //         ."
+        //         </ol>
+        //     ";
+        // } // End comparison funnels loop
+
+        // Comparison funnels V6.3
+        $comparisonFunnelsHTML = "";
+        foreach ($comparisonFunnels as $comparisonFunnel) {
+            $steps = array();
+
+            foreach ($comparisonFunnel['report']['steps'] as $index => $step) {
+                $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . ($index != 0 ? "({$step['conversionRate']}% conversion rate)" : '') . "</li>";
+                // $steps[] = "<li>Step \"{$step['name']}\": {$step['users']} users " . (array_key_exists($index + 1, $comparisonFunnel['report']['steps']) ? "({$comparisonFunnel['report']['steps'][$index + 1]['conversionRate']}% conversion rate)" : '') . "</li>";
+            }
+
+            $comparisonFunnelsHTML .= "
+                <h3>Comparison funnel: {$comparisonFunnel['name']}</h3>
                 <h4>Funnel steps:</h4>
                 <ol>
                 ".
@@ -40,30 +68,7 @@ class Step5AnalyzeBiggestOpportunity
                 ."
                 </ol>
             ";
-        } // End comparison funnels loop
-
-        $subjectFunnelSteps = array_map(function($step) {
-            return "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
-        }, $subjectFunnelReport['steps']);
-
-        // Comparison funnels
-        $comparisonFunnels = "";
-        foreach ($comparisonFunnelReports as $key => $report) {
-            $steps = array_map(function($step) {
-                return "<li>Step \"{$step['name']}\": {$step['users']} users</li>";
-            }, $report['steps']);
-
-            $comparisonFunnels .= "
-                <h3>Comparison funnel: {$report['funnel_name']}</h3>
-                <p>Conversion: {$report['overallConversionRate']}%</p>
-                <h4>Funnel steps:</h4>
-                <ol>
-                ".
-                    implode('', $steps)
-                ."
-                </ol>
-            ";
-        } // End comparison funnels loop
+        }
 
         /**
          * V4
@@ -75,14 +80,14 @@ class Step5AnalyzeBiggestOpportunity
 
         //     <p>Time period: {$report['period']}</p>
         //     <h3>Subject Funnel</h3>
-        //     <p>Conversion: {$subjectFunnelReport['overallConversionRate']}%</p>
+        //     <p>Conversion: {$subjectFunnel['overallConversionRate']}%</p>
         //     <h4>Funnel steps:</h4>
         //     <ol>
         //     ".
-        //         implode('', $subjectFunnelSteps)
+        //         implode('', $subjectFunnelStepsHTML)
         //     ."
         //     </ol>
-        //     {$comparisonFunnels}
+        //     {$comparisonFunnelsHTML}
         // ";
 
         // /**
@@ -99,14 +104,14 @@ class Step5AnalyzeBiggestOpportunity
         //     <p>Time period: {$report['period']}</p>
 
         //     <h3>Subject Funnel</h3>
-        //     <p>Conversion: {$subjectFunnelReport['overallConversionRate']}%</p>
+        //     <p>Conversion: {$subjectFunnel['overallConversionRate']}%</p>
         //     <h4>Funnel steps:</h4>
         //     <ol>
         //     ".
-        //         implode('', $subjectFunnelSteps)
+        //         implode('', $subjectFunnelStepsHTML)
         //     ."
         //     </ol>
-        //     {$comparisonFunnels}
+        //     {$comparisonFunnelsHTML}
         // ";
 
         // /**
@@ -123,43 +128,68 @@ class Step5AnalyzeBiggestOpportunity
         //     <p>Time period: {$report['period']}</p>
 
         //     <h3>Subject funnel:</h3>
-        //     <p>Conversion: {$subjectFunnelReport['overallConversionRate']}%</p>
+        //     <p>Conversion: {$subjectFunnel['overallConversionRate']}%</p>
         //     <h4>Funnel steps:</h4>
         //     <ol>
         //     ".
-        //         implode('', $subjectFunnelSteps)
+        //         implode('', $subjectFunnelStepsHTML)
         //     ."
         //     </ol>
-        //     {$comparisonFunnels}
+        //     {$comparisonFunnelsHTML}
+        // ";
+
+        // /**
+        //  * V6.2
+        //  */
+        // $messageContent = "
+        //     Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels. Calculate the conversion rate of each step in each funnel.
+
+        //     Begin your analysis with, \"The biggest opportunity for improvement is…\" Limit your analysis to 40 words.
+
+        //     I WANT TO KNOW WHICH TRANSITION (STEP TO STEP) IN MY FUNNEL HAS THE BIGGEST OPPORTUNITY FOR IMPROVEMENT COMPARED TO THE COMPARISON FUNNELS.
+
+        //     Now I will give you the data you need to complete the analysis:
+
+        //     <h2>Funnel data</h2>
+
+        //     <h3>Subject funnel: {$subjectFunnel['name']}</h3>
+        //     <p>Conversion: {$subjectFunnel['report']['overallConversionRate']}%</p>
+        //     <h4>Funnel steps:</h4>
+        //     <ol>
+        //     ".
+        //         implode('', $subjectFunnelStepsHTML)
+        //     ."
+        //     </ol>
+        //     {$comparisonFunnelsHTML}
         // ";
 
         /**
-         * V6.2
+         * V6.3
          */
         $messageContent = "
-            Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels. Calculate the conversion rate of each step in each funnel.
+            Your task is to analyze and compare website conversion funnels. Below, I've provided data for my funnel and one or more comparison funnels.
 
             Begin your analysis with, \"The biggest opportunity for improvement is…\" Limit your analysis to 40 words.
 
-            I WANT TO KNOW WHICH TRANSITION (STEP TO STEP) IN MY FUNNEL HAS THE BIGGEST OPPORTUNITY FOR IMPROVEMENT COMPARED TO THE COMPARISON FUNNELS.
+            I WANT TO KNOW WHICH STEP IN THE SUBJECT FUNNEL HAS THE BIGGEST OPPORTUNITY FOR IMPROVEMENT COMPARED TO THE CORRESPONDING STEP IN COMPARISON FUNNELS. 
+            THE SUBJECT FUNNEL STEP YOU IDENTIFY MUST HAVE A LOWER CONVERSION RATE THUS REPRESENTING THE BIGGEST OPPORTUNITY FOR IMPROVEMENT.
+            IF THE SUBJECT FUNNEL IS PERFORMING BETTER THAN THE COMPARISON FUNNELS ON ALL OF ITS STEPS, INDICATE THAT NO IMPROVEMENT IS NEEDED.
 
             Now I will give you the data you need to complete the analysis:
 
             <h2>Funnel data</h2>
-            <p>Time period: {$report['period']}</p>
 
-            <h3>Subject funnel:</h3>
-            <p>Conversion: {$subjectFunnelReport['overallConversionRate']}%</p>
+            <h3>Subject funnel: {$subjectFunnel['name']}</h3>
             <h4>Funnel steps:</h4>
             <ol>
             ".
-                implode('', $subjectFunnelSteps)
+                implode('', $subjectFunnelStepsHTML)
             ."
             </ol>
-            {$comparisonFunnels}
+            {$comparisonFunnelsHTML}
         ";
 
-        // dd($messageContent);
+        // return $messageContent;
 
         $response = $this->GPTService->getResponse($messageContent);
 

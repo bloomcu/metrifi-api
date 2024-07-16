@@ -34,14 +34,14 @@ class Dashboard extends Model
         if ($this->organization->is_private) {
             return $this->belongsToMany(Funnel::class)
                 ->where('organization_id', $this->organization->id) // Only return funnels from the same organization
-                ->withPivot('order')
+                ->withPivot(['order', 'disabled_steps'])
                 ->orderBy('order')
                 ->withTimestamps();
 
         } else {
             return $this->belongsToMany(Funnel::class)
                 ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
-                ->withPivot('order')
+                ->withPivot(['order', 'disabled_steps'])
                 ->orderBy('order')
                 ->withTimestamps();
         }
