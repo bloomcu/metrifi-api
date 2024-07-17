@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function() {
     // Google Analytics data
     Route::prefix('ga')->group(function() {
         // Funnel report
-        Route::post('funnel-report/{connection}', [GoogleAnalyticsDataController::class, 'funnelReport']);
+        Route::post('funnel-report/{funnel}', [GoogleAnalyticsDataController::class, 'funnelReport']);
         
         // Page users
         Route::post('page-users/{connection}', [GoogleAnalyticsDataController::class, 'pageUsers']);

@@ -2,23 +2,24 @@
 namespace DDD\Http\Services\GoogleAnalytics;
 
 use Illuminate\Http\Request;
+use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
 class GoogleAnalyticsDataController extends Controller
 {
-    public function funnelReport(Connection $connection, Request $request)
+    public function funnelReport(Funnel $funnel, Request $request)
     {
-        $report = GoogleAnalyticsData::funnelReport(
-            connection: $connection, 
+        $funnel = GoogleAnalyticsData::funnelReport(
+            funnel: $funnel,
             startDate: $request->startDate, 
             endDate: $request->endDate,
-            steps: $request->steps,
+            disabledSteps: $request->disabledSteps,
         );
 
         return response()->json([
-            'data' => $report
+            'data' => $funnel
         ], 200);
     }
 

@@ -3,11 +3,27 @@ namespace DDD\App\Services\GoogleAnalyticsData;
 
 use Illuminate\Support\Facades\Http;
 use Google\ApiCore\ApiException;
+use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAuth;
 
 class GoogleAnalyticsDataService
 {
+    private $report;
+
+    public function __construct() 
+    {
+        /**
+         * Format the funnel report.
+         * TODO: Refactor this using a design pattern such as Strategy or Factory.
+         * 
+         */
+        $this->report = [
+            'steps' => [],
+            'overallConversionRate' => 0
+        ];
+    }
+
     /**
      * Run a funnel report
      * 
@@ -16,7 +32,7 @@ class GoogleAnalyticsDataService
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
      * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
      */
-    public function funnelReport(Connection $connection, String $startDate, String $endDate, Array $steps)
+    public function funnelReport(Funnel $funnel, String $startDate, String $endDate, $disabledSteps = null)
     {
         /**
          * Generate a GA funnelReport request from our app's funnel steps.
@@ -28,13 +44,13 @@ class GoogleAnalyticsDataService
         $funnelSteps = [];
         
         // Iterate through each raw funnel step to structure it for the API request.
-        foreach ($steps as $step) {
+        foreach ($funnel->steps as $step) {
             $funnelFilterExpressionList = [];
 
             // If the step has no metrics, skip it.
             if (!$step['metrics']) {
-                $index = $this->getStepIndex($steps, $step['id']);
-                array_splice($steps, $index, 1);
+                $index = $this->getStepIndex($funnel->steps, $step['id']);
+                array_splice($funnel->steps, $index, 1);
                 continue;
             }
 
@@ -199,62 +215,100 @@ class GoogleAnalyticsDataService
         ];
 
         try {
-            $accessToken = $this->setupAccessToken($connection);
-            $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $connection->uid . ':runFunnelReport?access_token=' . $accessToken;
+            $accessToken = $this->setupAccessToken($funnel->connection);
+            $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $funnel->connection->uid . ':runFunnelReport?access_token=' . $accessToken;
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
-            
-            /**
-             * Format the funnel report.
-             * TODO: Refactor this using a design pattern such as Strategy or Factory.
-             * 
-             */
-            $report = [
-                'steps' => [],
-                'overallConversionRate' => 0
-            ];
 
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {
-                return $report;
+                return $this->report;
             }
-            
-            // Track metrics from previous steps.
-            // $lastStepUsers = 0;
-            $lastStepConversionRate = '100%';
 
-            // Iterate through each step in the funnel.
-            // TODO: Check if we have any rows, if not, zero out the metrics
-            foreach ($steps as $index => $step) {
+            /**
+             * Get users for each step
+             */
+            foreach ($funnel->steps as $index => $step) {
                 $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
-                $conversionRate = $this->getReportRowConversion($gaFunnelReport['funnelTable']['rows'], $step['name']);
+                // $conversionRate = $this->getReportRowConversion($gaFunnelReport['funnelTable']['rows'], $step['name']);
 
                 // If the step is not in the report, that means it has 0 users.
-                if ($users) {
-                    $steps[$index]['users'] = $users;
-                    // $steps[$index]['conversion'] = $lastStepConversionRate;
-                    $lastStepConversionRate = $conversionRate;
+                if (!$users) {
+                    array_push($this->report['steps'], [
+                        'id' => $step['id'],
+                        'name' => $step['name'],
+                        'users' => 0,
+                    ]);
                 } else {
-                    $steps[$index]['users'] = '0';
-                    // $steps[$index]['conversion'] = '0%';
+                    array_push($this->report['steps'], [
+                        'id' => $step['id'],
+                        'name' => $step['name'],
+                        'users' => $users,
+                    ]);
                 }
-
-                // Add to report
-                $report['steps'][] = $steps[$index];
             }
+
+            // Remove disabled steps from report
+            $this->removeDisabledSteps($funnel, $disabledSteps);
+
+            // Calculate conversion rate of each step in report
+            $this->calculateConversionRates($funnel);
 
             // Calculate the overall conversion rate.
-            $first = $steps[0]['users'];
-            $last = end($steps)['users'];
+            $first = $this->report['steps'][0]['users'];
+            $last = end($this->report['steps'])['users'];
             if ($first > 0) {
                 $ocr = ($last / $first) * 100;
-                $report['overallConversionRate'] = round($ocr, 2);
+                $this->report['overallConversionRate'] = round($ocr, 2);
             }
 
-            // return $steps;
-            return $report;
+            // Add report to funnel
+            $funnel['report'] = $this->report;
+
+            return $funnel;
+
+            return $funnel;
 
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
+        }
+    }
+
+    private function removeDisabledSteps($funnel, $disabledSteps) {
+        if (!$disabledSteps) {
+            return;
+        }
+
+        foreach ($funnel->steps as $index => $step) {
+            if (in_array($step['id'], json_decode($disabledSteps))) {
+
+                // Find the index of the step
+                $index = $this->getStepIndex($this->report['steps'], $step['id']);
+
+                // Remove the step from the report
+                array_splice($this->report['steps'], $index, 1);
+            }
+        }
+    }
+
+    private function calculateConversionRates() {
+        foreach ($this->report['steps'] as $index => $step) {
+            if ($index === 0) {
+                $this->report['steps'][$index]['conversionRate'] = '100';
+                continue;
+            }
+
+            $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
+
+            if (is_infinite($conversionRate) || is_nan($conversionRate)) {
+                $this->report['steps'][$index]['conversionRate'] = '0.00';
+                return;
+            }
+
+            $formatted = $conversionRate * 100; // Get a percentage
+            $formatted = number_format($formatted, 2); // Round to 2 decimal places
+            $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
+
+            $this->report['steps'][$index]['conversionRate'] = $formatted;
         }
     }
 
@@ -267,16 +321,16 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function getReportRowConversion($reportRows, $name) {
-        foreach ($reportRows as $row) {
-            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
-                $conversion = $row['metricValues'][1]['value'];
-                $percentage = $conversion * 100;
-                $formattedPercentage = number_format($percentage, 2);
-                return $formattedPercentage . '%';
-            }
-        }
-    }
+    // private function getReportRowConversion($reportRows, $name) {
+    //     foreach ($reportRows as $row) {
+    //         if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
+    //             $conversion = $row['metricValues'][1]['value'];
+    //             $percentage = $conversion * 100;
+    //             $formattedPercentage = number_format($percentage, 2);
+    //             return $formattedPercentage . '%';
+    //         }
+    //     }
+    // }
 
     private function getStepIndex($steps, $id) {
         foreach ($steps as $index => $step) {

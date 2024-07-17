@@ -8,11 +8,11 @@ use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
-use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
-use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
-use DDD\Domain\Analyses\Actions\Step3CalculateStepConversionRates;
+use DDD\Domain\Analyses\Actions\Step1GetSubjectFunnelPerformance;
 use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
-use DDD\Domain\Analyses\Actions\Step1AnalyzeOverallConversionRate;
+use DDD\Domain\Analyses\Actions\Step3CalculateStepConversionRates;
+use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
+use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
@@ -25,7 +25,10 @@ class AnalysisController extends Controller
 
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
-        // return $request->comparisonFunnels;
+        // Bail early if dashboard has no funnels
+        if (count($dashboard->funnels) === 0) {
+            return;
+        }
 
         // Setup time period (later accrept this as a parameter from the request)
         $period = match ('last28Days') {
@@ -55,50 +58,43 @@ class AnalysisController extends Controller
         if (count($analysis->subjectFunnel->steps) === 0) {
             return;
         }
-
-        // Bail early if dashboard has no funnels
-        if (count($analysis->dashboard->funnels) === 0) {
-            return;
-        }
-
+        // return json_decode($dashboard->funnels[0]->pivot->disabled_steps);
         // Get subject funnel report
-        // $subjectFunnelReport = GoogleAnalyticsData::funnelReport(
-        //     connection: $analysis->subjectFunnel->connection, 
-        //     startDate: $period['startDate'], 
-        //     endDate: $period['endDate'],
-        //     steps: $analysis->subjectFunnel->steps->toArray(),
-        // );
-
-        // return $subjectFunnelReport;
+        $subjectFunnel = GoogleAnalyticsData::funnelReport(
+            funnel: $analysis->subjectFunnel, 
+            startDate: $period['startDate'], 
+            endDate: $period['endDate'],
+            disabledSteps: $dashboard->funnels[0]->pivot->disabled_steps,
+        );
 
         // Add period to report
         // $subjectFunnelReport['period'] = $period['startDate'] . ' - ' . $period['endDate'];
 
         // Build array of comparison funnel reports
-        // $comparisonFunnelReports = [];
-        // foreach ($analysis->dashboard->funnels as $key => $funnel) {
-        //     if ($key === 0) continue; // Skip subject funnel (already processed above)
+        $comparisonFunnels = [];
+        foreach ($dashboard->funnels as $key => $comparisonFunnel) {
+            if ($key === 0) continue; // Skip subject funnel (already processed above)
+            
+            $funnel = GoogleAnalyticsData::funnelReport(
+                funnel: $comparisonFunnel, 
+                startDate: $period['startDate'], 
+                endDate: $period['endDate'],
+                disabledSteps: $comparisonFunnel->pivot->disabled_steps,
+            );
 
-        //     $report = GoogleAnalyticsData::funnelReport(
-        //         connection: $funnel->connection, 
-        //         startDate: $period['startDate'], 
-        //         endDate: $period['endDate'],
-        //         steps: $funnel->steps->toArray(),
-        //     );
+            // $funnel['funnel_name'] = $f['name'];
+            // $funnel['period'] = $period['startDate'] . ' - ' . $period['endDate'];
 
-        //     $report['funnel_name'] = $funnel['name'];
-        //     $report['period'] = $period['startDate'] . ' - ' . $period['endDate'];
-
-        //     array_push($comparisonFunnelReports, $report);
-        // }
+            array_push($comparisonFunnels, $funnel);
+        }
 
         // TODO: Step 1 is broken because the overall conversion rate of each funnel is computed on the frontend
-        // Step1AnalyzeOverallConversionRate::run($analysis, $request->subjectFunnel, $request->comparisonFunnels);
+        Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
 
         // Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
         // Step3CalculateStepConversionRates::run($analysis);
         // Step4CalculateStepRatios::run($analysis);
-        Step5AnalyzeBiggestOpportunity::run($analysis, $request->subjectFunnel, $request->comparisonFunnels);
+        Step5AnalyzeBiggestOpportunity::run($analysis, $subjectFunnel, $comparisonFunnels);
 
         return new AnalysisResource($analysis);
     }
