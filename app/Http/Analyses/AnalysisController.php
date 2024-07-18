@@ -26,7 +26,7 @@ class AnalysisController extends Controller
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
         // Bail early if dashboard has no funnels
-        if (count($dashboard->funnels) === 0) {
+        if (count($dashboard->funnels) <= 1) {
             return;
         }
 
@@ -58,13 +58,15 @@ class AnalysisController extends Controller
         if (count($analysis->subjectFunnel->steps) === 0) {
             return;
         }
+        
         // return json_decode($dashboard->funnels[0]->pivot->disabled_steps);
+
         // Get subject funnel report
         $subjectFunnel = GoogleAnalyticsData::funnelReport(
             funnel: $analysis->subjectFunnel, 
             startDate: $period['startDate'], 
             endDate: $period['endDate'],
-            disabledSteps: $dashboard->funnels[0]->pivot->disabled_steps,
+            disabledSteps: json_decode($dashboard->funnels[0]->pivot->disabled_steps),
         );
 
         // Add period to report
@@ -74,12 +76,14 @@ class AnalysisController extends Controller
         $comparisonFunnels = [];
         foreach ($dashboard->funnels as $key => $comparisonFunnel) {
             if ($key === 0) continue; // Skip subject funnel (already processed above)
-            
+
+            // return json_decode($comparisonFunnel->pivot->disabled_steps);
+
             $funnel = GoogleAnalyticsData::funnelReport(
                 funnel: $comparisonFunnel, 
                 startDate: $period['startDate'], 
                 endDate: $period['endDate'],
-                disabledSteps: $comparisonFunnel->pivot->disabled_steps,
+                disabledSteps: json_decode($comparisonFunnel->pivot->disabled_steps),
             );
 
             // $funnel['funnel_name'] = $f['name'];

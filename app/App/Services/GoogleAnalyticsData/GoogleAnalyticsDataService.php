@@ -3,6 +3,7 @@ namespace DDD\App\Services\GoogleAnalyticsData;
 
 use Illuminate\Support\Facades\Http;
 use Google\ApiCore\ApiException;
+use DivisionByZeroError;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAuth;
@@ -11,18 +12,18 @@ class GoogleAnalyticsDataService
 {
     private $report;
 
-    public function __construct() 
-    {
-        /**
-         * Format the funnel report.
-         * TODO: Refactor this using a design pattern such as Strategy or Factory.
-         * 
-         */
-        $this->report = [
-            'steps' => [],
-            'overallConversionRate' => 0
-        ];
-    }
+    // public function __construct() 
+    // {
+    //     /**
+    //      * Format the funnel report.
+    //      * TODO: Refactor this using a design pattern such as Strategy or Factory.
+    //      * 
+    //      */
+    //     $this->report = [
+    //         'steps' => [],
+    //         'overallConversionRate' => 0
+    //     ];
+    // }
 
     /**
      * Run a funnel report
@@ -32,8 +33,17 @@ class GoogleAnalyticsDataService
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
      * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
      */
-    public function funnelReport(Funnel $funnel, String $startDate, String $endDate, $disabledSteps = null)
+    public function funnelReport(Funnel $funnel, String $startDate, String $endDate, ?Array $disabledSteps = [])
     {
+        $this->report = [
+            'steps' => [],
+            'overallConversionRate' => 0
+        ];
+        
+        // if ($funnel['name'] == 'Second Chance Checking') {
+        //     dd($disabledSteps);
+        // }
+
         /**
          * Generate a GA funnelReport request from our app's funnel steps.
          * TODO: Refactor this using Factory and Builder patterns.
@@ -247,6 +257,11 @@ class GoogleAnalyticsDataService
                 }
             }
 
+            // if ($funnel['name'] == 'Second Chance Checking') {
+            //     // dd($funnel->steps->toArray());
+            //     dd($this->report);
+            // }
+
             // Remove disabled steps from report
             $this->removeDisabledSteps($funnel, $disabledSteps);
 
@@ -266,8 +281,6 @@ class GoogleAnalyticsDataService
 
             return $funnel;
 
-            return $funnel;
-
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
@@ -279,7 +292,7 @@ class GoogleAnalyticsDataService
         }
 
         foreach ($funnel->steps as $index => $step) {
-            if (in_array($step['id'], json_decode($disabledSteps))) {
+            if (in_array($step['id'], $disabledSteps)) {
 
                 // Find the index of the step
                 $index = $this->getStepIndex($this->report['steps'], $step['id']);
@@ -297,9 +310,13 @@ class GoogleAnalyticsDataService
                 continue;
             }
 
-            $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
+            try {
+                $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
+            } catch (DivisionByZeroError $e) {
+                $conversionRate = 0;
+            }
 
-            if (is_infinite($conversionRate) || is_nan($conversionRate)) {
+            if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
                 $this->report['steps'][$index]['conversionRate'] = '0.00';
                 return;
             }
