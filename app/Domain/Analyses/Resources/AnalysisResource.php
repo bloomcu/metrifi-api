@@ -21,6 +21,7 @@ class AnalysisResource extends JsonResource
             'in_progress' => $this->in_progress,
             'subject_funnel_performance' => $this->subject_funnel_performance,
             'content' => $this->content,
+            'meta' => $this->meta,
             // 'subject_funnel' => new FunnelResource($this->subjectFunnel),
             // 'dashboard' => new DashboardResource($this->dashboard),
             'start_date' => $this->start_date,

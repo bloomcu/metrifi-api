@@ -306,7 +306,7 @@ class GoogleAnalyticsDataService
     private function calculateConversionRates() {
         foreach ($this->report['steps'] as $index => $step) {
             if ($index === 0) {
-                $this->report['steps'][$index]['conversionRate'] = '100';
+                $this->report['steps'][$index]['conversionRate'] = 100;
                 continue;
             }
 
@@ -317,13 +317,14 @@ class GoogleAnalyticsDataService
             }
 
             if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
-                $this->report['steps'][$index]['conversionRate'] = '0.00';
+                $this->report['steps'][$index]['conversionRate'] = 0;
                 return;
             }
 
             $formatted = $conversionRate * 100; // Get a percentage
-            $formatted = number_format($formatted, 2); // Round to 2 decimal places
-            $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
+            $formatted = round($formatted, 2); // Round to 2 decimal places
+            // $formatted = number_format($formatted, 2); // Format with commas
+            // $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
 
             $this->report['steps'][$index]['conversionRate'] = $formatted;
         }

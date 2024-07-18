@@ -9,9 +9,7 @@ use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\Step1GetSubjectFunnelPerformance;
-use DDD\Domain\Analyses\Actions\Step2NormalizeFunnelSteps;
-use DDD\Domain\Analyses\Actions\Step3CalculateStepConversionRates;
-use DDD\Domain\Analyses\Actions\Step4CalculateStepRatios;
+use DDD\Domain\Analyses\Actions\Step2GetSubjectFunnelBOFI;
 use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
@@ -92,13 +90,9 @@ class AnalysisController extends Controller
             array_push($comparisonFunnels, $funnel);
         }
 
-        // TODO: Step 1 is broken because the overall conversion rate of each funnel is computed on the frontend
         Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
-
-        // Step2NormalizeFunnelSteps::run($analysis, $subjectFunnelReport, $comparisonFunnelReports);
-        // Step3CalculateStepConversionRates::run($analysis);
-        // Step4CalculateStepRatios::run($analysis);
-        Step5AnalyzeBiggestOpportunity::run($analysis, $subjectFunnel, $comparisonFunnels);
+        Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
+        // Step5AnalyzeBiggestOpportunity::run($analysis, $subjectFunnel, $comparisonFunnels);
 
         return new AnalysisResource($analysis);
     }
