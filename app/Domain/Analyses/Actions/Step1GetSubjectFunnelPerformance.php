@@ -26,57 +26,42 @@ class Step1GetSubjectFunnelPerformance
             array_push($comparisonFunnelsConversionRates, $comparisonFunnel['report']['overallConversionRate']);
         }
 
-        // dd([
-        //     'subjectFunnelConversionRate' => $subjectFunnelConversionRate,
-        //     'comparisonFunnelsConversionRates' => $comparisonFunnelsConversionRates,
-        // ]);
-
         /**
          * Get the median of the comparison conversion rates
          */
         $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
 
-        // dd($medianOfComparisonConversionRates);
+        // dd([
+        //     'subjectFunnelConversionRate' => $subjectFunnelConversionRate,
+        //     'medianOfComparisonConversionRates' => $medianOfComparisonConversionRates,
+        //     '($medianOfComparisonConversionRates - $subjectFunnelConversionRate)' => $medianOfComparisonConversionRates - $subjectFunnelConversionRate,
+        // ]);
 
-        /**
-         * Run percentage difference formula
-         */
-        // Calculate the absolute difference
-        // $difference = abs($subjectFunnelConversionRate - $medianOfComparisonConversionRates);
-
-        // // Calculate the average of the two numbers
-        // $average = ($subjectFunnelConversionRate + $medianOfComparisonConversionRates) / 2;
+        // Test figures
+        // $subjectFunnelConversionRate = 7.33;
+        // $medianOfComparisonConversionRates = 0.07;
         
-        // // Calculate the percentage difference
-        // $percentageDifference = ($difference / $average) * 100;
+        /**
+         * Get subject funnel conversion rate percentage difference higher/lower
+         */
+        $percentageDifference = $this->calculatePercentageChange($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
 
-        $percentageDifference = $this->calculatePercentageDifference($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
-
-        if ($percentageDifference === INF) {
+        // Handle infinity, don't update analysis
+        if ($percentageDifference === INF || $percentageDifference === -INF) {
             return $analysis;
         }
 
         // dd($percentageDifference);
 
         /**
-         * Get subject funnel conversion rate percentage difference higher/lower
-         */
-        // try {
-            // $percentageDifference = ($subjectFunnelConversionRate - $medianOfComparisonConversionRates) / $medianOfComparisonConversionRates * 100;
-        // } catch(DivisionByZeroError $e) {
-        //     $percentageDifference = 0;
-        // }
-
-        // dd(round($percentageDifference, 2));
-
-        /**
          * Format the percentage difference to include a + or - sign
          */
         // $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . round($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
-
         // dd($formattedPercentageDifference);
 
+        // Round result to 2 decimal places
         $roundedPercentageDifference = round($percentageDifference, 2);
+        // dd($roundedPercentageDifference);
 
         // Update dashboard
         $analysis->dashboard->update([
@@ -86,9 +71,6 @@ class Step1GetSubjectFunnelPerformance
         // Update analysis
         $analysis->update([
             'subject_funnel_performance' => $roundedPercentageDifference,
-            // 'content' => '
-            //     <p>' . $formattedPercentageDifference . ($formattedPercentageDifference <= 0 ? '% lower' : '% higher') . ' than comparisons</p>
-            // ',
         ]);
 
         return $analysis;
@@ -113,21 +95,31 @@ class Step1GetSubjectFunnelPerformance
     }
 
     // TODO: Move this to a helper/service class
-    function calculatePercentageDifference($a, $b) {
-        // Calculate the absolute difference
-        $difference = $a - $b;
-
-        // Calculate the average of the two numbers
-        $average = ($a + $b) / 2;
-
-        // Check if the average is zero to prevent division by zero
-        if ($average == 0) {
-            return INF; // Return infinity
+    function calculatePercentageChange($a, $b) {
+        // Check if either $a or $b is zero to prevent division by zero
+        if ($a == 0) {
+            if ($b > 0) {
+                return -INF; // Infinite decrease
+            } else if ($b < 0) {
+                return INF; // Infinite increase
+            } else {
+                return 0; // No change
+            }
         }
 
-        // Calculate the percentage difference
-        $percentageDifference = ($difference / $average) * 100;
+        if ($b == 0) {
+            if ($a > 0) {
+                return INF; // Infinite increase
+            } else if ($a < 0) {
+                return -INF; // Infinite decrease
+            } else {
+                return 0; // No change
+            }
+        }
 
-        return $percentageDifference;
+        // Calculate the percentage change
+        $percentageChange = (($a - $b) / $b) * 100;
+        
+        return $percentageChange;
     }
 }
