@@ -231,7 +231,19 @@ class GoogleAnalyticsDataService
 
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {
-                return $this->report;
+                // Build report steps with no users
+                foreach ($funnel->steps as $index => $step) {
+                    array_push($this->report['steps'], [
+                        'id' => $step['id'],
+                        'name' => $step['name'],
+                        'users' => 0,
+                    ]);
+                }
+
+                // Add report to funnel
+                $funnel['report'] = $this->report;
+
+                return $funnel;
             }
 
             /**
