@@ -67,23 +67,25 @@ class Step2GetSubjectFunnelBOFI
             array_push($subjectFunnelStepRatios, $stepRatio);
         }
 
-        $meta .= "<p><strong>Subject Funnel Step Ratios: [" . implode(', ', $subjectFunnelStepRatios) . "]</strong></p>";
+        $meta .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $subjectFunnelStepRatios) . "]</p>";
 
         /**
          * Find the index of the largest ratio in the array
          */
         $largestRatio = max($subjectFunnelStepRatios); // Get the largest number in the array
-        $largestRatioIndex = array_search($largestRatio, $subjectFunnelStepRatios); // Get the index of the largest number
+        $indexOfLargestRatio = array_search($largestRatio, $subjectFunnelStepRatios); // Get the index of the largest number
 
-        $meta .= "<p><strong>Largest ratio: {$largestRatio}</strong></p>";
+        $meta .= "<p><strong>Largest ratio:</strong> {$largestRatio}</p>";
 
         /**
          * Find the subject funnel BOFI step by index
          */
-        // $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$largestRatioIndex - 1];
-        $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$largestRatioIndex];
+        // $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio - 1];
+        $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio];
 
-        $content = "The biggest opportunity for improvement is: {$subjectFunnelBOFIStep['name']} (" . $subjectFunnel['report']['steps'][$largestRatioIndex + 1]['conversionRate'] . "%)\n\n";
+        $content = "
+            The biggest opportunity for improvement is step " . $indexOfLargestRatio + 1 .": 
+            {$subjectFunnelBOFIStep['name']} (" . $subjectFunnel['report']['steps'][$indexOfLargestRatio + 1]['conversionRate'] . "%)\n\n";
 
         // dd($meta);
         // dd($subjectFunnelStepRatios);
