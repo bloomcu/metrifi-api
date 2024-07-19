@@ -48,9 +48,13 @@ class Step2GetSubjectFunnelBOFI
 
             $meta .= "<p>Median of Comparisons (". implode(' + ', $comparisonConversionRates) .") / 2 = {$medianOfComparisonConversionRates}</p>";
 
-            // Get the ratio of the subject funnel step conversion rate to the median of the comparison conversion rates
-            // Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
-            // small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
+            /** 
+             * Use small constant strategy against division by zero issues 
+             * 
+             * Get the ratio of the subject funnel step conversion rate to the median of the comparison conversion rates
+             * Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
+             * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
+             */
             if ($subjectFunnelStepConversionRate === 0 || $medianOfComparisonConversionRates === 0) {
                 $subjectFunnelStepConversionRate += 0.01;
                 $medianOfComparisonConversionRates += 0.01;
