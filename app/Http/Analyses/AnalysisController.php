@@ -10,7 +10,6 @@ use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
 use DDD\Domain\Analyses\Actions\Step1GetSubjectFunnelPerformance;
 use DDD\Domain\Analyses\Actions\Step2GetSubjectFunnelBOFI;
-use DDD\Domain\Analyses\Actions\Step5AnalyzeBiggestOpportunity;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 use DDD\App\Controllers\Controller;
 
@@ -56,8 +55,6 @@ class AnalysisController extends Controller
         if (count($analysis->subjectFunnel->steps) === 0) {
             return;
         }
-        
-        // return json_decode($dashboard->funnels[0]->pivot->disabled_steps);
 
         // Get subject funnel report
         $subjectFunnel = GoogleAnalyticsData::funnelReport(
@@ -67,15 +64,10 @@ class AnalysisController extends Controller
             disabledSteps: json_decode($dashboard->funnels[0]->pivot->disabled_steps),
         );
 
-        // Add period to report
-        // $subjectFunnelReport['period'] = $period['startDate'] . ' - ' . $period['endDate'];
-
         // Build array of comparison funnel reports
         $comparisonFunnels = [];
         foreach ($dashboard->funnels as $key => $comparisonFunnel) {
             if ($key === 0) continue; // Skip subject funnel (already processed above)
-
-            // return json_decode($comparisonFunnel->pivot->disabled_steps);
 
             $funnel = GoogleAnalyticsData::funnelReport(
                 funnel: $comparisonFunnel, 
@@ -84,15 +76,11 @@ class AnalysisController extends Controller
                 disabledSteps: json_decode($comparisonFunnel->pivot->disabled_steps),
             );
 
-            // $funnel['funnel_name'] = $f['name'];
-            // $funnel['period'] = $period['startDate'] . ' - ' . $period['endDate'];
-
             array_push($comparisonFunnels, $funnel);
         }
 
         Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
         Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
-        // Step5AnalyzeBiggestOpportunity::run($analysis, $subjectFunnel, $comparisonFunnels);
 
         return new AnalysisResource($analysis);
     }
