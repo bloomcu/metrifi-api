@@ -83,9 +83,7 @@ class Step2GetSubjectFunnelBOFI
         // $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio - 1];
         $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio];
 
-        $content = "
-            The biggest opportunity for improvement is step " . $indexOfLargestRatio + 1 .": 
-            {$subjectFunnelBOFIStep['name']} (" . $subjectFunnel['report']['steps'][$indexOfLargestRatio + 1]['conversionRate'] . "%)\n\n";
+        $content = "The biggest opportunity for improvement is step " . $indexOfLargestRatio + 1 .": {$subjectFunnelBOFIStep['name']} (" . $subjectFunnel['report']['steps'][$indexOfLargestRatio + 1]['conversionRate'] . "%)\n\n";
 
         // dd($meta);
         // dd($subjectFunnelStepRatios);
