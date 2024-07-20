@@ -12,19 +12,6 @@ class GoogleAnalyticsDataService
 {
     private $report;
 
-    // public function __construct() 
-    // {
-    //     /**
-    //      * Format the funnel report.
-    //      * TODO: Refactor this using a design pattern such as Strategy or Factory.
-    //      * 
-    //      */
-    //     $this->report = [
-    //         'steps' => [],
-    //         'overallConversionRate' => 0
-    //     ];
-    // }
-
     /**
      * Run a funnel report
      * 
@@ -37,7 +24,8 @@ class GoogleAnalyticsDataService
     {
         $this->report = [
             'steps' => [],
-            'overallConversionRate' => 0
+            'overallConversionRate' => 0,
+            'assets' => 0
         ];
         
         // if ($funnel['name'] == 'Second Chance Checking') {
@@ -251,7 +239,6 @@ class GoogleAnalyticsDataService
              */
             foreach ($funnel->steps as $index => $step) {
                 $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
-                // $conversionRate = $this->getReportRowConversion($gaFunnelReport['funnelTable']['rows'], $step['name']);
 
                 // If the step is not in the report, that means it has 0 users.
                 if (!$users) {
@@ -268,11 +255,6 @@ class GoogleAnalyticsDataService
                     ]);
                 }
             }
-
-            // if ($funnel['name'] == 'Second Chance Checking') {
-            //     // dd($funnel->steps->toArray());
-            //     dd($this->report);
-            // }
 
             // Remove disabled steps from report
             $this->removeDisabledSteps($funnel, $disabledSteps);
@@ -350,17 +332,6 @@ class GoogleAnalyticsDataService
             }
         }
     }
-
-    // private function getReportRowConversion($reportRows, $name) {
-    //     foreach ($reportRows as $row) {
-    //         if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
-    //             $conversion = $row['metricValues'][1]['value'];
-    //             $percentage = $conversion * 100;
-    //             $formattedPercentage = number_format($percentage, 2);
-    //             return $formattedPercentage . '%';
-    //         }
-    //     }
-    // }
 
     private function getStepIndex($steps, $id) {
         foreach ($steps as $index => $step) {
