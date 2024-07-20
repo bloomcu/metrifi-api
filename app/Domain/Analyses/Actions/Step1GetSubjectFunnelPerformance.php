@@ -44,33 +44,26 @@ class Step1GetSubjectFunnelPerformance
         /**
          * Get subject funnel conversion rate percentage difference higher/lower
          */
-        $percentageDifference = $this->calculatePercentageChange($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
+        $percentageChange = $this->calculatePercentageChange($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
 
         // Handle infinity, don't update analysis
-        if ($percentageDifference === INF || $percentageDifference === -INF) {
+        if ($percentageChange === INF || $percentageChange === -INF) {
             return $analysis;
         }
-
-        // dd($percentageDifference);
-
-        /**
-         * Format the percentage difference to include a + or - sign
-         */
-        // $formattedPercentageDifference = ($percentageDifference >= 0 ? '+' : '') . round($percentageDifference, 2) . ($percentageDifference >= 0 ? '% higher' : '% lower');
-        // dd($formattedPercentageDifference);
+        // dd($percentageChange);
 
         // Round result to 2 decimal places
-        $roundedPercentageDifference = round($percentageDifference, 2);
+        $roundedPercentageChange = round($percentageChange, 2);
         // dd($roundedPercentageDifference);
 
         // Update dashboard
         $analysis->dashboard->update([
-            'subject_funnel_performance' => $roundedPercentageDifference,
+            'subject_funnel_performance' => $roundedPercentageChange,
         ]);
 
         // Update analysis
         $analysis->update([
-            'subject_funnel_performance' => $roundedPercentageDifference,
+            'subject_funnel_performance' => $roundedPercentageChange,
         ]);
 
         return $analysis;
