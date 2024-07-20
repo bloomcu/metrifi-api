@@ -65,11 +65,7 @@ class Step2GetSubjectFunnelBOFI
             $stepRatio = $medianOfComparisonConversionRates / $subjectFunnelStepConversionRate;
             // $stepRatio = round($stepRatio, 2);
 
-            $meta .= "<p>Ratio ({$subjectFunnelStepConversionRate} / {$medianOfComparisonConversionRates}) = {$stepRatio}</p>";
-
-            $subjectFunnelStepPerformance = $this->calculatePercentageChange($subjectFunnelStepConversionRate, $medianOfComparisonConversionRates);
-
-            $meta .= "<p>Subject funnel step performance (({$subjectFunnelStepConversionRate} - {$medianOfComparisonConversionRates}) / {$medianOfComparisonConversionRates}) * 100 = {$subjectFunnelStepPerformance}</p><br>";
+            $meta .= "<p>Ratio ({$subjectFunnelStepConversionRate} / {$medianOfComparisonConversionRates}) = {$stepRatio}</p><br>";
 
             // Add the step ratio to the array
             array_push($subjectFunnelStepRatios, $stepRatio);
@@ -98,45 +94,11 @@ class Step2GetSubjectFunnelBOFI
 
         // Update analysis
         $analysis->update([
-            'bofi_step_index' => $indexOfLargestRatio + 1,
-            'bofi_step_name' => $subjectFunnelBOFIStep['name'],
-            'bofi_performance' => $subjectFunnel['report']['steps'][$indexOfLargestRatio + 1]['conversionRate'],
-            'bofi_asset_change' => ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'],
-            'period' => '28 days',
             'content' => $content,
             'meta' => $meta,
         ]);
 
         return $analysis;
-    }
-
-    // TODO: Move this to a helper/service class
-    function calculatePercentageChange($a, $b) {
-        // Check if either $a or $b is zero to prevent division by zero
-        if ($a == 0) {
-            if ($b > 0) {
-                return -INF; // Infinite decrease
-            } else if ($b < 0) {
-                return INF; // Infinite increase
-            } else {
-                return 0; // No change
-            }
-        }
-
-        if ($b == 0) {
-            if ($a > 0) {
-                return INF; // Infinite increase
-            } else if ($a < 0) {
-                return -INF; // Infinite decrease
-            } else {
-                return 0; // No change
-            }
-        }
-
-        // Calculate the percentage change
-        $percentageChange = (($a - $b) / $b) * 100;
-        
-        return $percentageChange;
     }
 
     // TODO: Move this to a helper/service class
