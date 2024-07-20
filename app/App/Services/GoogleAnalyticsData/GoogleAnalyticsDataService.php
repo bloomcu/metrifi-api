@@ -259,19 +259,14 @@ class GoogleAnalyticsDataService
             // Remove disabled steps from report
             $this->removeDisabledSteps($funnel, $disabledSteps);
 
-            // Calculate assets of the funnel
-            $this->calculateAssets($funnel);
-
             // Calculate conversion rate of each step in report
-            $this->calculateConversionRates($funnel);
+            $this->calculateConversionRates();
 
             // Calculate the overall conversion rate.
-            $first = $this->report['steps'][0]['users'];
-            $last = end($this->report['steps'])['users'];
-            if ($first > 0) {
-                $ocr = ($last / $first) * 100;
-                $this->report['overallConversionRate'] = round($ocr, 2);
-            }
+            $this->calculateOverallConversionRate();
+
+            // Calculate assets of the funnel
+            $this->calculateFunnelAssets($funnel);
 
             // Add report to funnel
             $funnel['report'] = $this->report;
@@ -300,14 +295,6 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function calculateAssets($funnel) {
-        $lastStep = end($this->report['steps']);
-        $users = $lastStep['users'];
-        $assets = $users * $funnel->conversion_value;
-
-        $this->report['assets'] = ($assets / 100);
-    }
-
     private function calculateConversionRates() {
         foreach ($this->report['steps'] as $index => $step) {
             if ($index === 0) {
@@ -333,6 +320,24 @@ class GoogleAnalyticsDataService
 
             $this->report['steps'][$index]['conversionRate'] = $formatted;
         }
+    }
+
+    private function calculateOverallConversionRate() {
+        $first = $this->report['steps'][0]['users'];
+        $last = end($this->report['steps'])['users'];
+
+        if ($first > 0) {
+            $ocr = ($last / $first) * 100;
+            $this->report['overallConversionRate'] = round($ocr, 2);
+        }
+    }
+
+    private function calculateFunnelAssets($funnel) {
+        $lastStep = end($this->report['steps']);
+        $users = $lastStep['users'];
+        $assets = $users * $funnel->conversion_value;
+
+        $this->report['assets'] = ($assets / 100);
     }
 
     private function getReportRowUsers($reportRows, $name) {
