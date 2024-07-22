@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::table('analyses', function (Blueprint $table) {
             $table->decimal('subject_funnel_assets')->after('subject_funnel_performance')->nullable();
-            // $table->integer('bofi_step_id')->after('subject_funnel_assets')->nullable();
             $table->integer('bofi_step_index')->after('subject_funnel_assets')->nullable();
             $table->string('bofi_step_name')->after('bofi_step_index')->nullable();
             $table->decimal('bofi_performance')->after('bofi_step_name')->nullable();
