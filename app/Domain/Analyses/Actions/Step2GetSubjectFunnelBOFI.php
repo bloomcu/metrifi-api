@@ -197,25 +197,15 @@ class Step2GetSubjectFunnelBOFI
 
     // TODO: Move this to a helper/service class
     function calculatePercentageChange($a, $b) {
-        // Check if either $a or $b is zero to prevent division by zero
-        if ($a == 0) {
-            if ($b > 0) {
-                return -INF; // Infinite decrease
-            } else if ($b < 0) {
-                return INF; // Infinite increase
-            } else {
-                return 0; // No change
-            }
-        }
-
-        if ($b == 0) {
-            if ($a > 0) {
-                return INF; // Infinite increase
-            } else if ($a < 0) {
-                return -INF; // Infinite decrease
-            } else {
-                return 0; // No change
-            }
+        /** 
+         * Use small constant strategy against division by zero issues 
+         * 
+         * Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
+         * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
+         */
+        if ($a == 0 || $b == 0) {
+            $a += 0.0001;
+            $b += 0.0001;
         }
 
         // Calculate the percentage change
