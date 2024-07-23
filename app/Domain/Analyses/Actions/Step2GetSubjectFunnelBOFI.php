@@ -179,7 +179,7 @@ class Step2GetSubjectFunnelBOFI
 
             $meta .= "<p>Step {$count} conversion rate of Subject Funnel = {$subjectFunnelStep['conversionRate']}</p>";
 
-            $meta .= "<p>Step {$count} conversion rate of Comparison Funnel = " . implode(', ', $subjectFunnelStep['comparisonConversionRates']) . "</p>";
+            $meta .= "<p>Step {$count} conversion rate of Comparison Funnels = " . implode(', ', $subjectFunnelStep['comparisonConversionRates']) . "</p>";
 
             $meta .= "<p>Median of Comparisons = {$subjectFunnelStep['medianOfComparisons']}</p>";
 
