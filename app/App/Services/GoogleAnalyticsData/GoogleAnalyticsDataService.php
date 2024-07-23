@@ -270,6 +270,7 @@ class GoogleAnalyticsDataService
 
             // Add report to funnel
             $funnel['report'] = $this->report;
+            // $funnel['gaReport'] = $gaFunnelReport;
 
             return $funnel;
 
@@ -314,7 +315,7 @@ class GoogleAnalyticsDataService
             }
 
             $formatted = $conversionRate * 100; // Get a percentage
-            $formatted = round($formatted, 2); // Round to 2 decimal places
+            // $formatted = round($formatted, 2); // Round to 2 decimal places
             // $formatted = number_format($formatted, 2); // Format with commas
             // $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
 
@@ -328,7 +329,8 @@ class GoogleAnalyticsDataService
 
         if ($first > 0) {
             $ocr = ($last / $first) * 100;
-            $this->report['overallConversionRate'] = round($ocr, 2);
+            // $this->report['overallConversionRate'] = round($ocr, 2);
+            $this->report['overallConversionRate'] = $ocr;
         }
     }
 
