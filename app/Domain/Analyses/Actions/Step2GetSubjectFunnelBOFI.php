@@ -151,9 +151,13 @@ class Step2GetSubjectFunnelBOFI
         //     $bofiConversionRate += 0.01;
         //     $bofiMedianOfComparisons += 0.01;
         // }
-        $reference['bofiPerformance'] = $this->calculatePercentageChange($bofiConversionRate, $bofiMedianOfComparisons);
+        $bofiPerformance = $this->calculatePercentageChange($bofiConversionRate, $bofiMedianOfComparisons);
+        // $reference['bofiPerformance'] = round($bofiPerformance, 2);
+        $reference['bofiPerformance'] = $bofiPerformance;
 
-        $reference['bofiAssetChange'] = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
+        $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
+        // $reference['bofiAssetChange'] = round($bofiAssetChange);
+        $reference['bofiAssetChange'] = $bofiAssetChange;
 
         // Update analysis
         $analysis->update([
@@ -167,6 +171,45 @@ class Step2GetSubjectFunnelBOFI
         ]);
 
         return $analysis;
+    }
+
+    // TODO: Move this to a helper/service class
+    function calculatePercentageChange($a, $b) {
+        /** 
+         * Use small constant strategy against division by zero issues 
+         * 
+         * Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
+         * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
+         */
+        if ($a == 0 || $b == 0) {
+            $a += 0.0001;
+            $b += 0.0001;
+        }
+
+        // Calculate the percentage change
+        $percentageChange = (($a - $b) / $b) * 100;
+        
+        return $percentageChange;
+        // return round($percentageChange, 5);
+    }
+
+    // TODO: Move this to a helper/service class
+    function calculateMedian($arrayOfNumbers) {
+        sort($arrayOfNumbers);
+        $count = count($arrayOfNumbers);
+        
+        if ($count % 2 == 0) {
+            // If the number of elements is even
+            $middle1 = $arrayOfNumbers[$count / 2 - 1];
+            $middle2 = $arrayOfNumbers[$count / 2];
+            $median = ($middle1 + $middle2) / 2;
+        } else {
+            // If the number of elements is odd
+            $median = $arrayOfNumbers[floor($count / 2)];
+        }
+        
+        return $median;
+        // return round($median, 5);
     }
 
     function generateMeta($reference) {
@@ -193,42 +236,5 @@ class Step2GetSubjectFunnelBOFI
         $meta .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
 
         return $meta;
-    }
-
-    // TODO: Move this to a helper/service class
-    function calculatePercentageChange($a, $b) {
-        /** 
-         * Use small constant strategy against division by zero issues 
-         * 
-         * Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
-         * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
-         */
-        if ($a == 0 || $b == 0) {
-            $a += 0.0001;
-            $b += 0.0001;
-        }
-
-        // Calculate the percentage change
-        $percentageChange = (($a - $b) / $b) * 100;
-        
-        return $percentageChange;
-    }
-
-    // TODO: Move this to a helper/service class
-    function calculateMedian($arrayOfNumbers) {
-        sort($arrayOfNumbers);
-        $count = count($arrayOfNumbers);
-        
-        if ($count % 2 == 0) {
-            // If the number of elements is even
-            $middle1 = $arrayOfNumbers[$count / 2 - 1];
-            $middle2 = $arrayOfNumbers[$count / 2];
-            $median = ($middle1 + $middle2) / 2;
-        } else {
-            // If the number of elements is odd
-            $median = $arrayOfNumbers[floor($count / 2)];
-        }
-        
-        return $median;
     }
 }

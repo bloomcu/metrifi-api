@@ -329,8 +329,8 @@ class GoogleAnalyticsDataService
 
         if ($first > 0) {
             $ocr = ($last / $first) * 100;
-            // $this->report['overallConversionRate'] = round($ocr, 2);
-            $this->report['overallConversionRate'] = $ocr;
+            $this->report['overallConversionRate'] = round($ocr, 5);
+            // $this->report['overallConversionRate'] = $ocr;
         }
     }
 

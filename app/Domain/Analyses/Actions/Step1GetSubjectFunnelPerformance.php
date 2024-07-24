@@ -53,7 +53,8 @@ class Step1GetSubjectFunnelPerformance
         // dd($percentageChange);
 
         // Round result to 2 decimal places
-        $roundedPercentageChange = round($percentageChange, 2);
+        // $roundedPercentageChange = round($percentageChange, 2);
+        $roundedPercentageChange = $percentageChange;
         // dd($roundedPercentageDifference);
 
         // Update dashboard
@@ -81,10 +82,11 @@ class Step1GetSubjectFunnelPerformance
             $median = ($middle1 + $middle2) / 2;
         } else {
             // If the number of elements is odd
-            $median = $arrayOfNumbers[floor($count / 2)];
+            $median = $arrayOfNumbers[floor($count / 5)];
         }
         
         return $median;
+        // return round($median, 5);
     }
 
     // TODO: Move this to a helper/service class
@@ -104,5 +106,6 @@ class Step1GetSubjectFunnelPerformance
         $percentageChange = (($a - $b) / $b) * 100;
         
         return $percentageChange;
+        // return round($percentageChange, 5);
     }
 }
