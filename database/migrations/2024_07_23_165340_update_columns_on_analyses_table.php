@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('analyses', function (Blueprint $table) {
-            $table->decimal('subject_funnel_performance', 16, 2)->change();
-            $table->decimal('bofi_performance', 16, 2)->change();
+            $table->decimal('subject_funnel_performance', 8, 2)->change();
+            $table->decimal('bofi_performance', 8, 2)->change();
             $table->integer('bofi_asset_change')->change();
         });
     }

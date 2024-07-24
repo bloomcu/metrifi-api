@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::table('analyses', function (Blueprint $table) {
             $table->decimal('subject_funnel_performance', 16, 2)->change();
             $table->decimal('bofi_performance', 16, 2)->change();
-            $table->integer('bofi_asset_change')->change();
         });
     }
 
@@ -30,7 +29,6 @@ return new class extends Migration
         Schema::table('analyses', function (Blueprint $table) {
             $table->decimal('subject_funnel_performance')->change();
             $table->decimal('bofi_performance')->change();
-            $table->decimal('bofi_asset_change')->change();
         });
     }
 };
