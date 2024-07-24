@@ -3,6 +3,7 @@
 namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use DDD\Domain\Analyses\Enums\AnalysisIssueEnum;
 use DDD\Domain\Analyses\Analysis;
 
 class Step2GetSubjectFunnelBOFI
@@ -12,6 +13,21 @@ class Step2GetSubjectFunnelBOFI
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
         // dd($subjectFunnel);
+
+        /**
+         * Check that all comparison funnels have same number of steps
+         */
+        $subjectFunnelStepsCount = count($subjectFunnel['report']['steps']);
+
+        foreach ($comparisonFunnels as $comparisonFunnel) {
+            if (count($comparisonFunnel['report']['steps']) !== $subjectFunnelStepsCount) {
+                $analysis->update([
+                    'issue' => 'One or more funnels do not have the same number of steps.',
+                ]);
+        
+                return $analysis;
+            }
+        }
 
         $meta = '';
         
