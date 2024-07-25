@@ -82,7 +82,7 @@ class Step1GetSubjectFunnelPerformance
             $median = ($middle1 + $middle2) / 2;
         } else {
             // If the number of elements is odd
-            $median = $arrayOfNumbers[floor($count / 5)];
+            $median = $arrayOfNumbers[floor($count / 2)];
         }
         
         return $median;
