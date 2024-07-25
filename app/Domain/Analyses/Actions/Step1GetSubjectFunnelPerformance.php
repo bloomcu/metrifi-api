@@ -12,24 +12,33 @@ class Step1GetSubjectFunnelPerformance
 
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
+        $reference = [
+            'subjectFunnelConversionRate' => null, // e.g. 4.29
+            'comparisonFunnelsConversionRates' => [],  // e.g., 0.00, 6.09, 20.00
+            'medianOfComparisonConversionRates' => null, // e.g. 2.0636215334421
+            'percentageChange' => null, // e.g. 29.56
+        ];
+
         /**
          * Get the conversion rate for the subject funnel
          */
         $subjectFunnelConversionRate = $subjectFunnel['report']['overallConversionRate'];
+        $reference['subjectFunnelConversionRate'] = $subjectFunnelConversionRate;
 
         /**
          * Get the conversion rates for the comparison funnels
          */
         $comparisonFunnelsConversionRates = [];
-
         foreach ($comparisonFunnels as $key => $comparisonFunnel) {
             array_push($comparisonFunnelsConversionRates, $comparisonFunnel['report']['overallConversionRate']);
         }
+        $reference['comparisonFunnelsConversionRates'] = $comparisonFunnelsConversionRates;
 
         /**
          * Get the median of the comparison conversion rates
          */
         $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
+        $reference['medianOfComparisonConversionRates'] = $medianOfComparisonConversionRates;
 
         // dd([
         //     'subjectFunnelConversionRate' => $subjectFunnelConversionRate,
@@ -45,26 +54,27 @@ class Step1GetSubjectFunnelPerformance
          * Get subject funnel conversion rate percentage difference higher/lower
          */
         $percentageChange = $this->calculatePercentageChange($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
+        $reference['percentageChange'] = $percentageChange;
 
         // Handle infinity, don't update analysis
-        if ($percentageChange === INF || $percentageChange === -INF) {
-            return $analysis;
-        }
+        // if ($percentageChange === INF || $percentageChange === -INF) {
+        //     return $analysis;
+        // }
         // dd($percentageChange);
 
         // Round result to 2 decimal places
         // $roundedPercentageChange = round($percentageChange, 2);
-        $roundedPercentageChange = $percentageChange;
+        // $roundedPercentageChange = $percentageChange;
         // dd($roundedPercentageDifference);
 
         // Update dashboard
-        $analysis->dashboard->update([
-            'subject_funnel_performance' => $roundedPercentageChange,
-        ]);
+        // $analysis->dashboard->update([
+        //     'subject_funnel_performance' => $percentageChange,
+        // ]);
 
         // Update analysis
         $analysis->update([
-            'subject_funnel_performance' => $roundedPercentageChange,
+            'subject_funnel_performance' => $percentageChange,
         ]);
 
         return $analysis;
@@ -108,4 +118,14 @@ class Step1GetSubjectFunnelPerformance
         return $percentageChange;
         // return round($percentageChange, 5);
     }
+
+    // function generateMeta($reference) {
+    //     $meta = '';
+
+    //     $meta .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
+
+    //     $meta .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
+
+    //     return $meta;
+    // }
 }
