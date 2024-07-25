@@ -198,8 +198,8 @@ class Step2GetSubjectFunnelBOFI
          * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
          */
         if ($a == 0 || $b == 0) {
-            $a += 0.0001;
-            $b += 0.0001;
+            $a += 0.001;
+            $b += 0.001;
         }
 
         // Calculate the percentage change
