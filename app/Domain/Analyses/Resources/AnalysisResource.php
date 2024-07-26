@@ -21,6 +21,7 @@ class AnalysisResource extends JsonResource
             'id' => $this->id,
             'in_progress' => $this->in_progress,
             'issue' => $this->issue,
+            'subject_funnel_conversion_value' => $this->subject_funnel_conversion_value,
             'subject_funnel_performance' => $this->subject_funnel_performance,
             'bofi_step_index' => $this->bofi_step_index,
             'bofi_performance' => $this->bofi_performance,

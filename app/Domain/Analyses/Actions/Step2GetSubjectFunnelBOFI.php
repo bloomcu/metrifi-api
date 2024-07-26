@@ -177,6 +177,7 @@ class Step2GetSubjectFunnelBOFI
 
         // Update analysis
         $analysis->update([
+            'subject_funnel_conversion_value' => $subjectFunnel->conversion_value,
             'bofi_step_index' => $reference['bofiStepIndex'],
             // 'bofi_step_name' => $reference['bofiStepName'],
             'bofi_performance' => $reference['bofiPerformance'],
