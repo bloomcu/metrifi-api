@@ -110,6 +110,14 @@ class Step1GetSubjectFunnelPerformance
         if ($a == 0 || $b == 0) {
             $a += 0.001;
             $b += 0.001;
+
+            // Calculate the percentage change
+            $percentageChange = (($a - $b) / $b) * 100;
+
+            // Round up to 2 decimal places
+            $percentageChange = round($percentageChange);
+
+            return $percentageChange;
         }
 
         // Calculate the percentage change
