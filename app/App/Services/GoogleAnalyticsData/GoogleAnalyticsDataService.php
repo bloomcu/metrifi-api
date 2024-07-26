@@ -246,12 +246,14 @@ class GoogleAnalyticsDataService
                         'id' => $step['id'],
                         'name' => $step['name'],
                         'users' => 0,
+                        'metrics' => $step['metrics']
                     ]);
                 } else {
                     array_push($this->report['steps'], [
                         'id' => $step['id'],
                         'name' => $step['name'],
                         'users' => $users,
+                        'metrics' => $step['metrics']
                     ]);
                 }
             }
