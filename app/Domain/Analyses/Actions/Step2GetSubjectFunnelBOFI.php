@@ -98,31 +98,13 @@ class Step2GetSubjectFunnelBOFI
             array_push($reference['subjectFunnelStepRatios'], $stepRatio);
         }
 
-        // $meta .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $subjectFunnelStepRatios) . "]</p>";
-
         /**
          * Find the index of the largest ratio in the array
          */
         $largestRatio = max($reference['subjectFunnelStepRatios']); // Get the largest number in the array
         $indexOfLargestRatio = array_search($largestRatio, $reference['subjectFunnelStepRatios']); // Get the index of the largest number
-
         $reference['largestRatio'] = $largestRatio;
-        // $meta .= "<p><strong>Largest ratio:</strong> {$largestRatio}</p>";
-
-        /**
-         * Find the subject funnel BOFI step by index
-         */
-        // $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio - 1];
-        // $subjectFunnelBOFIStep = $subjectFunnel['report']['steps'][$indexOfLargestRatio];
-
-        // $content = "The biggest opportunity for improvement is step " . $indexOfLargestRatio + 1 .": {$subjectFunnelBOFIStep['name']} (" . $subjectFunnel['report']['steps'][$indexOfLargestRatio + 1]['conversionRate'] . "%)\n\n";
-
-        // dd($meta);
-        // dd($subjectFunnelStepRatios);
-
         $reference['bofiStepIndex'] = $indexOfLargestRatio;
-
-        // $reference['bofiStepName'] = $subjectFunnel['report']['steps'][$indexOfLargestRatio]['name'];
 
         /** 
          * Get bofi performance
@@ -149,7 +131,7 @@ class Step2GetSubjectFunnelBOFI
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',
             'content' => $reference,
-            'meta' => $this->generateMeta($reference),
+            'reference' => $this->generateReference($reference),
         ]);
 
         return $analysis;
@@ -202,29 +184,29 @@ class Step2GetSubjectFunnelBOFI
         // return round($median, 5);
     }
 
-    function generateMeta($reference) {
-        $meta = '';
+    function generateReference($reference) {
+        $html = '';
 
         foreach ($reference['subjectFunnelSteps'] as $index => $subjectFunnelStep) {
             $count = $index;
 
-            $meta .= "<p><strong>Ratio for step {$count} of the Subject Funnel</strong></p>";
+            $html .= "<p><strong>Ratio for step {$count} of the Subject Funnel</strong></p>";
 
-            $meta .= "<p>Step {$count} conversion rate of Subject Funnel = {$subjectFunnelStep['conversionRate']}</p>";
+            $html .= "<p>Step {$count} conversion rate of Subject Funnel = {$subjectFunnelStep['conversionRate']}</p>";
 
-            $meta .= "<p>Step {$count} conversion rate of Comparison Funnels = " . implode(', ', $subjectFunnelStep['comparisonConversionRates']) . "</p>";
+            $html .= "<p>Step {$count} conversion rate of Comparison Funnels = " . implode(', ', $subjectFunnelStep['comparisonConversionRates']) . "</p>";
 
-            $meta .= "<p>Median of Comparisons = {$subjectFunnelStep['medianOfComparisons']}</p>";
+            $html .= "<p>Median of Comparisons = {$subjectFunnelStep['medianOfComparisons']}</p>";
 
-            $meta .= "<p>Ratio ({$subjectFunnelStep['conversionRate']} / {$subjectFunnelStep['medianOfComparisons']}) = {$subjectFunnelStep['ratio']}</p>";
+            $html .= "<p>Ratio ({$subjectFunnelStep['conversionRate']} / {$subjectFunnelStep['medianOfComparisons']}) = {$subjectFunnelStep['ratio']}</p>";
 
-            $meta .= "<p>Subject funnel step performance (({$subjectFunnelStep['conversionRate']} - {$subjectFunnelStep['medianOfComparisons']}) / {$subjectFunnelStep['medianOfComparisons']}) * 100 = {$subjectFunnelStep['performance']}</p><br>";
+            $html .= "<p>Subject funnel step performance (({$subjectFunnelStep['conversionRate']} - {$subjectFunnelStep['medianOfComparisons']}) / {$subjectFunnelStep['medianOfComparisons']}) * 100 = {$subjectFunnelStep['performance']}</p><br>";
         }
 
-        $meta .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
+        $html .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
 
-        $meta .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
+        $html .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
 
-        return $meta;
+        return $html;
     }
 }
