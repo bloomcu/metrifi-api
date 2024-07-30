@@ -12,8 +12,6 @@ class Step2GetSubjectFunnelBOFI
 
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
-        // dd($subjectFunnel);
-
         /**
          * Check that all comparison funnels have same number of steps
          */
@@ -28,8 +26,6 @@ class Step2GetSubjectFunnelBOFI
                 return $analysis;
             }
         }
-
-        $meta = '';
         
         $reference = [
             'subjectFunnelSteps' => [
@@ -44,7 +40,6 @@ class Step2GetSubjectFunnelBOFI
             ],
             'largestRatio' => null, // e.g. 2.0636215334421
             'bofiStepIndex' => null, // e.g. 1
-            // 'bofiStepName' => '', // e.g. 'Auto Loan page',
             'bofiPerformance' => null, // e.g. 6.13,
             'bofiAssetChange' => null, // e.g. 1000,
         ];
@@ -52,28 +47,16 @@ class Step2GetSubjectFunnelBOFI
         /**
          * Build an array with the ratio of each subject funnel step compared to corresponding steps in comparison funnels
          */
-        $subjectFunnelStepRatios = [];
-        
         foreach ($subjectFunnel['report']['steps'] as $index => $subjectFunnelStep) {
             if ($index === 0) {
                 continue;
             }
-            
-            $count = $index;
-
-            // $meta .= "<p><strong>Ratio for step {$count} of the Subject Funnel</strong></p>";
 
             // Get the conversion rate for this step in the subject funnel
             $subjectFunnelStepConversionRate = $subjectFunnelStep['conversionRate'];
-
-            $reference['subjectFunnelSteps'][$index] = [
-                'conversionRate' => $subjectFunnelStepConversionRate,
-            ];
-
-            // $meta .= "<p>Step {$count} conversion rate of Subject Funnel = {$subjectFunnelStepConversionRate}</p>";
+            $reference['subjectFunnelSteps'][$index] = ['conversionRate' => $subjectFunnelStepConversionRate];
 
             // Get the conversion rates for this step in the comparison funnels
-            $comparisonConversionRates = [];
             foreach ($comparisonFunnels as $comparisonFunnel) {
                 // Get the conversion rate for this step in the comparison funnel
                 $comparisonFunnelStepConversionRate = $comparisonFunnel['report']['steps'][$index]['conversionRate'];
@@ -85,15 +68,11 @@ class Step2GetSubjectFunnelBOFI
 
                 // Push to reference
                 array_push($reference['subjectFunnelSteps'][$index]['comparisonConversionRates'], $comparisonFunnelStepConversionRate);
-
-                // $meta .= "<p>Step {$count} conversion rate of Comparison Funnel = {$comparisonFunnelStepConversionRate}</p>";
             }
 
             // Get the median of the comparison conversion rates
             $medianOfComparisonConversionRates = $this->calculateMedian($reference['subjectFunnelSteps'][$index]['comparisonConversionRates']);
-
             $reference['subjectFunnelSteps'][$index]['medianOfComparisons'] = $medianOfComparisonConversionRates;
-            // $meta .= "<p>Median of Comparisons = {$medianOfComparisonConversionRates}</p>";
 
             /** 
              * Use small constant strategy against division by zero issues 
@@ -107,23 +86,15 @@ class Step2GetSubjectFunnelBOFI
                 $medianOfComparisonConversionRates += 0.01;
             }
 
+            // Set step performance
             $subjectFunnelStepPerformance = $this->calculatePercentageChange($subjectFunnelStepConversionRate, $medianOfComparisonConversionRates);
-
             $reference['subjectFunnelSteps'][$index]['performance'] = $subjectFunnelStepPerformance;
 
-            // dd($subjectFunnelStepConversionRate, $medianOfComparisonConversionRates);
-
+            // Set step performance ratio against the median of comparisons
             $stepRatio = $medianOfComparisonConversionRates / $subjectFunnelStepConversionRate;
-            // $stepRatio = round($stepRatio, 2);
-
             $reference['subjectFunnelSteps'][$index]['ratio'] = $stepRatio;
-            // $meta .= "<p>Ratio ({$subjectFunnelStepConversionRate} / {$medianOfComparisonConversionRates}) = {$stepRatio}</p>";
-
-            
-            // $meta .= "<p>Subject funnel step performance (({$subjectFunnelStepConversionRate} - {$medianOfComparisonConversionRates}) / {$medianOfComparisonConversionRates}) * 100 = {$subjectFunnelStepPerformance}</p><br>";
 
             // Add the step ratio to the array
-            
             array_push($reference['subjectFunnelStepRatios'], $stepRatio);
         }
 
@@ -155,24 +126,17 @@ class Step2GetSubjectFunnelBOFI
 
         /** 
          * Get bofi performance
-         * Use small constant strategy against division by zero issues 
-         * 
-         * Cache the bofi conversion rate and median of comparisons
-         * Check for division by zero and add a small constant. To avoid division by zero or getting a zero ratio, you could add a 
-         * small constant (like 0.01) to both the numerator and the denominator. This technique is sometimes used in data analysis to handle zero values.
          */
+         // Setup the bofi conversion rate and median of it's comparisons for the analysis
         $bofiConversionRate = $reference['subjectFunnelSteps'][$indexOfLargestRatio + 1]['conversionRate'];
         $bofiMedianOfComparisons = $reference['subjectFunnelSteps'][$indexOfLargestRatio + 1]['medianOfComparisons'];
-        // if ($bofiConversionRate === 0 || $bofiMedianOfComparisons === 0) {
-        //     $bofiConversionRate += 0.01;
-        //     $bofiMedianOfComparisons += 0.01;
-        // }
+
+        // Get bofi performance
         $bofiPerformance = $this->calculatePercentageChange($bofiConversionRate, $bofiMedianOfComparisons);
-        // $reference['bofiPerformance'] = round($bofiPerformance, 2);
         $reference['bofiPerformance'] = $bofiPerformance;
 
+        // Get bofi asset change
         $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
-        // $reference['bofiAssetChange'] = round($bofiAssetChange);
         $reference['bofiAssetChange'] = $bofiAssetChange;
 
         // Update analysis
@@ -181,6 +145,7 @@ class Step2GetSubjectFunnelBOFI
             'bofi_step_index' => $reference['bofiStepIndex'],
             // 'bofi_step_name' => $reference['bofiStepName'],
             'bofi_performance' => $reference['bofiPerformance'],
+            'bofi_median_of_comparisons' => $bofiMedianOfComparisons,
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',
             'content' => $reference,
