@@ -27,7 +27,7 @@ class AnalysisResource extends JsonResource
             'bofi_performance' => $this->bofi_performance,
             'bofi_median_of_comparisons' => $this->bofi_median_of_comparisons,
             'bofi_asset_change' => $this->bofi_asset_change,
-            'content' => $this->content,
+            // 'meta' => $this->meta,
             'reference' => $this->reference,
             // 'subject_funnel' => new FunnelResource($this->subjectFunnel),
             // 'dashboard' => new DashboardResource($this->dashboard),

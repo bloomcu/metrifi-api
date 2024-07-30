@@ -130,7 +130,7 @@ class Step2GetSubjectFunnelBOFI
             'bofi_median_of_comparisons' => $bofiMedianOfComparisons,
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',
-            'content' => $reference,
+            // 'meta' => $reference,
             'reference' => $this->generateReference($reference),
         ]);
 
