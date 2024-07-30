@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\Domain\Analyses\Enums\AnalysisIssueEnum;
 use DDD\App\Traits\BelongsToOrganization;
 
 class Analysis extends Model
@@ -18,6 +19,10 @@ class Analysis extends Model
     protected $guarded = [
         'id',
     ];
+
+    // protected $casts = [
+    //     'issue' => AnalysisIssueEnum::class,
+    // ];
 
     /**
      * Dashboard this analysis belongs to.
