@@ -13,11 +13,18 @@ class Step1GetSubjectFunnelPerformance
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
         $reference = [
+            'subjectFunnelUsers' => null, // 1000
             'subjectFunnelConversionRate' => null, // e.g. 4.29
             'comparisonFunnelsConversionRates' => [],  // e.g., 0.00, 6.09, 20.00
             'medianOfComparisonConversionRates' => null, // e.g. 2.0636215334421
             'percentageChange' => null, // e.g. 29.56
         ];
+
+        /**
+         * Get the number of users at the top of the subject funnel
+         */
+        $subjectFunnelUsers = $subjectFunnel['report']['steps'][0]['users'];
+        $reference['subjectFunnelUsers'] = $subjectFunnelUsers;
 
         /**
          * Get the conversion rate for the subject funnel
@@ -74,7 +81,9 @@ class Step1GetSubjectFunnelPerformance
 
         // Update analysis
         $analysis->update([
+            'subject_funnel_users' => $subjectFunnelUsers,
             'subject_funnel_performance' => $percentageChange,
+            'reference' => $this->generateReference($reference),
         ]);
 
         return $analysis;
@@ -127,13 +136,11 @@ class Step1GetSubjectFunnelPerformance
         // return round($percentageChange, 5);
     }
 
-    // function generateMeta($reference) {
-    //     $meta = '';
+    function generateReference($reference) {
+        $html = '';
 
-    //     $meta .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
+        $html .= "<p><strong>Subject Funnel users:</strong> {$reference['subjectFunnelUsers']}</p><br>";
 
-    //     $meta .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
-
-    //     return $meta;
-    // }
+        return $html;
+    }
 }

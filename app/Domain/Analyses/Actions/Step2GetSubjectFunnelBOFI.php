@@ -121,6 +121,9 @@ class Step2GetSubjectFunnelBOFI
         $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
         $reference['bofiAssetChange'] = $bofiAssetChange;
 
+        // Append to reference
+        $appendedReference = $analysis->reference .= $this->generateReference($reference);
+
         // Update analysis
         $analysis->update([
             'subject_funnel_conversion_value' => $subjectFunnel->conversion_value,
@@ -131,7 +134,7 @@ class Step2GetSubjectFunnelBOFI
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',
             // 'meta' => $reference,
-            'reference' => $this->generateReference($reference),
+            'reference' => $appendedReference,
         ]);
 
         return $analysis;
@@ -203,7 +206,7 @@ class Step2GetSubjectFunnelBOFI
             $html .= "<p>Subject funnel step performance (({$subjectFunnelStep['conversionRate']} - {$subjectFunnelStep['medianOfComparisons']}) / {$subjectFunnelStep['medianOfComparisons']}) * 100 = {$subjectFunnelStep['performance']}</p><br>";
         }
 
-        $html .= "<p><strong>Subject Funnel Step Ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
+        $html .= "<p><strong>Subject Funnel step ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
 
         $html .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
 
