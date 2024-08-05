@@ -23,6 +23,8 @@ class DashboardFunnelController extends Controller
             $pivot->setHighestOrderNumber();
         }
 
+        $dashboard->touch();
+
         return response()->json([
             'message' => 'Funnel(s) attached to dashboard successfully'
         ], 200);
@@ -31,6 +33,8 @@ class DashboardFunnelController extends Controller
     public function detach(Organization $organization, Dashboard $dashboard, Request $request)
     {
         $dashboard->funnels()->detach($request->funnel_id);
+
+        $dashboard->touch();
 
         return response()->json([
             'message' => 'Funnel detached from dashboard successfully'
@@ -44,6 +48,8 @@ class DashboardFunnelController extends Controller
             ->firstOrFail();
 
         $pivot->reorder($request->order);
+
+        $dashboard->touch();
         
         return response()->json([
             'message' => 'Funnel reordered successfully'
@@ -69,6 +75,8 @@ class DashboardFunnelController extends Controller
         }
 
         $pivot->save();
+
+        $dashboard->touch();
         
         // Todo: create a resource for this
         return response()->json([
@@ -87,6 +95,8 @@ class DashboardFunnelController extends Controller
         $pivot->update([
             'disabled_steps' => null
         ]);
+
+        $dashboard->touch();
         
         // Todo: create a resource for this
         return response()->json([
