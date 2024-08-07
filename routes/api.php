@@ -5,6 +5,7 @@ use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Middleware\VerifyUserCanAccessAdminRoutes;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
@@ -28,13 +29,17 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('organizations')->group(function () {
             Route::get('/', [AdminOrganizationController::class, 'index']);
             Route::post('/', [AdminOrganizationController::class, 'store']);
-            Route::get('/{organization:slug}', [AdminOrganizationController::class, 'show']);
-            Route::put('/{organization:slug}', [AdminOrganizationController::class, 'update']);
-            Route::delete('/{organization:slug}', [AdminOrganizationController::class, 'destroy']);
         });
         
         // Dashboards
         Route::get('/dashboards', [AdminDashboardController::class, 'index']);
+    });
+
+    // Organizations
+    Route::prefix('organizations')->group(function () {
+        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
+        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
+        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
     });
 
     // Benchmarks
