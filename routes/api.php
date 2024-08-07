@@ -5,7 +5,7 @@ use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
-use DDD\Http\Organizations\OrganizationController;
+use DDD\Http\Middleware\VerifyUserCanAccessAdminRoutes;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
 use DDD\Http\Funnels\FunnelSearchController;
@@ -18,8 +18,24 @@ use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
+use DDD\Http\Admin\AdminOrganizationController;
+use DDD\Http\Admin\AdminDashboardController;
 
 Route::middleware('auth:sanctum')->group(function() {
+    // Admin
+    Route::prefix('admin')->middleware(['canAccessAdminArea'])->group(function () {
+        // Organizations
+        Route::prefix('organizations')->group(function () {
+            Route::get('/', [AdminOrganizationController::class, 'index']);
+            Route::post('/', [AdminOrganizationController::class, 'store']);
+            Route::get('/{organization:slug}', [AdminOrganizationController::class, 'show']);
+            Route::put('/{organization:slug}', [AdminOrganizationController::class, 'update']);
+            Route::delete('/{organization:slug}', [AdminOrganizationController::class, 'destroy']);
+        });
+        
+        // Dashboards
+        Route::get('/dashboards', [AdminDashboardController::class, 'index']);
+    });
 
     // Benchmarks
     Route::prefix('benchmarks')->group(function () {
@@ -33,15 +49,6 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('{benchmark}/calculate')->group(function() {
             Route::get('/', [BenchmarkCalculateController::class, 'calculate']);
         });
-    });
-
-    // Organizations
-    Route::prefix('organizations')->group(function () {
-        Route::get('/', [OrganizationController::class, 'index']);
-        Route::post('/', [OrganizationController::class, 'store']);
-        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
-        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
-        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
     });
     
     // Google Auth

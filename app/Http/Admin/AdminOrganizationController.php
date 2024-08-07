@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Http\Organizations;
+namespace DDD\Http\Admin;
 
 use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class OrganizationController extends Controller
+class AdminOrganizationController extends Controller
 {
     /**
      * Display a listing of the resource.
