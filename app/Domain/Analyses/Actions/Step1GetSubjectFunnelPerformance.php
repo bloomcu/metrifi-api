@@ -3,7 +3,6 @@
 namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use DivisionByZeroError;
 use DDD\Domain\Analyses\Analysis;
 
 class Step1GetSubjectFunnelPerformance

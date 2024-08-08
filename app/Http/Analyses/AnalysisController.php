@@ -22,11 +22,6 @@ class AnalysisController extends Controller
 
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
-        // Bail early if dashboard has no funnels
-        if (count($dashboard->funnels) <= 1) {
-            return;
-        }
-
         // Setup time period (later accrept this as a parameter from the request)
         $period = match ('last28Days') {
             'yesterday' => [
@@ -43,6 +38,20 @@ class AnalysisController extends Controller
             ]
         };
 
+        // Bail early if dashboard has no subject funnel
+        if (!$request->subjectFunnelId) {
+            // Create a new analysis
+            $analysis = $dashboard->analyses()->create([
+                'subject_funnel_id' => null,
+                'in_progress' => 1,
+                'issue' => 'Dashboard has no subject funnel',
+                'start_date' => now()->subDays(28), // 28 days ago
+                'end_date' => now()->subDays(1), // yesterday
+            ]);
+
+            return new AnalysisResource($analysis);
+        }
+
         // Create a new analysis
         $analysis = $dashboard->analyses()->create([
             'subject_funnel_id' => $request->subjectFunnelId,
@@ -51,9 +60,16 @@ class AnalysisController extends Controller
             'end_date' => now()->subDays(1), // yesterday
         ]);
 
+        // Bail early if dashboard has no funnels
+        if (count($dashboard->funnels) === 1) {
+            $analysis->update(['issue' => 'Dashboard has no comparison funnels.']);
+            return new AnalysisResource($analysis);
+        }
+
         // Bail early if subject funnel has no steps
         if (count($analysis->subjectFunnel->steps) === 0) {
-            return;
+            $analysis->update(['issue' => 'Subject funnel has no steps.']);
+            return new AnalysisResource($analysis);
         }
 
         // Get subject funnel report

@@ -16,7 +16,6 @@ class Step2GetSubjectFunnelBOFI
          * Check that all comparison funnels have same number of steps
          */
         $subjectFunnelStepsCount = count($subjectFunnel['report']['steps']);
-
         foreach ($comparisonFunnels as $comparisonFunnel) {
             if (count($comparisonFunnel['report']['steps']) !== $subjectFunnelStepsCount) {
                 $analysis->update([
