@@ -6,7 +6,6 @@ use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Organizations\OrganizationController;
-use DDD\Http\Middleware\VerifyUserCanAccessAdminRoutes;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
 use DDD\Http\Funnels\FunnelSearchController;
@@ -25,14 +24,17 @@ use DDD\Http\Admin\AdminDashboardController;
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
     Route::prefix('admin')->middleware(['canAccessAdminArea'])->group(function () {
+        // Dashboards
+        Route::prefix('dashboards')->group(function () {
+            Route::get('/', [AdminDashboardController::class, 'index']);
+            Route::get('/analyze', [AdminDashboardController::class, 'analyzeAll']);
+        });
+        
         // Organizations
         Route::prefix('organizations')->group(function () {
             Route::get('/', [AdminOrganizationController::class, 'index']);
             Route::post('/', [AdminOrganizationController::class, 'store']);
         });
-        
-        // Dashboards
-        Route::get('/dashboards', [AdminDashboardController::class, 'index']);
     });
 
     // Organizations
