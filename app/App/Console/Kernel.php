@@ -22,7 +22,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('admin:analyze-all-dashboards')->everyThreeMinutes();
+        // cd /home/forge/staging-api.metrifi && php artisan schedule:run
+        // php /home/forge/staging-api.metrifi/artisan schedule:run
+
+        $schedule->command('admin:analyze-all-dashboards')->daily();
         // $schedule->command('admin:analyze-all-dashboards')->dailyAt('02:00'); // 2:00 AM UTC (https://www.timeanddate.com/worldclock/timezone/utc)
         // $schedule->command('admin:analyze-all-dashboards')->dailyAt('17:00')->timezone('America/Denver');	; // https://www.timeanddate.com/worldclock/timezone/utc
     }
