@@ -44,10 +44,13 @@ class RunAnalysisAction
             // Create a new analysis
             $analysis = $dashboard->analyses()->create([
                 'subject_funnel_id' => null,
-                'in_progress' => 0,
                 'issue' => 'Dashboard has no subject funnel',
                 'start_date' => now()->subDays(28), // 28 days ago
                 'end_date' => now()->subDays(1), // yesterday
+            ]);
+
+            $dashboard->update([
+                'analysis_in_progress' => 0,
             ]);
 
             return new AnalysisResource($analysis);
@@ -56,7 +59,6 @@ class RunAnalysisAction
         // Create a new analysis
         $analysis = $dashboard->analyses()->create([
             'subject_funnel_id' => $dashboard->funnels[0]->id,
-            'in_progress' => 1,
             'start_date' => now()->subDays(28), // 28 days ago
             'end_date' => now()->subDays(1), // yesterday
         ]);
@@ -64,18 +66,26 @@ class RunAnalysisAction
         // Bail early if dashboard has no funnels
         if (count($dashboard->funnels) === 1) {
             $analysis->update([
-                'in_progress' => 0,
                 'issue' => 'Dashboard has no comparison funnels.'
             ]);
+
+            $dashboard->update([
+                'analysis_in_progress' => 0,
+            ]);
+
             return new AnalysisResource($analysis);
         }
 
         // Bail early if subject funnel has no steps
         if (count($analysis->subjectFunnel->steps) === 0) {
             $analysis->update([
-                'in_progress' => 0,
                 'issue' => 'Subject funnel has no steps.'
             ]);
+
+            $dashboard->update([
+                'analysis_in_progress' => 0,
+            ]);
+
             return new AnalysisResource($analysis);
         }
 
@@ -105,8 +115,8 @@ class RunAnalysisAction
         Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
         Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
 
-        $analysis->update([
-            'in_progress' => 0,
+        $dashboard->update([
+            'analysis_in_progress' => 0,
         ]);
 
         return new AnalysisResource($analysis);

@@ -28,6 +28,10 @@ class AdminDashboardController extends Controller
         $dashboards = Dashboard::all();
 
         foreach ($dashboards as $dashboard) {
+            $dashboard->update([
+                'analysis_in_progress' => 1,
+            ]);
+            
             RunAnalysisAction::dispatch($dashboard);
         }
         

@@ -24,6 +24,7 @@ class DashboardResource extends JsonResource
             'organization' => new OrganizationResource($this->organization),
             'user' => new UserResource($this->user),
             'name' => $this->name,
+            'analysis_in_progress' => $this->analysis_in_progress,
             'subject_funnel_performance' => $this->subject_funnel_performance,
             'latest_analysis' => new AnalysisResource($this->latestAnalysis),
             // 'latest_analysis' => $this->latestAnalysis,
