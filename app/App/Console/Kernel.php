@@ -22,7 +22,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('admin:analyze-all-dashboards')->dailyAt('02:00'); // 2:00 AM UTC
+        // $schedule->command('admin:analyze-all-dashboards')->dailyAt('02:00'); // 2:00 AM UTC (https://www.timeanddate.com/worldclock/timezone/utc)
+        $schedule->command('admin:analyze-all-dashboards')->dailyAt('21:25'); // https://www.timeanddate.com/worldclock/timezone/utc
     }
 
     /**
