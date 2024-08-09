@@ -8,7 +8,7 @@ use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 use DDD\Domain\Analyses\Requests\AnalysisUpdateRequest;
 use DDD\Domain\Analyses\Analysis;
-use DDD\Domain\Analyses\Actions\RunAnalysisAction;
+use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
 use DDD\App\Controllers\Controller;
 
 class AnalysisController extends Controller
@@ -20,7 +20,7 @@ class AnalysisController extends Controller
 
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
-        return RunAnalysisAction::run($dashboard);
+        return AnalyzeDashboardAction::run($dashboard);
 
         // Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
     }

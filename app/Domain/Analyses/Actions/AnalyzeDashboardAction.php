@@ -9,7 +9,7 @@ use DDD\Domain\Analyses\Actions\Step2GetSubjectFunnelBOFI;
 use DDD\Domain\Analyses\Actions\Step1GetSubjectFunnelPerformance;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
 
-class RunAnalysisAction
+class AnalyzeDashboardAction
 {
     use AsAction;
 

@@ -5,7 +5,7 @@ namespace DDD\Http\Admin;
 use Illuminate\Http\Request;
 use DDD\Domain\Dashboards\Resources\DashboardResource;
 use DDD\Domain\Dashboards\Dashboard;
-use DDD\Domain\Analyses\Actions\RunAnalysisAction;
+use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
 use DDD\App\Controllers\Controller;
 
 class AdminDashboardController extends Controller
@@ -31,8 +31,8 @@ class AdminDashboardController extends Controller
             $dashboard->update([
                 'analysis_in_progress' => 1,
             ]);
-            
-            RunAnalysisAction::dispatch($dashboard);
+
+            AnalyzeDashboardAction::dispatch($dashboard);
         }
         
         return DashboardResource::collection($dashboards);
