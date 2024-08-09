@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('admin:analyze-all-dashboards')->hourlyAt(50);
+        $schedule->command('admin:analyze-all-dashboards')->hourlyAt(1);
     }
 
     /**
