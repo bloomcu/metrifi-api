@@ -40,7 +40,7 @@ class AnalyzeDashboardAction
         };
 
         // Bail early if dashboard has no subject funnel
-        if (!$dashboard->funnels) {
+        if (!$dashboard->funnels->count()) {
             // Create a new analysis
             $analysis = $dashboard->analyses()->create([
                 'subject_funnel_id' => null,
