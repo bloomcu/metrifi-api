@@ -39,52 +39,34 @@ class AnalyzeDashboardAction
             ]
         };
 
-        // Bail early if dashboard has no subject funnel
-        if (!$dashboard->funnels->count()) {
-            // Create a new analysis
-            $analysis = $dashboard->analyses()->create([
-                'subject_funnel_id' => null,
-                'issue' => 'Dashboard has no subject funnel',
-                'start_date' => now()->subDays(28), // 28 days ago
-                'end_date' => now()->subDays(1), // yesterday
-            ]);
-
-            $dashboard->update([
-                'analysis_in_progress' => 0,
-            ]);
-
-            return new AnalysisResource($analysis);
-        }
-
-        // Create a new analysis
+        // Create a fresh analysis
         $analysis = $dashboard->analyses()->create([
-            'subject_funnel_id' => $dashboard->funnels[0]->id,
             'start_date' => now()->subDays(28), // 28 days ago
             'end_date' => now()->subDays(1), // yesterday
         ]);
 
-        // Bail early if dashboard has no funnels
-        if (count($dashboard->funnels) === 1) {
-            $analysis->update([
-                'issue' => 'Dashboard has no comparison funnels.'
-            ]);
+        // Bail early if dashboard has no subject funnel
+        if (!$dashboard->funnels->count()) {
+            $analysis->update(['issue' => 'Dashboard has no subject funnel']);
 
-            $dashboard->update([
-                'analysis_in_progress' => 0,
-            ]);
+            $dashboard->update(['analysis_in_progress' => 0]);
 
             return new AnalysisResource($analysis);
         }
 
-        // Bail early if subject funnel has no steps
-        if (count($analysis->subjectFunnel->steps) === 0) {
+        // Assign the focus funnel
+        $analysis->update([
+            'subject_funnel_id' => $dashboard->funnels[0]->id,
+        ]);
+
+        // Bail early if dashboard has no comparison funnels
+        if (count($dashboard->funnels) === 1) {
             $analysis->update([
-                'issue' => 'Subject funnel has no steps.'
+                'subject_funnel_id' => $dashboard->funnels[0]->id,
+                'issue' => 'Dashboard has no comparison funnels.'
             ]);
 
-            $dashboard->update([
-                'analysis_in_progress' => 0,
-            ]);
+            $dashboard->update(['analysis_in_progress' => 0]);
 
             return new AnalysisResource($analysis);
         }
@@ -110,6 +92,30 @@ class AnalyzeDashboardAction
             );
 
             array_push($comparisonFunnels, $funnel);
+        }
+
+        // Bail early if subject funnel has less than 2 steps
+        if (count($subjectFunnel['report']['steps']) < 2) {
+            $analysis->update([
+                'issue' => 'Subject funnel has less than 2 steps.'
+            ]);
+
+            $dashboard->update(['analysis_in_progress' => 0]);
+
+            return new AnalysisResource($analysis);
+        }
+
+        // Bail early if all comparison funnels do not have the same number of steps as subject funnel
+        foreach ($comparisonFunnels as $comparisonFunnel) {
+            if (count($comparisonFunnel['report']['steps']) !== count($subjectFunnel['report']['steps'])) {
+                $analysis->update([
+                    'issue' => 'One or more funnels do not have the same number of steps.',
+                ]);
+
+                $dashboard->update(['analysis_in_progress' => 0]);
+        
+                return new AnalysisResource($analysis);
+            }
         }
 
         Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);

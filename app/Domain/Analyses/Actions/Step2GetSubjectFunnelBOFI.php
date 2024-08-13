@@ -12,20 +12,6 @@ class Step2GetSubjectFunnelBOFI
 
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
-        /**
-         * Check that all comparison funnels have same number of steps
-         */
-        $subjectFunnelStepsCount = count($subjectFunnel['report']['steps']);
-        foreach ($comparisonFunnels as $comparisonFunnel) {
-            if (count($comparisonFunnel['report']['steps']) !== $subjectFunnelStepsCount) {
-                $analysis->update([
-                    'issue' => 'One or more funnels do not have the same number of steps.',
-                ]);
-        
-                return $analysis;
-            }
-        }
-        
         $reference = [
             'subjectFunnelSteps' => [
                 // e.g., 'conversionRate' => 6.13,
