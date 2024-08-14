@@ -47,7 +47,7 @@ class AnalyzeDashboardAction
 
         // Bail early if dashboard has no subject funnel
         if (!$dashboard->funnels->count()) {
-            $analysis->update(['issue' => 'Dashboard has no subject funnel']);
+            $analysis->update(['issue' => 'Dashboard has no funnels.']);
 
             $dashboard->update(['analysis_in_progress' => 0]);
 
