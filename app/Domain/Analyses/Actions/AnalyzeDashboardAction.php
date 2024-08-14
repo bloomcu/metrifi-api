@@ -97,7 +97,7 @@ class AnalyzeDashboardAction
         // Bail early if subject funnel has less than 2 steps
         if (count($subjectFunnel['report']['steps']) < 2) {
             $analysis->update([
-                'issue' => 'Subject funnel has less than 2 steps.'
+                'issue' => 'Focus funnel has less than two steps.'
             ]);
 
             $dashboard->update(['analysis_in_progress' => 0]);
