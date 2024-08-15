@@ -18,8 +18,31 @@ use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
+use DDD\Http\Admin\AdminOrganizationController;
+use DDD\Http\Admin\AdminDashboardController;
 
 Route::middleware('auth:sanctum')->group(function() {
+    // Admin
+    Route::prefix('admin')->middleware(['canAccessAdminArea'])->group(function () {
+        // Dashboards
+        Route::prefix('dashboards')->group(function () {
+            Route::get('/', [AdminDashboardController::class, 'index']);
+            Route::get('/analyze', [AdminDashboardController::class, 'analyzeAll']);
+        });
+        
+        // Organizations
+        Route::prefix('organizations')->group(function () {
+            Route::get('/', [AdminOrganizationController::class, 'index']);
+            Route::post('/', [AdminOrganizationController::class, 'store']);
+        });
+    });
+
+    // Organizations
+    Route::prefix('organizations')->group(function () {
+        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
+        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
+        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+    });
 
     // Benchmarks
     Route::prefix('benchmarks')->group(function () {
@@ -33,15 +56,6 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('{benchmark}/calculate')->group(function() {
             Route::get('/', [BenchmarkCalculateController::class, 'calculate']);
         });
-    });
-
-    // Organizations
-    Route::prefix('organizations')->group(function () {
-        Route::get('/', [OrganizationController::class, 'index']);
-        Route::post('/', [OrganizationController::class, 'store']);
-        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
-        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
-        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
     });
     
     // Google Auth

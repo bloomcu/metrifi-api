@@ -19,7 +19,6 @@ class AnalysisResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'in_progress' => $this->in_progress,
             'issue' => $this->issue,
             'subject_funnel_conversion_value' => $this->subject_funnel_conversion_value,
             'subject_funnel_users' => $this->subject_funnel_users,

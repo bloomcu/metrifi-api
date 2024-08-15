@@ -225,6 +225,7 @@ class GoogleAnalyticsDataService
                         'id' => $step['id'],
                         'name' => $step['name'],
                         'users' => 0,
+                        'conversionRate' => 0,
                     ]);
                 }
 
@@ -263,13 +264,13 @@ class GoogleAnalyticsDataService
 
             // Calculate conversion rate of each step in report
             $this->calculateConversionRates();
-
+            
             // Calculate the overall conversion rate.
             $this->calculateOverallConversionRate();
 
             // Calculate assets of the funnel
             $this->calculateFunnelAssets($funnel);
-
+            
             // Add report to funnel
             $funnel['report'] = $this->report;
             // $funnel['gaReport'] = $gaFunnelReport;
@@ -304,16 +305,16 @@ class GoogleAnalyticsDataService
                 $this->report['steps'][$index]['conversionRate'] = 100;
                 continue;
             }
-
+            
             try {
                 $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
             } catch (DivisionByZeroError $e) {
                 $conversionRate = 0;
             }
-
+            
             if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
                 $this->report['steps'][$index]['conversionRate'] = 0;
-                return;
+                continue;
             }
 
             $formatted = $conversionRate * 100; // Get a percentage

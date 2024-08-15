@@ -12,21 +12,6 @@ class Step2GetSubjectFunnelBOFI
 
     function handle(Analysis $analysis, $subjectFunnel, $comparisonFunnels)
     {
-        /**
-         * Check that all comparison funnels have same number of steps
-         */
-        $subjectFunnelStepsCount = count($subjectFunnel['report']['steps']);
-
-        foreach ($comparisonFunnels as $comparisonFunnel) {
-            if (count($comparisonFunnel['report']['steps']) !== $subjectFunnelStepsCount) {
-                $analysis->update([
-                    'issue' => 'One or more funnels do not have the same number of steps.',
-                ]);
-        
-                return $analysis;
-            }
-        }
-        
         $reference = [
             'subjectFunnelSteps' => [
                 // e.g., 'conversionRate' => 6.13,
@@ -118,9 +103,19 @@ class Step2GetSubjectFunnelBOFI
         $reference['bofiPerformance'] = $bofiPerformance;
 
         // Get bofi asset change
-        $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
-        $reference['bofiAssetChange'] = $bofiAssetChange;
-
+        if ($subjectFunnel['report']['assets'] != 0) {
+            // Focus funnel is generating assets, calculate the asset change from that number
+            $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
+            $reference['bofiAssetChange'] = $bofiAssetChange;
+        } else {
+            // Focus funnel is not generating assets (assets are $0.00)
+            // Calculate potential assets as if the bofi step converted users at the same rate as the median of comparisons
+            $bofiStepUsers = $subjectFunnel['report']['steps'][$indexOfLargestRatio]['users'];
+            $bofiPotentialUsers = $bofiMedianOfComparisons * $bofiStepUsers;
+            $assets = $bofiPotentialUsers * ($subjectFunnel['conversion_value'] / 100);
+            $reference['bofiAssetChange'] = $assets / 100;
+        }
+        
         // Append to reference
         $appendedReference = $analysis->reference .= $this->generateReference($reference);
 
