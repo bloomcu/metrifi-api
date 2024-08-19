@@ -40,15 +40,15 @@ class GoogleAnalyticsDataService
 
         // Initialize an array to hold the structured funnel steps for the API request.
         $funnelSteps = [];
-        
+
         // Iterate through each raw funnel step to structure it for the API request.
         foreach ($funnel->steps as $step) {
             $funnelFilterExpressionList = [];
 
             // If the step has no metrics, skip it.
-            if (!$step['metrics']) {
+            if ($step->metrics->isEmpty()) {
                 $index = $this->getStepIndex($funnel->steps, $step['id']);
-                array_splice($funnel->steps, $index, 1);
+                $funnel->steps->splice($index);
                 continue;
             }
 
@@ -216,6 +216,8 @@ class GoogleAnalyticsDataService
             $accessToken = $this->setupAccessToken($funnel->connection);
             $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $funnel->connection->uid . ':runFunnelReport?access_token=' . $accessToken;
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
+
+            // dd($gaFunnelReport);
 
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {
