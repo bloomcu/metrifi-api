@@ -27,10 +27,6 @@ class GoogleAnalyticsDataService
             'overallConversionRate' => 0,
             'assets' => 0
         ];
-        
-        // if ($funnel['name'] == 'Second Chance Checking') {
-        //     dd($disabledSteps);
-        // }
 
         /**
          * Generate a GA funnelReport request from our app's funnel steps.
@@ -44,11 +40,11 @@ class GoogleAnalyticsDataService
         // Iterate through each raw funnel step to structure it for the API request.
         foreach ($funnel->steps as $step) {
             $funnelFilterExpressionList = [];
-
+            
             // If the step has no metrics, skip it.
             if ($step->metrics->isEmpty()) {
-                $index = $this->getStepIndex($funnel->steps, $step['id']);
-                $funnel->steps->splice($index);
+                $index = $this->getStepIndex($funnel->steps, $step->id);
+                $funnel->steps->forget($index);
                 continue;
             }
 
@@ -217,8 +213,6 @@ class GoogleAnalyticsDataService
             $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $funnel->connection->uid . ':runFunnelReport?access_token=' . $accessToken;
             $gaFunnelReport = Http::post($endpoint, $funnelReportRequest)->json();
 
-            // dd($gaFunnelReport);
-
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {
                 // Build report steps with no users
@@ -329,6 +323,8 @@ class GoogleAnalyticsDataService
     }
 
     private function calculateOverallConversionRate() {
+        // if (!$this->report['steps']) { return; }
+
         $first = $this->report['steps'][0]['users'];
         $last = end($this->report['steps'])['users'];
 
@@ -340,6 +336,8 @@ class GoogleAnalyticsDataService
     }
 
     private function calculateFunnelAssets($funnel) {
+        // if (!$this->report['steps']) { return; }
+
         $lastStep = end($this->report['steps']);
         $users = $lastStep['users'];
         $assets = $users * $funnel->conversion_value;
