@@ -82,6 +82,8 @@ class Step1GetSubjectFunnelPerformance
         $analysis->update([
             'subject_funnel_users' => $subjectFunnelUsers,
             'subject_funnel_performance' => $percentageChange,
+            'subject_funnel_conversion_rate' => $subjectFunnelConversionRate,
+            'median_of_comparison_conversion_rates' => $medianOfComparisonConversionRates,
             'reference' => $this->generateReference($reference),
         ]);
 
@@ -138,7 +140,9 @@ class Step1GetSubjectFunnelPerformance
     function generateReference($reference) {
         $html = '';
 
-        $html .= "<p><strong>Subject Funnel users:</strong> {$reference['subjectFunnelUsers']}</p><br>";
+        $html .= "<p><strong>Subject Funnel users:</strong> {$reference['subjectFunnelUsers']}</p>";
+        $html .= "<p><strong>Subject Funnel conversion rate:</strong> {$reference['subjectFunnelConversionRate']}</p>";
+        $html .= "<p><strong>Median of comparison conversion rates:</strong> {$reference['medianOfComparisonConversionRates']}</p><br>";
 
         return $html;
     }

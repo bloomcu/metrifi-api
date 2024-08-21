@@ -26,6 +26,7 @@ class Step2GetSubjectFunnelBOFI
             'largestRatio' => null, // e.g. 2.0636215334421
             'bofiStepIndex' => null, // e.g. 1
             'bofiPerformance' => null, // e.g. 6.13,
+            'bofiConversionRate' => null, // e.g. 4.00,
             'bofiAssetChange' => null, // e.g. 1000,
         ];
 
@@ -94,8 +95,11 @@ class Step2GetSubjectFunnelBOFI
         /** 
          * Get bofi performance
          */
-         // Setup the bofi conversion rate and median of it's comparisons for the analysis
+         // Setup the bofi conversion rate
         $bofiConversionRate = $reference['subjectFunnelSteps'][$indexOfLargestRatio + 1]['conversionRate'];
+        $reference['bofiConversionRate'] = $bofiConversionRate;
+
+        // Setup the median of bofi comparisons for the analysis
         $bofiMedianOfComparisons = $reference['subjectFunnelSteps'][$indexOfLargestRatio + 1]['medianOfComparisons'];
 
         // Get bofi performance
@@ -125,6 +129,7 @@ class Step2GetSubjectFunnelBOFI
             'bofi_step_index' => $reference['bofiStepIndex'],
             // 'bofi_step_name' => $reference['bofiStepName'],
             'bofi_performance' => $reference['bofiPerformance'],
+            'bofi_conversion_rate' => $reference['bofiConversionRate'],
             'bofi_median_of_comparisons' => $bofiMedianOfComparisons,
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',

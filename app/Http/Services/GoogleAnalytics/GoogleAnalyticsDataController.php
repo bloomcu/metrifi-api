@@ -11,7 +11,7 @@ class GoogleAnalyticsDataController extends Controller
 {
     public function funnelReport(Funnel $funnel, Request $request)
     {
-        $funnel = GoogleAnalyticsData::funnelReport(
+        $report = GoogleAnalyticsData::funnelReport(
             funnel: $funnel,
             startDate: $request->startDate, 
             endDate: $request->endDate,
@@ -19,7 +19,7 @@ class GoogleAnalyticsDataController extends Controller
         );
 
         return response()->json([
-            'data' => $funnel
+            'data' => $report
         ], 200);
     }
 
