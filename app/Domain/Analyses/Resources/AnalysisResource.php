@@ -3,9 +3,6 @@
 namespace DDD\Domain\Analyses\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use DDD\Domain\Funnels\Resources\FunnelResource;
-use DDD\Domain\Dashboards\Resources\DashboardResource;
-use DDD\Domain\Analyses\Enums\AnalysisIssueEnum;
 
 class AnalysisResource extends JsonResource
 {
@@ -30,10 +27,7 @@ class AnalysisResource extends JsonResource
             'bofi_conversion_rate' => $this->bofi_conversion_rate,
             'bofi_median_of_comparisons' => $this->bofi_median_of_comparisons,
             'bofi_asset_change' => $this->bofi_asset_change,
-            // 'meta' => $this->meta,
             'reference' => $this->reference,
-            // 'subject_funnel' => new FunnelResource($this->subjectFunnel),
-            // 'dashboard' => new DashboardResource($this->dashboard),
             'period' => $this->period,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,

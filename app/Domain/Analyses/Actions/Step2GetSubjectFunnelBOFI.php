@@ -3,7 +3,6 @@
 namespace DDD\Domain\Analyses\Actions;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use DDD\Domain\Analyses\Enums\AnalysisIssueEnum;
 use DDD\Domain\Analyses\Analysis;
 
 class Step2GetSubjectFunnelBOFI
@@ -127,13 +126,11 @@ class Step2GetSubjectFunnelBOFI
         $analysis->update([
             'subject_funnel_conversion_value' => $subjectFunnel->conversion_value,
             'bofi_step_index' => $reference['bofiStepIndex'],
-            // 'bofi_step_name' => $reference['bofiStepName'],
             'bofi_performance' => $reference['bofiPerformance'],
             'bofi_conversion_rate' => $reference['bofiConversionRate'],
             'bofi_median_of_comparisons' => $bofiMedianOfComparisons,
             'bofi_asset_change' => $reference['bofiAssetChange'],
             'period' => '28 days',
-            // 'meta' => $reference,
             'reference' => $appendedReference,
         ]);
 
@@ -165,7 +162,6 @@ class Step2GetSubjectFunnelBOFI
         $percentageChange = (($a - $b) / $b) * 100;
         
         return $percentageChange;
-        // return round($percentageChange, 5);
     }
 
     // TODO: Move this to a helper/service class
@@ -184,7 +180,6 @@ class Step2GetSubjectFunnelBOFI
         }
         
         return $median;
-        // return round($median, 5);
     }
 
     function generateReference($reference) {
