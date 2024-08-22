@@ -18,7 +18,7 @@ class AdminDashboardController extends Controller
         // $dashboards = Dashboard::all();
 
         $dashboards = Dashboard::query()
-            ->with(['organization', 'latestAnalysis'])
+            ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
             ->get();
 
 
@@ -33,7 +33,7 @@ class AdminDashboardController extends Controller
     public function analyzeAll()
     {
         $dashboards = Dashboard::query()
-            ->with(['organization', 'latestAnalysis'])
+            ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
             ->get();
 
         foreach ($dashboards as $dashboard) {

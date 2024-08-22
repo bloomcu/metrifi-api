@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $dashboards = Dashboard::query()
             ->where('organization_id', $organization->id)
-            ->with(['organization', 'latestAnalysis'])
+            ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
             ->get();
 
         return IndexDashboardResource::collection($dashboards);

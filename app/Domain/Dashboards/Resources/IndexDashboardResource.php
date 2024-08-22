@@ -28,6 +28,13 @@ class IndexDashboardResource extends JsonResource
             'subject_funnel_performance' => $this->subject_funnel_performance,
             // 'latest_analysis' => new AnalysisResource($this->latestAnalysis),
             // 'latest_analysis' => $this->latestAnalysis,
+
+            // 'median_analysis' => new AnalysisResource($this->medianAnalysis),
+            // 'max_analysis' => new AnalysisResource($this->maxAnalysis),
+
+            'median_analysis' => new AnalysisResource($this->whenLoaded('medianAnalysis')),
+            'max_analysis' => new AnalysisResource($this->whenLoaded('maxAnalysis')),
+
             'notes' => $this->notes,
             'description' => $this->description,
             'zoom' => $this->zoom,
