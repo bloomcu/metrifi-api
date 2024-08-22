@@ -3,7 +3,7 @@
 namespace DDD\Http\Admin;
 
 use Illuminate\Http\Request;
-use DDD\Domain\Dashboards\Resources\DashboardResource;
+use DDD\Domain\Dashboards\Resources\IndexDashboardResource;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
 use DDD\App\Controllers\Controller;
@@ -24,7 +24,7 @@ class AdminDashboardController extends Controller
 
         // return $dashboards;
 
-        return DashboardResource::collection($dashboards);
+        return IndexDashboardResource::collection($dashboards);
     }
 
     /**
@@ -32,7 +32,9 @@ class AdminDashboardController extends Controller
      */
     public function analyzeAll()
     {
-        $dashboards = Dashboard::all();
+        $dashboards = Dashboard::query()
+            ->with(['organization', 'latestAnalysis'])
+            ->get();
 
         foreach ($dashboards as $dashboard) {
             $dashboard->update([
@@ -42,6 +44,6 @@ class AdminDashboardController extends Controller
             AnalyzeDashboardAction::dispatch($dashboard);
         }
         
-        return DashboardResource::collection($dashboards);
+        return IndexDashboardResource::collection($dashboards);
     }
 }

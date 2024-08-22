@@ -56,7 +56,11 @@ class Step2GetSubjectFunnelBOFI
             }
 
             // Get the median of the comparison conversion rates
-            $medianOfComparisonConversionRates = $this->calculateMedian($reference['subjectFunnelSteps'][$index]['comparisonConversionRates']);
+            if ($analysis->type === 'median') {
+                $medianOfComparisonConversionRates = $this->calculateMedian($reference['subjectFunnelSteps'][$index]['comparisonConversionRates']);
+            } else {
+                $medianOfComparisonConversionRates = $this->findMax($reference['subjectFunnelSteps'][$index]['comparisonConversionRates']);
+            }
             $reference['subjectFunnelSteps'][$index]['medianOfComparisons'] = $medianOfComparisonConversionRates;
 
             /** 
@@ -180,6 +184,11 @@ class Step2GetSubjectFunnelBOFI
         }
         
         return $median;
+    }
+
+    // TODO: Move this to a helper/service class
+    function findMax($arrayOfNumbers) {
+        return max($arrayOfNumbers);
     }
 
     function generateReference($reference) {

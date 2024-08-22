@@ -43,7 +43,12 @@ class Step1GetSubjectFunnelPerformance
         /**
          * Get the median of the comparison conversion rates
          */
-        $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
+        if ($analysis->type === 'median') {
+            $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
+        } else {
+            $medianOfComparisonConversionRates = $this->findMax($comparisonFunnelsConversionRates);
+        }
+        
         $reference['medianOfComparisonConversionRates'] = $medianOfComparisonConversionRates;
         
         /**
@@ -81,6 +86,11 @@ class Step1GetSubjectFunnelPerformance
         
         return $median;
         // return round($median, 5);
+    }
+
+    // TODO: Move this to a helper/service class
+    function findMax($arrayOfNumbers) {
+        return max($arrayOfNumbers);
     }
 
     // TODO: Move this to a helper/service class

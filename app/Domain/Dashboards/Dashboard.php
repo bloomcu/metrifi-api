@@ -3,13 +3,14 @@
 namespace DDD\Domain\Dashboards;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Dashboards\Traits\DashboardIsOrderable;
 use DDD\Domain\Analyses\Analysis;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
-use DDD\Domain\Dashboards\Traits\DashboardIsOrderable;
 
 class Dashboard extends Model
 {
@@ -62,8 +63,18 @@ class Dashboard extends Model
      *
      * @return HasOne
      */
-    public function latestAnalysis()
+    // public function latestAnalysis()
+    // {
+    //     return $this->hasOne(Analysis::class)->latestOfMany();
+    // }
+
+    public function medianAnalysis(): HasOne
     {
-        return $this->hasOne(Analysis::class)->latestOfMany();
+        return $this->hasOne(Analysis::class)->whereType('median')->latest();
+    }
+
+    public function maxAnalysis(): HasOne
+    {
+        return $this->hasOne(Analysis::class)->whereType('max')->latest();
     }
 }
