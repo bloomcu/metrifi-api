@@ -15,8 +15,15 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
-        $dashboards = Dashboard::all();
-        
+        // $dashboards = Dashboard::all();
+
+        $dashboards = Dashboard::query()
+            ->with(['organization', 'latestAnalysis'])
+            ->get();
+
+
+        // return $dashboards;
+
         return DashboardResource::collection($dashboards);
     }
 
