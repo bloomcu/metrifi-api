@@ -5,9 +5,11 @@ namespace DDD\Domain\Analyses\Actions;
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Dashboards\Resources\ShowDashboardResource;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\Domain\Analyses\Actions\Step3CalculatePotentialAssets;
 use DDD\Domain\Analyses\Actions\Step2GetSubjectFunnelBOFI;
 use DDD\Domain\Analyses\Actions\Step1GetSubjectFunnelPerformance;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
+use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 
 class AnalyzeDashboardAction
 {
@@ -110,12 +112,15 @@ class AnalyzeDashboardAction
 
             // Analyze
             Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
-            Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);   
+            Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
+            Step3CalculatePotentialAssets::run($analysis, $subjectFunnel, $comparisonFunnels);
         }
 
         $dashboard->update([
             'analysis_in_progress' => 0,
         ]);
+
+        CalculateOrganizationTotalAssetsAction::run($dashboard->organization);
 
         return new ShowDashboardResource($dashboard);
     }
