@@ -211,8 +211,7 @@ class Step2GetSubjectFunnelBOFI
         }
 
         $html .= "<p><strong>Subject Funnel step ratios:</strong> [" . implode(', ', $reference['subjectFunnelStepRatios']) . "]</p>";
-
-        $html .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p>";
+        $html .= "<p><strong>Largest ratio:</strong> {$reference['largestRatio']}</p><br>";
 
         return $html;
     }

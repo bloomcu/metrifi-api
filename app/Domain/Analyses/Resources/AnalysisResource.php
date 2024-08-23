@@ -19,6 +19,8 @@ class AnalysisResource extends JsonResource
             'type' => $this->type,
             // 'issue' => $this->issue,
             'subject_funnel_conversion_value' => $this->subject_funnel_conversion_value,
+            'subject_funnel_assets' => $this->subject_funnel_assets,
+            'subject_funnel_potential_assets' => $this->subject_funnel_potential_assets,
             'subject_funnel_users' => $this->subject_funnel_users,
             'subject_funnel_performance' => $this->subject_funnel_performance,
             'subject_funnel_conversion_rate' => $this->subject_funnel_conversion_rate,

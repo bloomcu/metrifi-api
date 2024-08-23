@@ -36,6 +36,7 @@ class Organization extends Model {
 
     protected $casts = [
         'onboarding' => OnboardingCast::class,
+        'assets' => 'array',
     ];
 
     public static function boot()

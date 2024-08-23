@@ -3,6 +3,8 @@
 namespace DDD\Http\Admin;
 
 use Illuminate\Http\Request;
+use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 use DDD\Domain\Dashboards\Resources\IndexDashboardResource;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
@@ -42,6 +44,12 @@ class AdminDashboardController extends Controller
             ]);
 
             AnalyzeDashboardAction::dispatch($dashboard);
+        }
+
+        $organizations = Organization::all();
+
+        foreach ($organizations as $organization) {
+            CalculateOrganizationTotalAssetsAction::dispatch($organization);
         }
         
         return IndexDashboardResource::collection($dashboards);
