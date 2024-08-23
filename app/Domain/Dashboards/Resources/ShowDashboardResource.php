@@ -8,7 +8,7 @@ use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Funnels\Resources\FunnelResource;
 use DDD\Domain\Analyses\Resources\AnalysisResource;
 
-class DashboardResource extends JsonResource
+class ShowDashboardResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,12 +22,14 @@ class DashboardResource extends JsonResource
             'id' => $this->id,
             'order' => $this->order,
             'organization' => new OrganizationResource($this->organization),
-            'user' => new UserResource($this->user),
             'name' => $this->name,
             'analysis_in_progress' => $this->analysis_in_progress,
+            'issue' => $this->issue,
             'subject_funnel_performance' => $this->subject_funnel_performance,
-            'latest_analysis' => new AnalysisResource($this->latestAnalysis),
+            // 'latest_analysis' => new AnalysisResource($this->latestAnalysis),
             // 'latest_analysis' => $this->latestAnalysis,
+            'median_analysis' => new AnalysisResource($this->medianAnalysis),
+            'max_analysis' => new AnalysisResource($this->maxAnalysis),
             'notes' => $this->notes,
             'description' => $this->description,
             'zoom' => $this->zoom,

@@ -43,40 +43,19 @@ class Step1GetSubjectFunnelPerformance
         /**
          * Get the median of the comparison conversion rates
          */
-        $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
+        if ($analysis->type === 'median') {
+            $medianOfComparisonConversionRates = $this->calculateMedian($comparisonFunnelsConversionRates);
+        } else {
+            $medianOfComparisonConversionRates = $this->findMax($comparisonFunnelsConversionRates);
+        }
+        
         $reference['medianOfComparisonConversionRates'] = $medianOfComparisonConversionRates;
-
-        // dd([
-        //     'subjectFunnelConversionRate' => $subjectFunnelConversionRate,
-        //     'medianOfComparisonConversionRates' => $medianOfComparisonConversionRates,
-        //     '($medianOfComparisonConversionRates - $subjectFunnelConversionRate)' => $medianOfComparisonConversionRates - $subjectFunnelConversionRate,
-        // ]);
-
-        // Test figures
-        // $subjectFunnelConversionRate = 7.33;
-        // $medianOfComparisonConversionRates = 0.07;
         
         /**
          * Get subject funnel conversion rate percentage difference higher/lower
          */
         $percentageChange = $this->calculatePercentageChange($subjectFunnelConversionRate, $medianOfComparisonConversionRates);
         $reference['percentageChange'] = $percentageChange;
-
-        // Handle infinity, don't update analysis
-        // if ($percentageChange === INF || $percentageChange === -INF) {
-        //     return $analysis;
-        // }
-        // dd($percentageChange);
-
-        // Round result to 2 decimal places
-        // $roundedPercentageChange = round($percentageChange, 2);
-        // $roundedPercentageChange = $percentageChange;
-        // dd($roundedPercentageDifference);
-
-        // Update dashboard
-        // $analysis->dashboard->update([
-        //     'subject_funnel_performance' => $percentageChange,
-        // ]);
 
         // Update analysis
         $analysis->update([
@@ -107,6 +86,11 @@ class Step1GetSubjectFunnelPerformance
         
         return $median;
         // return round($median, 5);
+    }
+
+    // TODO: Move this to a helper/service class
+    function findMax($arrayOfNumbers) {
+        return max($arrayOfNumbers);
     }
 
     // TODO: Move this to a helper/service class
