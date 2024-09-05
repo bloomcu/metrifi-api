@@ -255,6 +255,9 @@ class GoogleAnalyticsDataService
                 }
             }
 
+            // Calculate assets of the funnel
+            $this->calculateFunnelAssets($funnel);
+            
             // Remove disabled steps from report
             $this->removeDisabledSteps($funnel, $disabledSteps);
 
@@ -263,9 +266,6 @@ class GoogleAnalyticsDataService
             
             // Calculate the overall conversion rate.
             $this->calculateOverallConversionRate();
-
-            // Calculate assets of the funnel
-            $this->calculateFunnelAssets($funnel);
             
             // Add report to funnel
             $funnel['report'] = $this->report;
@@ -336,8 +336,6 @@ class GoogleAnalyticsDataService
     }
 
     private function calculateFunnelAssets($funnel) {
-        // if (!$this->report['steps']) { return; }
-
         $lastStep = end($this->report['steps']);
         $users = $lastStep['users'];
         $assets = $users * $funnel->conversion_value;
