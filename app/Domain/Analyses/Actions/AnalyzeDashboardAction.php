@@ -25,6 +25,13 @@ class AnalyzeDashboardAction
 
     function handle(Dashboard $dashboard)
     {
+        // Reset issue if dashboard has a previous issue
+        if ($dashboard->issue) {
+            $dashboard->update([
+                'issue' => null,
+            ]);
+        }
+        
         // Bail early if dashboard has no subject funnel
         if (!$dashboard->funnels->count()) {
             $dashboard->update([
