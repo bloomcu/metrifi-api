@@ -115,20 +115,26 @@ class Step2GetSubjectFunnelBOFI
         // $reference['bofiAssetChange'] = $bofiAssetChange;
 
         // Get potential assets
-        // First check if the last step in the funnel has users. If not, there is no potential assets
-        // Get the last step of the subject funnel report steps
         $lastStepIndex = count($subjectFunnel['report']['steps']) - 1;
         $lastStep = $subjectFunnel['report']['steps'][$lastStepIndex];
 
-        if ($lastStepIndex !== $indexOfLargestRatio + 1 && $lastStep['users'] === 0) {
-            // Last step is not converting users and is not the BOFI
+        if ($bofiPerformance >= 0) {
+            // If the BOFI performance is zero (all steps perform same as comparisons), 
+            // or if the BOFI performance is positive (BOFI performs better than comparisons), 
+            // then the potential assets are zero.
             $reference['bofiAssetChange'] = 0;
+
+        } elseif ($lastStepIndex !== $indexOfLargestRatio + 1 && $lastStep['users'] === 0) {
+            // Last step is not converting users and is not the BOFI, no potential assets
+            $reference['bofiAssetChange'] = 0;
+
         } else {
             // Calculate potential assets as if the BOFI step converted users at the same rate as the median of comparisons
             $users = $subjectFunnel['report']['steps'][$indexOfLargestRatio]['users']; // BOFI users
             $potentialUsers = $bofiMedianOfComparisons * $users;
             $assets = $potentialUsers * ($subjectFunnel['conversion_value'] / 100);
             $reference['bofiAssetChange'] = $assets / 100;
+            
         }
         
         // Append to reference
