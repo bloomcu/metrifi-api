@@ -13,12 +13,12 @@ class Step3CalculatePotentialAssets
     {
         $assets = $subjectFunnel['report']['assets'] * 100; // In cents
 
-        $change = $analysis->bofi_asset_change * 100; // In cents
-        if ($change < 0) { // If the change is negative, we don't want a negative potential
-            $change = 0;
+        $potential = $analysis->bofi_asset_change * 100; // In cents
+        if ($potential < 0) { // If the change is negative, we don't want a negative potential
+            $potential = 0;
         }
 
-        $potential = $assets + $change;
+        // $potential = $assets + $change;
 
         // Build reference
         $reference = $analysis->reference .= $this->generateReference([
