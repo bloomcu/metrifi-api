@@ -171,6 +171,8 @@ return [
         DDD\App\Providers\GoogleAnalyticsDataServiceProvider::class,
         DDD\App\Providers\GoogleAuthServiceProvider::class,
         DDD\App\Providers\RouteServiceProvider::class,
+        DDD\App\Providers\FaviconServiceProvider::class,
+        DDD\App\Providers\ScreenshotServiceProvider::class,
     ])->toArray(),
 
     /*

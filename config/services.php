@@ -49,4 +49,12 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
         'organization' => env('OPENAI_ORGANIZATION'),
     ],
+
+    'thumbio' => [
+        'token' => env('THUMBIO_TOKEN'),
+    ],
+
+    'screenshotone' => [
+        'accesskey' => env('SCREENSHOTONE_ACCESSKEY'),
+    ],
 ];
