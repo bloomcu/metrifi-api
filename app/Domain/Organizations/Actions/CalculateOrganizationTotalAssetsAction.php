@@ -12,17 +12,21 @@ class CalculateOrganizationTotalAssetsAction
 
     function handle(Organization $organization)
     {
+        // Initialize assets object
         $assets = [
             'median' => [
                 'assets' => 0,
-                'potential' => 0
+                'potential' => 0,
+                'total_potential' => 0,
             ],
             'max' => [
                 'assets' => 0,
-                'potential' => 0
+                'potential' => 0,
+                'total_potential' => 0,
             ],
         ];
 
+        // Tally up the assets and potential assets for each dashboard
         foreach ($organization->dashboards as $dashboard) {
             if (!$dashboard->analyses->count()) {
                 continue;
@@ -35,6 +39,11 @@ class CalculateOrganizationTotalAssetsAction
             $assets['max']['potential'] += $dashboard->maxAnalysis->subject_funnel_potential_assets / 100;
         }
 
+        // Add up total potentials
+        $assets['median']['total_potential'] = $assets['median']['assets'] + $assets['median']['potential'];
+        $assets['max']['total_potential'] = $assets['max']['assets'] + $assets['max']['potential'];
+
+        // Update the organization's assets
         $organization->update([
             'assets' => $assets
         ]);
