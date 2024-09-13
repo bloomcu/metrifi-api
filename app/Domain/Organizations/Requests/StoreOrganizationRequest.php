@@ -24,6 +24,7 @@ class StoreOrganizationRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
+            'domain' => 'required|string|unique:websites',
         ];
     }
 
