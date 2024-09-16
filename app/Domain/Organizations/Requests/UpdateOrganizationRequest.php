@@ -24,6 +24,7 @@ class UpdateOrganizationRequest extends FormRequest
     {
         return [
             'title' => 'string',
+            'domain' => 'required|string|unique:websites',
         ];
     }
 

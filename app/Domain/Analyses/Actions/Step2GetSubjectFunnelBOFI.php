@@ -114,7 +114,9 @@ class Step2GetSubjectFunnelBOFI
         // $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
         // $reference['bofiAssetChange'] = $bofiAssetChange;
 
-        // Get potential assets
+        /** 
+         * Get BOFI performance
+         */
         $lastStepIndex = count($subjectFunnel['report']['steps']) - 1;
         $lastStep = $subjectFunnel['report']['steps'][$lastStepIndex];
 
@@ -127,8 +129,15 @@ class Step2GetSubjectFunnelBOFI
         } elseif ($lastStepIndex !== $indexOfLargestRatio + 1 && $lastStep['users'] === 0) {
             // Last step is not converting users and is not the BOFI, no potential assets
             $reference['bofiAssetChange'] = 0;
+        
+        } elseif ($subjectFunnel['report']['assets'] != 0) {
+            // Focus funnel is generating assets
+            // Calculate the asset change from that number
+            $bofiAssetChange = ($subjectFunnel['report']['assets'] * $largestRatio) - $subjectFunnel['report']['assets'];
+            $reference['bofiAssetChange'] = $bofiAssetChange;
 
         } else {
+            // Focus funnel is not generating assets
             // Calculate potential assets as if the BOFI step converted users at the same rate as the median of comparisons
             $users = $subjectFunnel['report']['steps'][$indexOfLargestRatio]['users']; // BOFI users
             $potentialUsers = $bofiMedianOfComparisons * $users;
