@@ -5,6 +5,7 @@ use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
@@ -163,6 +164,12 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::post('/', [AnalysisController::class, 'store']);
             Route::get('/{analysis}', [AnalysisController::class, 'show']);
             Route::put('/{analysis}', [AnalysisController::class, 'update']);
+        });
+
+        // Recommendations
+        Route::prefix('/dashboards/{dashboard}/recommendations')->group(function() {
+            Route::post('/', [RecommendationController::class, 'store']);
+            Route::get('/{recommendation}', [RecommendationController::class, 'show']);
         });
     }); 
 });
