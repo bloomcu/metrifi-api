@@ -16,11 +16,15 @@ return new class extends Migration
         Schema::create('recommendations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dashboard_id');
+            $table->string('thread_id')->nullable();
             $table->boolean('in_progress')->default(true);
+            $table->string('status')->nullable();
             $table->string('title');
             $table->longText('content')->nullable();
-            $table->string('prototype')->nullable();
+            $table->string('screenshot')->nullable();
+            $table->longText('prototype')->nullable();
             $table->string('period')->nullable();
+            $table->longText('reference')->nullable();
             $table->timestamps();
 
             // Foreign constraints

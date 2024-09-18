@@ -28,6 +28,7 @@ class StoreRecommendationRequest extends FormRequest
         return [
             'title' => 'required|string',
             'content' => 'nullable|string',
+            'screenshot' => 'nullable|string',
             'prototype' => 'nullable|string',
             'period' => 'nullable|string',
         ];

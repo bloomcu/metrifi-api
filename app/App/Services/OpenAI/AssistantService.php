@@ -6,78 +6,201 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 class AssistantService
 {
-    // protected $client;
+    public function createThread() {
+        $response = OpenAI::threads()->create([]);
 
-    // public function __construct()
-    // {
-    //     $this->client = OpenAI::client(env('OPENAI_API_KEY'));
-    // }
-
-    public function getAssistantResponse(string $assistantId, string $message) {
-        $run = $this->createAndRunThread($assistantId, $message);
-
-        return $this->getFinalMessage(
-            threadId: $run['thread_id'], 
-            runId: $run['id']
-        );
+        return $response->toArray();
     }
 
-    public function createAndRunThread(string $assistantId, string $message) {
+    public function addMessageToThread(string $threadId, string $message, array $fileIds = []) {
+        $message = [
+            'role' => 'user',
+            'content' => [
+                [
+                    'type' => 'text',
+                    'text' => $message
+                ]
+            ]
+        ];
+
+        foreach ($fileIds as $fileId) {
+            $message['content'][] = [
+                'type' => 'image_file',
+                'image_file' => [
+                    'file_id' => $fileId
+                ]
+            ];
+        }
+
+        $response = OpenAI::threads()->messages()->create($threadId, $message);
+
+        return $response->toArray();
+    }
+
+    public function createRun(string $threadId, string $assistantId) {
+        $response = OpenAI::threads()->runs()->create(
+            threadId: $threadId,
+            parameters: [
+                'assistant_id' => $assistantId,
+            ]
+        );
+
+        return $response->toArray();
+    }
+
+    public function getRun(string $threadId, string $runId) {
+        $response = OpenAI::threads()->runs()->retrieve($threadId, $runId);
+
+        return $response->toArray();
+    }
+
+    public function pollRunUntilComplete(string $threadId, string $runId) {
+        $maxAttempts = 40;
+        $attempts = 0;
+
+        while ($attempts < $maxAttempts) {
+            $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
+
+            if ($run['status'] === 'completed') {
+                return $run['status'];
+            }
+
+            if ($run['status'] === 'failed') {
+                throw new \Exception("Run failed");
+            }
+
+            sleep(4);
+
+            $attempts++;
+        }
+
+        throw new \Exception("Polling exceeded the maximum number of attempts.");
+        
+        // $pollingInterval = 1; // Set delay in seconds between polls
+        // $maxPollingAttempts = 20; // Limit number of attempts
+        // $attempts = 0;
+
+        // do {
+        //     $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
+
+        //     if ($run->status === 'completed') break;
+
+        //     sleep($pollingInterval);
+
+        //     $attempts++;
+        // } while ($run->status !== 'completed' && $attempts < $maxPollingAttempts);
+
+        // return $run->toArray();
+    }
+
+    // public function pollRunForFinalMessage(string $threadId, string $runId) {
+    //     $pollingInterval = 1; // Set delay in seconds between polls
+    //     $maxPollingAttempts = 20; // Limit number of attempts
+    //     $attempts = 0;
+
+    //     do {
+    //         $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
+
+    //         if ($run->status === 'completed') break;
+
+    //         sleep($pollingInterval);
+
+    //         $attempts++;
+    //     } while ($run->status !== 'completed' && $attempts < $maxPollingAttempts);
+
+    //     $messages = $this->getMessages(threadId: $threadId);
+
+    //     return $messages['data'][0]['content'][0]['text']['value'];
+    // }
+
+    public function getMessages(string $threadId) {
+        $response = OpenAI::threads()->messages()->list($threadId);
+
+        return $response->toArray();
+    }
+
+    public function getFinalMessage(string $threadId) {
+        $messages = $this->getMessages(threadId: $threadId);
+
+        return $messages['data'][0]['content'][0]['text']['value'];
+    }
+
+    // public function getAssistantResponse(string $assistantId, string $message) {
+    //     $run = $this->createAndRunThread($assistantId, $message);
+
+    //     $message = $this->pollForFinalMessage(
+    //         threadId: $run['thread_id'], 
+    //         runId: $run['id']
+    //     );
+
+    //     return $message;
+    // }
+
+    public function createAndRunThread(string $assistantId, string $message, array $fileIds = []) {
+        $messages = [
+            [
+                'role' => 'user', 
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => $message
+                    ]
+                ]
+            ]
+        ];
+
+        foreach ($fileIds as $fileId) {
+            $messages[0]['content'][] = [
+                'type' => 'image_file',
+                'image_file' => [
+                    'file_id' => $fileId
+                ]
+            ];
+        }
+
         $run = OpenAI::threads()->createAndRun([
             'assistant_id' => $assistantId,
             'thread' => [
-                'messages' => [
-                    [
-                        'role' => 'user', 
-                        'content' => $message
-                    ],
-                ],
+                'messages' => $messages
             ]
         ]);
 
         return $run;
     }
 
-    public function getFinalMessage(string $threadId, string $runId) {
-        $pollingInterval = 1; // Set a delay in seconds between polls
-        $maxPollingAttempts = 6; // Optional: limit the number of attempts
+    public function pollForFinalMessage(string $threadId, string $runId) {
+        $pollingInterval = 1; // Set delay in seconds between polls
+        $maxPollingAttempts = 20; // Limit number of attempts
         $attempts = 0;
 
         do {
             $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
 
-            if ($run->status === 'completed') {
-                break;
-            }
+            if ($run->status === 'completed') break;
 
             sleep($pollingInterval);
 
             $attempts++;
         } while ($run->status !== 'completed' && $attempts < $maxPollingAttempts);
 
-        $messages = $this->getMessagesList(threadId: $threadId);
+        $messages = $this->getMessages(threadId: $threadId);
 
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
-    public function getThread(string $threadId) {
-        $response = OpenAI::threads()->retrieve($threadId);
+    public function uploadFile(string $fileUrl) {
+        $response = OpenAI::files()->upload([
+            'purpose' => 'vision',
+            'file' => fopen($fileUrl, 'r')
+        ]);
 
         return $response->toArray();
-        // return $response['data']['messages'][0]['content'];
     }
 
-    public function getMessagesList(string $threadId) {
-        $response = OpenAI::threads()->messages()->list($threadId);
+    // public function getSingleMessage(string $threadId, string $messageId) {
+    //     $response = OpenAI::threads()->messages()->retrieve($threadId, $messageId);
 
-        return $response->toArray();
-        // return $response['data']['messages'][0]['content'];
-    }
-
-    public function getMessage(string $threadId, string $messageId) {
-        $response = OpenAI::threads()->messages()->retrieve($threadId, $messageId);
-
-        return $response->toArray();
-        return $response['data']['messages'][0]['content'];
-    }
+    //     return $response->toArray();
+    //     return $response['data']['messages'][0]['content'];
+    // }
 }

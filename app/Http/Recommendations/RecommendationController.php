@@ -2,12 +2,19 @@
 
 namespace DDD\Http\Recommendations;
 
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Http\Request;
 use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
+use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
+use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
+use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
+use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\App\Services\Screenshot\ThumbioService;
+use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
@@ -18,26 +25,31 @@ class RecommendationController extends Controller
     //     return AnalysisResource::collection($dashboard->analyses);
     // }
 
-    public function store(Organization $organization, Dashboard $dashboard, StoreRecommendationRequest $request, AssistantService $assistant)
-    {   
-        $response = $assistant->getAssistantResponse(
-            assistantId: 'asst_CMWB6kdTk4KH9zJ3W6U4x8er', 
-            message: 'Hello assistant, is this working?'
-        );
+    public function store(
+        Organization $organization, 
+        Dashboard $dashboard, 
+        StoreRecommendationRequest $request, 
+        AssistantService $assistant
+    ){   
+        $thread = $assistant->createThread();
 
-        return $response;
+        $recommendation = $dashboard->recommendations()->create([
+            ...$request->validated(),
+            'thread_id' => $thread['id']
+        ]);
 
-        // $recommendation = $dashboard->recommendations()->create($request->validated());
+        Bus::chain([
+            UIAnalyzer::makeJob($recommendation),
+            ContentWriter::makeJob($recommendation),
+            ComponentPicker::makeJob($recommendation),
+            PageBuilder::makeJob($recommendation),
+        ])->dispatch();
 
-        // return new RecommendationResource($recommendation);
+        return new RecommendationResource($recommendation);
     }
 
-    public function show(Organization $organization, Dashboard $dashboard, Recommendation $recommendation, AssistantService $assistant)
+    public function show(Organization $organization, Dashboard $dashboard, Recommendation $recommendation)
     {
-        return $assistant->getMessagesList(
-            threadId: 'thread_MYoqWrNUgPTUn5RiELMKRisu'
-        );
-
         return new RecommendationResource($recommendation);
     }
 

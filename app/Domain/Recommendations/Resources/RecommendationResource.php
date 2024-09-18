@@ -17,11 +17,14 @@ class RecommendationResource extends JsonResource
         return [
             'id' => $this->id,
             'dashboard_id' => $this->dashboard_id,
+            'thread_id' => $this->thread_id,
             'in_progress' => $this->in_progress,
+            'status' => $this->status,
             'title' => $this->title,
             'content' => $this->content,
             'prototype' => $this->prototype,
             'period' => $this->period,
+            'reference' => $this->reference,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

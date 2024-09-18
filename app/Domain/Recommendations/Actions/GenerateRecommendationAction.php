@@ -8,7 +8,7 @@ use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 use DDD\Domain\Dashboards\Resources\ShowDashboardResource;
 
-class GetRecommendationAction
+class GenerateRecommendationAction
 {
     use AsAction;
 
