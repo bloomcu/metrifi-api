@@ -3,17 +3,23 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
+use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class UIAnalyzer
+class UIAnalyzer implements ShouldQueue
 {
-    use AsAction;
+    use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $jobTimeout = 180;
-    public $jobTries = 2;
-    public $jobBackoff = 5;
+    public $name = 'ui_analyzer';
+    public $timeout = 60;
+    public $tries = 50;
+    public $backoff = 5;
 
     protected ScreenshotInterface $screenshotter;
     protected AssistantService $assistant;
@@ -29,35 +35,52 @@ class UIAnalyzer
     function handle(
         Recommendation $recommendation, 
     ){
-        $recommendation->update(['status' => 'ui_analyzer_in_progress']);
+        $recommendation->update(['status' => $this->name . '_in_progress']);
 
-        // $screenshot = $screenshotter->getScreenshot(
-        //     url: 'https://centricity.org/loans/vehicle/auto-loans/'
-        // );
+        // Start the run if it hasn't been started yet
+        if (!isset($recommendation->runs[$this->name])) {
 
-        $this->assistant->addMessageToThread(
+            // $screenshot = $screenshotter->getScreenshot(
+            //     url: 'https://centricity.org/loans/vehicle/auto-loans/'
+            // );
+
+            $this->assistant->addMessageToThread(
+                threadId: $recommendation->thread_id,
+                message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of two higher performing auto loan pages (second and third files)',
+                fileIds: [
+                    'file-IH4PUBjqstiW72QGLfXnI1DS',
+                    'file-VUYG4GncvLroPDC9KNhV6lBc',
+                    'file-AaFdaPUSl65btACwRe0V3vhR',
+                ]
+            );
+    
+            $run = $this->assistant->createRun(
+                threadId: $recommendation->thread_id,
+                assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
+            );
+
+            $recommendation->runs = array_merge($recommendation->runs, [
+                $this->name => $run['id'],
+            ]);
+
+            $recommendation->save();
+        }
+
+        // Check the status of the run
+        $status = $this->assistant->getRunStatus(
             threadId: $recommendation->thread_id,
-            message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of two higher performing auto loan pages (second and third files)',
-            fileIds: [
-                'file-IH4PUBjqstiW72QGLfXnI1DS',
-                'file-VUYG4GncvLroPDC9KNhV6lBc',
-                'file-AaFdaPUSl65btACwRe0V3vhR',
-            ]
+            runId: $recommendation->runs[$this->name]
         );
 
-        $run = $this->assistant->createRun(
-            threadId: $recommendation->thread_id,
-            assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
-        );
-        
-        $status = $this->assistant->pollRunUntilComplete(
-            threadId: $recommendation->thread_id,
-            runId: $run['id']
-        );
-
-        if ($status === 'completed') {
-            // sleep(2);
+        if ($status !== 'completed') {
+            // Dispatch a new instance of the job with a delay
+            self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }
+
+        // Run is completed.
+        $recommendation->update(['status' => $this->name . '_completed']);
+        ContentWriter::dispatch($recommendation);
+        return;
     }
 }

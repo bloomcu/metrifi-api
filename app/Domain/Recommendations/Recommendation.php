@@ -16,6 +16,14 @@ class Recommendation extends Model
         'id',
     ];
 
+    protected $casts = [
+        'runs' => 'array',
+    ];
+
+    protected $attributes = [
+        'runs' => '[]',
+    ];
+
     /**
      * Dashboard this recommendation belongs to.
      *

@@ -18,7 +18,7 @@ class RecommendationResource extends JsonResource
             'id' => $this->id,
             'dashboard_id' => $this->dashboard_id,
             'thread_id' => $this->thread_id,
-            'in_progress' => $this->in_progress,
+            'runs' => $this->runs,
             'status' => $this->status,
             'title' => $this->title,
             'content' => $this->content,

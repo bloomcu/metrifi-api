@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->json('run_id')->after('thread_id')->nullable();
+            $table->json('runs')->after('thread_id')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->dropColumn('run_id');
+            $table->dropColumn('runs');
         });
     }
 };

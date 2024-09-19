@@ -54,6 +54,12 @@ class AssistantService
         return $response->toArray();
     }
 
+    public function getRunStatus(string $threadId, string $runId) {
+        $response = OpenAI::threads()->runs()->retrieve($threadId, $runId);
+
+        return $response->status;
+    }
+
     public function pollRunUntilComplete(string $threadId, string $runId) {
         $maxAttempts = 40;
         $attempts = 0;

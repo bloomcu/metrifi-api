@@ -38,12 +38,14 @@ class RecommendationController extends Controller
             'thread_id' => $thread['id']
         ]);
 
-        Bus::chain([
-            UIAnalyzer::makeJob($recommendation),
-            ContentWriter::makeJob($recommendation),
-            ComponentPicker::makeJob($recommendation),
-            PageBuilder::makeJob($recommendation),
-        ])->dispatch();
+        UIAnalyzer::dispatch($recommendation);
+
+        // Bus::chain([
+        //     UIAnalyzer::makeJob($recommendation),
+        //     ContentWriter::makeJob($recommendation),
+        //     ComponentPicker::makeJob($recommendation),
+        //     PageBuilder::makeJob($recommendation),
+        // ])->dispatch();
 
         return new RecommendationResource($recommendation);
     }
