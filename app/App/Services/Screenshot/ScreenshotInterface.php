@@ -4,9 +4,10 @@ namespace DDD\App\Services\Screenshot;
 
 interface ScreenshotInterface
 {
-    public function take(
+    public function getScreenshot(
         string $url,
-        string $width,
-        string $height,
+        string $wait = '0',
+        string $width = '1200',
+        string $height = '1200',
     );
 }
