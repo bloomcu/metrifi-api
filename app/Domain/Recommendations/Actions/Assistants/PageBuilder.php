@@ -80,7 +80,7 @@ class PageBuilder implements ShouldQueue
         Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
 
         $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
-        $html = preg_match('/<body[^>]*>(.*)$/is', $message, $matches) ? $matches[1] : '';
+        $html = preg_match('/<body>(.*?)<\/body>/is', $message, $matches) ? $matches[1] : '';
 
         $recommendation->update([
             'status' => $this->name . '_completed',
