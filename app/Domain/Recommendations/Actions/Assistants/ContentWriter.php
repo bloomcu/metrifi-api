@@ -23,9 +23,8 @@ class ContentWriter implements ShouldQueue
 
     protected AssistantService $assistant;
 
-    public function __construct(
-        AssistantService $assistant
-    ){
+    public function __construct(AssistantService $assistant)
+    {
         $this->assistant = $assistant;
     }
 
@@ -43,6 +42,8 @@ class ContentWriter implements ShouldQueue
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_CMWB6kdTk4KH9zJ3W6U4x8er',
+                maxPromptTokens: 10000,
+                maxCompletionTokens: 10000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -53,26 +54,31 @@ class ContentWriter implements ShouldQueue
         }
 
         // Check the status of the run
-        $status = $this->assistant->getRunStatus(
+        $run = $this->assistant->getRun(
             threadId: $recommendation->thread_id,
             runId: $recommendation->runs[$this->name]
         );
 
         // log the status
-        Log::info('ContentWriter status: ' . $status);
+        // Log::info('ContentWriter status: ' . $run->status);
 
-        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
-            $recommendation->update(['status' => $this->name . '_' . $status]);
+        if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $run['status']]);
             return;
         }
-        
-        if ($status !== 'completed') {
+
+        if ($run['status'] !== 'completed') {
             // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }
 
         // Run is completed.
+        Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
+        Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
+        Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+        Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+
         $recommendation->update(['status' => $this->name . '_completed']);
         ComponentPicker::dispatch($recommendation);
         return;

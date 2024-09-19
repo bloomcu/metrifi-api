@@ -50,8 +50,16 @@ class RecommendationController extends Controller
         return new RecommendationResource($recommendation);
     }
 
-    public function show(Organization $organization, Dashboard $dashboard, Recommendation $recommendation)
+    public function show(Organization $organization, Dashboard $dashboard, AssistantService $assistant, Recommendation $recommendation)
     {
+        // PageBuilder::dispatch($recommendation);
+
+        // $message = $assistant->getFinalMessage(threadId: $recommendation->thread_id);
+        // return $message;
+        // $result = preg_match('/<body[^>]*>(.*?)<\/body>/is', $message, $matches);
+        // return $result;
+
+
         return new RecommendationResource($recommendation);
     }
 

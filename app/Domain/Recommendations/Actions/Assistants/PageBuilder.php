@@ -22,9 +22,8 @@ class PageBuilder implements ShouldQueue
 
     protected AssistantService $assistant;
 
-    public function __construct(
-        AssistantService $assistant
-    ){
+    public function __construct(AssistantService $assistant)
+    {
         $this->assistant = $assistant;
     }
 
@@ -42,6 +41,7 @@ class PageBuilder implements ShouldQueue
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_Wk0cohBVjSRxWLu2XGLd3361',
+                maxPromptTokens: 10000,
                 maxCompletionTokens: 10000,
             );
 
@@ -53,30 +53,38 @@ class PageBuilder implements ShouldQueue
         }
 
         // Check the status of the run
-        $status = $this->assistant->getRunStatus(
+        $run = $this->assistant->getRun(
             threadId: $recommendation->thread_id,
             runId: $recommendation->runs[$this->name]
         );
 
         // log the status
-        Log::info('PageBuilder status: ' . $status);
+        // Log::info('PageBuilder status: ' . $run->status);
 
-        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
-            $recommendation->update(['status' => $this->name . '_' . $status]);
+        // if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+        if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $run['status']]);
             return;
         }
 
-        if ($status !== 'completed') {
+        if ($run['status'] !== 'completed') {
             // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }
 
         // Run is completed.
+        Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
+        Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
+        Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+        Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+
         $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+        $html = preg_match('/<body>(.*?)<\/body>/is', $message, $matches) ? $matches[1] : '';
+
         $recommendation->update([
             'status' => $this->name . '_completed',
-            'content' => $message
+            'prototype' => $html,
         ]);
 
         return;

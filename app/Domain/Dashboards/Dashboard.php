@@ -78,4 +78,9 @@ class Dashboard extends Model
     {
         return $this->hasMany(Recommendation::class);
     }
+
+    public function recommendation(): HasOne
+    {
+        return $this->hasOne(Recommendation::class)->latest();
+    }
 }

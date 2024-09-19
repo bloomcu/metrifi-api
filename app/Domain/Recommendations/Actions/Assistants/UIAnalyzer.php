@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
+use DDD\Domain\Recommendations\Actions\Assistants\ConfidentialityRuleQA;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 
@@ -25,17 +25,14 @@ class UIAnalyzer implements ShouldQueue
     protected ScreenshotInterface $screenshotter;
     protected AssistantService $assistant;
 
-    public function __construct(
-        ScreenshotInterface $screenshotter,
-        AssistantService $assistant
-    ){
+    public function __construct(ScreenshotInterface $screenshotter, AssistantService $assistant)
+    {
         $this->screenshotter = $screenshotter;
         $this->assistant = $assistant;
     }
 
-    function handle(
-        Recommendation $recommendation, 
-    ){
+    function handle(Recommendation $recommendation)
+    {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
         // Start the run if it hasn't been started yet
@@ -58,6 +55,8 @@ class UIAnalyzer implements ShouldQueue
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
+                maxPromptTokens: 2000,
+                maxCompletionTokens: 2000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -68,28 +67,34 @@ class UIAnalyzer implements ShouldQueue
         }
 
         // Check the status of the run
-        $status = $this->assistant->getRunStatus(
+        $run = $this->assistant->getRun(
             threadId: $recommendation->thread_id,
             runId: $recommendation->runs[$this->name]
         );
 
         // log the status
-        Log::info('UIAnalyzer status: ' . $status);
+        // Log::info('UIAnalyzer status: ' . $run->status);
 
-        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
-            $recommendation->update(['status' => $this->name . '_' . $status]);
+        if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $run['status']]);
             return;
         }
 
-        if ($status !== 'completed') {
-            // Dispatch new job to recheck
+        if ($run['status'] !== 'completed') {
+            // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }
 
         // Run is completed.
+        Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
+        Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
+        Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+        Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+        // Log::info($this->name . ' run: ' . json_encode($run));
+
         $recommendation->update(['status' => $this->name . '_completed']);
-        ContentWriter::dispatch($recommendation);
+        ConfidentialityRuleQA::dispatch($recommendation);
         return;
     }
 }

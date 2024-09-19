@@ -9,14 +9,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
+use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class ComponentPicker implements ShouldQueue
+class ConfidentialityRuleQA implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
-    public $name = 'component_picker';
+    public $name = 'confidentiality_rule_qa';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;
@@ -41,9 +41,9 @@ class ComponentPicker implements ShouldQueue
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
-                assistantId: 'asst_pSC8qeDAM1Le5PJVPlfZ9HYA',
-                maxPromptTokens: 40000,
-                maxCompletionTokens: 10000,
+                assistantId: 'asst_57iZEjDpsLZMSUnswF8GGb8y',
+                maxPromptTokens: 5000,
+                maxCompletionTokens: 5000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -60,7 +60,7 @@ class ComponentPicker implements ShouldQueue
         );
 
         // log the status
-        // Log::info('ComponentPicker status: ' . $run->status);
+        // Log::info('ConfidentialityRuleQA status: ' . $run->status);
 
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
             $recommendation->update(['status' => $this->name . '_' . $run['status']]);
@@ -80,7 +80,15 @@ class ComponentPicker implements ShouldQueue
         Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
 
         $recommendation->update(['status' => $this->name . '_completed']);
-        PageBuilder::dispatch($recommendation);
+        
+        $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+        
+        $recommendation->update([
+            'status' => $this->name . '_completed',
+            'content' => $message,
+        ]);
+
+        ContentWriter::dispatch($recommendation);
         return;
     }
 }

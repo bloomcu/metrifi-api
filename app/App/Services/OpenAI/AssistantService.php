@@ -37,12 +37,18 @@ class AssistantService
         return $response->toArray();
     }
 
-    public function createRun(string $threadId, string $assistantId, int $maxCompletionTokens = null) {
+    public function createRun(
+        string $threadId, 
+        string $assistantId, 
+        int $maxPromptTokens = null,
+        int $maxCompletionTokens = null,
+    ) {
         $response = OpenAI::threads()->runs()->create(
             threadId: $threadId,
             parameters: [
                 'assistant_id' => $assistantId,
-                'max_completion_tokens' => $maxCompletionTokens
+                'max_completion_tokens' => $maxCompletionTokens,
+                'max_prompt_tokens' => $maxPromptTokens,
             ]
         );
 
