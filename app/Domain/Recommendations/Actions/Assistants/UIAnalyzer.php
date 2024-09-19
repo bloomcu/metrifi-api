@@ -3,6 +3,7 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,7 +47,7 @@ class UIAnalyzer implements ShouldQueue
 
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of two higher performing auto loan pages (second and third files)',
+                message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of other higher performing auto loan pages (subsequent files)',
                 fileIds: [
                     'file-IH4PUBjqstiW72QGLfXnI1DS',
                     'file-VUYG4GncvLroPDC9KNhV6lBc',
@@ -72,8 +73,16 @@ class UIAnalyzer implements ShouldQueue
             runId: $recommendation->runs[$this->name]
         );
 
+        // log the status
+        Log::info('UIAnalyzer status: ' . $status);
+
+        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $status]);
+            return;
+        }
+
         if ($status !== 'completed') {
-            // Dispatch a new instance of the job with a delay
+            // Dispatch new job to recheck
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }

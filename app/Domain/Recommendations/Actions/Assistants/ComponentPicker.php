@@ -3,6 +3,7 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,6 +57,14 @@ class ComponentPicker implements ShouldQueue
             threadId: $recommendation->thread_id,
             runId: $recommendation->runs[$this->name]
         );
+
+        // log the status
+        Log::info('ComponentPicker status: ' . $status);
+
+        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $status]);
+            return;
+        }
 
         if ($status !== 'completed') {
             // Dispatch a new instance of the job with a delay

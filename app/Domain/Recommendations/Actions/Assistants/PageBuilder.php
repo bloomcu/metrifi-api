@@ -3,6 +3,7 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,6 +42,7 @@ class PageBuilder implements ShouldQueue
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_Wk0cohBVjSRxWLu2XGLd3361',
+                maxCompletionTokens: 10000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -55,6 +57,14 @@ class PageBuilder implements ShouldQueue
             threadId: $recommendation->thread_id,
             runId: $recommendation->runs[$this->name]
         );
+
+        // log the status
+        Log::info('PageBuilder status: ' . $status);
+
+        if (in_array($status, ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
+            $recommendation->update(['status' => $this->name . '_' . $status]);
+            return;
+        }
 
         if ($status !== 'completed') {
             // Dispatch a new instance of the job with a delay
