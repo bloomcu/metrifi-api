@@ -9,25 +9,22 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\ConfidentialityRuleQA;
-use DDD\App\Services\Screenshot\ScreenshotInterface;
+use DDD\Domain\Recommendations\Actions\Assistants\SectionCategorizer;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class UIAnalyzer implements ShouldQueue
+class SectionCounter implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $name = 'ui_analyzer';
+    
+    public $name = 'section_counter';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;
 
-    protected ScreenshotInterface $screenshotter;
     protected AssistantService $assistant;
 
-    public function __construct(ScreenshotInterface $screenshotter, AssistantService $assistant)
+    public function __construct(AssistantService $assistant)
     {
-        $this->screenshotter = $screenshotter;
         $this->assistant = $assistant;
     }
 
@@ -37,26 +34,16 @@ class UIAnalyzer implements ShouldQueue
 
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
-
-            // $screenshot = $screenshotter->getScreenshot(
-            //     url: 'https://centricity.org/loans/vehicle/auto-loans/'
-            // );
-
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of other higher performing auto loan pages (subsequent files)',
-                fileIds: [
-                    'file-IH4PUBjqstiW72QGLfXnI1DS',
-                    'file-VUYG4GncvLroPDC9KNhV6lBc',
-                    'file-AaFdaPUSl65btACwRe0V3vhR',
-                ]
+                message: '',
             );
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
-                assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
-                // maxPromptTokens: 2000,
-                // maxCompletionTokens: 2000,
+                assistantId: 'asst_smmCPJB1BXUjj022tUx6Keqj',
+                // maxPromptTokens: 5000,
+                // maxCompletionTokens: 5000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -97,8 +84,16 @@ class UIAnalyzer implements ShouldQueue
         }
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
-            $recommendation->update(['status' => $this->name . '_completed']);
-            ConfidentialityRuleQA::dispatch($recommendation)->delay(now()->addSeconds(15));
+            $count = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+
+            $recommendation->update([
+                'status' => $this->name . '_completed',
+                // 'sections_count' => $count,
+                'sections_count' => 8,
+            ]);
+
+            SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
+
             return;
         }
         
