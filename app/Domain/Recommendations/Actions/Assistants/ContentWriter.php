@@ -37,7 +37,7 @@ class ContentWriter implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'Complete your instructions',
+                message: 'Complete your instructions and return json.',
             );
     
             $run = $this->assistant->createRun(

@@ -88,8 +88,8 @@ class SectionCounter implements ShouldQueue
 
             $recommendation->update([
                 'status' => $this->name . '_completed',
-                // 'sections_count' => $count,
-                'sections_count' => 8,
+                'sections_count' => $count,
+                // 'sections_count' => 8,
             ]);
 
             SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
