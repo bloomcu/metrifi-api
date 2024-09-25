@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\SectionCategorizer;
+use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
 use DDD\App\Services\OpenAI\AssistantService;
 
 class SectionCounter implements ShouldQueue
@@ -92,7 +93,8 @@ class SectionCounter implements ShouldQueue
                 // 'sections_count' => 8,
             ]);
 
-            SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
+            // SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
+            PageBuilder::dispatch($recommendation)->delay(now()->addSeconds(15));
 
             return;
         }
