@@ -86,7 +86,7 @@ class ContentWriter implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
-            SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(15));
+            SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
 

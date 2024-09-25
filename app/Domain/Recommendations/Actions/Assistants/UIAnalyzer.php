@@ -98,7 +98,7 @@ class UIAnalyzer implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
-            ConfidentialityRuleQA::dispatch($recommendation)->delay(now()->addSeconds(15));
+            ConfidentialityRuleQA::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
         

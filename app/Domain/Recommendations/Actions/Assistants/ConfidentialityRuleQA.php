@@ -91,7 +91,7 @@ class ConfidentialityRuleQA implements ShouldQueue
                 'content' => $content,
             ]);
     
-            ContentWriter::dispatch($recommendation)->delay(now()->addSeconds(15));
+            ContentWriter::dispatch($recommendation)->delay(now()->addSeconds(8));
 
             return;
         }

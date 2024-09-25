@@ -84,18 +84,18 @@ class PageBuilder implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
-            $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
+            // $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
             $built = $recommendation->sections_built + 1;
             // $status = $built < $recommendation->sections_count ? $this->name . '_in_progress' : $this->name . '_completed';
     
             // Log::info('HTML: ' . $html);
             Log::info('Built: ' . $built);
-            Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $html);
+            Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $message);
     
             $recommendation->update([
                 'status' => $this->name . '_completed',
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $html,
+                'prototype' => $recommendation->prototype . $message,
             ]);
     
             // If there are more sections to build, dispatch a new instance of the job with a delay
@@ -108,7 +108,7 @@ class PageBuilder implements ShouldQueue
     
                 $recommendation->save();
     
-                self::dispatch($recommendation)->delay(now()->addSeconds(15));
+                self::dispatch($recommendation)->delay(now()->addSeconds(8));
                 return;
             }
         }
@@ -117,7 +117,7 @@ class PageBuilder implements ShouldQueue
         $recommendation->update([
             'status' => 'done',
         ]);
-        
+
         return;
     }
 }

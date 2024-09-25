@@ -93,8 +93,8 @@ class SectionCounter implements ShouldQueue
                 // 'sections_count' => 8,
             ]);
 
-            // SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
-            PageBuilder::dispatch($recommendation)->delay(now()->addSeconds(15));
+            // SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(8));
+            PageBuilder::dispatch($recommendation)->delay(now()->addSeconds(8));
 
             return;
         }
