@@ -36,7 +36,7 @@ class ConfidentialityRuleQA implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: '',
+                message: 'Complete your instructions',
             );
     
             $run = $this->assistant->createRun(
