@@ -36,12 +36,12 @@ class SectionCounter implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'Complete your instructions',
+                message: 'Tell me how many sections are in your content outline. Just output an integer and nothing else. I don\'t want an explanation of any kind; just tell me the number.',
             );
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
-                assistantId: 'asst_smmCPJB1BXUjj022tUx6Keqj',
+                assistantId: 'asst_CMWB6kdTk4KH9zJ3W6U4x8er',
                 // maxPromptTokens: 5000,
                 // maxCompletionTokens: 5000,
             );

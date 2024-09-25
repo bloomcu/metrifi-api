@@ -10,14 +10,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\SectionCategorizer;
-use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class ContentWriter implements ShouldQueue
+class SectionCounter implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
-    public $name = 'content_writer';
+    public $name = 'section_counter';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;
@@ -37,14 +36,14 @@ class ContentWriter implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'Complete your instructions.',
+                message: 'Complete your instructions',
             );
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
-                assistantId: 'asst_CMWB6kdTk4KH9zJ3W6U4x8er',
-                // maxPromptTokens: 10000,
-                // maxCompletionTokens: 10000,
+                assistantId: 'asst_smmCPJB1BXUjj022tUx6Keqj',
+                // maxPromptTokens: 5000,
+                // maxCompletionTokens: 5000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -85,11 +84,19 @@ class ContentWriter implements ShouldQueue
         }
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
-            $recommendation->update(['status' => $this->name . '_completed']);
-            SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(15));
+            $count = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+
+            $recommendation->update([
+                'status' => $this->name . '_completed',
+                'sections_count' => $count,
+                // 'sections_count' => 8,
+            ]);
+
+            SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(15));
+
             return;
         }
-
+        
         return;
     }
 }
