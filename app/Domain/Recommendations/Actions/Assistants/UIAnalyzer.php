@@ -50,7 +50,7 @@ class UIAnalyzer implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of other higher performing auto loan pages (subsequent files)',
+                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent files)',
                 fileIds: [
                     $focusScreenshotId,
                     ...$comparisonScreenshotIds,
