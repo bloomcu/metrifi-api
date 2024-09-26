@@ -28,6 +28,7 @@ class StoreRecommendationRequest extends FormRequest
         return [
             'title' => 'nullable|string',
             'period' => 'nullable|string',
+            'step_index' => 'nullable|integer',
             'metadata' => 'nullable|array',
         ];
     }
