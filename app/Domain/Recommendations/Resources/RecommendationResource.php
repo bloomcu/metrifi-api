@@ -25,6 +25,7 @@ class RecommendationResource extends JsonResource
             'prototype' => $this->prototype,
             'period' => $this->period,
             'reference' => $this->reference,
+            'metadata' => $this->metadata,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

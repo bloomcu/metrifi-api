@@ -26,11 +26,9 @@ class StoreRecommendationRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string',
-            'content' => 'nullable|string',
-            'screenshot' => 'nullable|string',
-            'prototype' => 'nullable|string',
+            'title' => 'nullable|string',
             'period' => 'nullable|string',
+            'metadata' => 'nullable|array',
         ];
     }
 

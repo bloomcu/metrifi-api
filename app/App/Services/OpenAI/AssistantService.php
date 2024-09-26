@@ -3,6 +3,8 @@
 namespace DDD\App\Services\OpenAI;
 
 use OpenAI\Laravel\Facades\OpenAI;
+use GuzzleHttp\Client;
+use Exception;
 
 class AssistantService
 {
@@ -201,13 +203,30 @@ class AssistantService
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
-    public function uploadFile(string $fileUrl) {
-        $response = OpenAI::files()->upload([
-            'purpose' => 'vision',
-            'file' => fopen($fileUrl, 'r')
-        ]);
+    public function uploadFile(string $url) {
+        // Download the image
+        $client = new Client();
+        $response = $client->get($url);
+        $imageContent = $response->getBody()->getContents();
 
-        return $response->toArray();
+        // Save the image temporarily
+        $tempImagePath = storage_path('app/screenshot.png');
+        file_put_contents($tempImagePath, $imageContent);
+
+        try {
+            // Upload file
+            $response = OpenAI::files()->upload([
+                'purpose' => 'vision',
+                'file' => fopen($tempImagePath, 'r')
+            ]);
+
+            // Clean up and delete the temporary file
+            unlink($tempImagePath);
+
+            return $response->id;
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     // public function getSingleMessage(string $threadId, string $messageId) {

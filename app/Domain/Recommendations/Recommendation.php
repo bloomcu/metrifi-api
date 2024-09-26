@@ -18,6 +18,7 @@ class Recommendation extends Model
 
     protected $casts = [
         'runs' => 'array',
+        'metadata' => 'array',
     ];
 
     protected $attributes = [

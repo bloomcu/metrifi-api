@@ -35,20 +35,25 @@ class UIAnalyzer implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
+        $focusScreenshotId = $file = $this->assistant->uploadFile(
+            url: $recommendation->metadata['focusScreenshot']
+        );
+
+        $comparisonScreenshotIds = [];
+        foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
+            $comparisonScreenshotIds[] = $this->assistant->uploadFile(
+                url: $comparisonScreenshot
+            );
+        }
+
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
-
-            // $screenshot = $screenshotter->getScreenshot(
-            //     url: 'https://centricity.org/loans/vehicle/auto-loans/'
-            // );
-
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
                 message: 'I\'ve attached a screenshot of my current auto loan page (first file). I\'ve also attached screenshots of other higher performing auto loan pages (subsequent files)',
                 fileIds: [
-                    'file-IH4PUBjqstiW72QGLfXnI1DS',
-                    'file-VUYG4GncvLroPDC9KNhV6lBc',
-                    'file-AaFdaPUSl65btACwRe0V3vhR',
+                    $focusScreenshotId,
+                    ...$comparisonScreenshotIds,
                 ]
             );
     

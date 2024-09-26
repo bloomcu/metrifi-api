@@ -8,6 +8,7 @@ use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
+use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
 use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
 use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
 use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
@@ -29,16 +30,19 @@ class RecommendationController extends Controller
         Organization $organization, 
         Dashboard $dashboard, 
         StoreRecommendationRequest $request, 
-        AssistantService $assistant
-    ){   
+        AssistantService $assistant,
+        ScreenshotInterface $screenshotter
+    ){
         $thread = $assistant->createThread();
 
         $recommendation = $dashboard->recommendations()->create([
-            ...$request->validated(),
-            'thread_id' => $thread['id']
+            'title' => $request->metadata['focus']['name'] . ' recommendation',
+            'thread_id' => $thread['id'],
+            'metadata' => $request->metadata,
         ]);
 
-        UIAnalyzer::dispatch($recommendation);
+        // UIAnalyzer::dispatch($recommendation);
+        ScreenshotGrabber::dispatch($recommendation);
 
         // Bus::chain([
         //     UIAnalyzer::makeJob($recommendation),
@@ -52,8 +56,6 @@ class RecommendationController extends Controller
 
     public function show(Organization $organization, Dashboard $dashboard, AssistantService $assistant, Recommendation $recommendation)
     {
-        // PageBuilder::dispatch($recommendation);
-
         // $message = $assistant->getFinalMessage(threadId: $recommendation->thread_id);
         // return $message;
         // $result = preg_match('/<body[^>]*>(.*?)<\/body>/is', $message, $matches);

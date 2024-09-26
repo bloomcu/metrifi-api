@@ -18,12 +18,12 @@ class ScreenshotServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(ScreenshotInterface::class, function ($app) {
-            // return new Thumbio(
-            //     token: config('services.thumbio.token'),
-            // );
-            return new ScreenshotOne(
-                accesskey: config('services.screenshotone.accesskey'),
+            return new Thumbio(
+                token: config('services.thumbio.token'),
             );
+            // return new ScreenshotOne(
+            //     accesskey: config('services.screenshotone.accesskey'),
+            // );
         });
     }
 
