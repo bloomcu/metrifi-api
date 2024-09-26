@@ -83,19 +83,19 @@ class PageBuilder implements ShouldQueue
         }
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
-            $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
-            // $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
             $built = $recommendation->sections_built + 1;
             // $status = $built < $recommendation->sections_count ? $this->name . '_in_progress' : $this->name . '_completed';
+            $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+            $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
     
             // Log::info('HTML: ' . $html);
             Log::info('Built: ' . $built);
-            Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $message);
+            Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $html);
     
             $recommendation->update([
                 'status' => $this->name . '_completed',
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $message,
+                'prototype' => $recommendation->prototype . $html,
             ]);
     
             // If there are more sections to build, dispatch a new instance of the job with a delay
