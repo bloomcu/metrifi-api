@@ -168,6 +168,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
         // Recommendations
         Route::prefix('/dashboards/{dashboard}/recommendations')->group(function() {
+            Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
         });

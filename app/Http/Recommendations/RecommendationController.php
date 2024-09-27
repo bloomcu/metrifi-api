@@ -21,10 +21,10 @@ use DDD\App\Controllers\Controller;
 
 class RecommendationController extends Controller
 {
-    // public function index(Organization $organization, Dashboard $dashboard)
-    // {
-    //     return AnalysisResource::collection($dashboard->analyses);
-    // }
+    public function index(Organization $organization, Dashboard $dashboard)
+    {
+        return RecommendationResource::collection($dashboard->recommendations);
+    }
 
     public function store(
         Organization $organization, 
