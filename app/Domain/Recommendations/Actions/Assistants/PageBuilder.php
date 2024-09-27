@@ -89,8 +89,8 @@ class PageBuilder implements ShouldQueue
             $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
     
             // Log::info('HTML: ' . $html);
-            Log::info('Built: ' . $built);
-            Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $html);
+            // Log::info('Built: ' . $built);
+            // Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $html);
     
             $recommendation->update([
                 'status' => $this->name . '_completed',
@@ -100,8 +100,6 @@ class PageBuilder implements ShouldQueue
     
             // If there are more sections to build, dispatch a new instance of the job with a delay
             if ($built < $recommendation->sections_count) {
-                Log::info('More sections to build, resetting run, dispatching self...');
-    
                 $recommendation->runs = array_merge($recommendation->runs, [
                     $this->name => null,
                 ]);

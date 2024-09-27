@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
+use Exception;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ConfidentialityRuleQA;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
@@ -35,15 +36,21 @@ class UIAnalyzer implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
-        $focusScreenshotId = $file = $this->assistant->uploadFile(
-            url: $recommendation->metadata['focusScreenshot']
-        );
-
-        $comparisonScreenshotIds = [];
-        foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
-            $comparisonScreenshotIds[] = $this->assistant->uploadFile(
-                url: $comparisonScreenshot
+        // Upload the screenshots
+        try {
+            $focusScreenshotId = $this->assistant->uploadFile(
+                url: $recommendation->metadata['focusScreenshot']
             );
+    
+            $comparisonScreenshotIds = [];
+            foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
+                $comparisonScreenshotIds[] = $this->assistant->uploadFile(
+                    url: $comparisonScreenshot
+                );
+            }
+        } catch (Exception $e) {
+            $recommendation->update(['status' => $this->name . '_failed']);
+            return;
         }
 
         // Start the run if it hasn't been started yet
@@ -80,9 +87,8 @@ class UIAnalyzer implements ShouldQueue
         // Log the status
         Log::info($this->name . ': ' . $run['status']);
 
+        // Issue, end the job
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
-            // End the job
-            Log::info('Ending the job...');
             $recommendation->update(['status' => $this->name . '_' . $run['status']]);
             return;
         }
