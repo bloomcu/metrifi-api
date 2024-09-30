@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Dashboards\Traits\DashboardIsOrderable;
 use DDD\Domain\Analyses\Analysis;
@@ -58,16 +59,6 @@ class Dashboard extends Model
         return $this->hasMany(Analysis::class);
     }
 
-    /**
-     * Latest analyses associated with the dashboard.
-     *
-     * @return HasOne
-     */
-    // public function latestAnalysis()
-    // {
-    //     return $this->hasOne(Analysis::class)->latestOfMany();
-    // }
-
     public function medianAnalysis(): HasOne
     {
         return $this->hasOne(Analysis::class)->whereType('median')->latest();
@@ -76,5 +67,20 @@ class Dashboard extends Model
     public function maxAnalysis(): HasOne
     {
         return $this->hasOne(Analysis::class)->whereType('max')->latest();
+    }
+
+    /**
+     * Recommendations associated with the dashboard.
+     *
+     * @return HasMany
+     */
+    public function recommendations()
+    {
+        return $this->hasMany(Recommendation::class);
+    }
+
+    public function recommendation(): HasOne
+    {
+        return $this->hasOne(Recommendation::class)->latest();
     }
 }
