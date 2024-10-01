@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Http;
 use Google\ApiCore\ApiException;
 use DivisionByZeroError;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Funnels\Data\FunnelData;
+use DDD\Domain\Connections\Data\ConnectionData;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAuth;
 
@@ -20,7 +22,7 @@ class GoogleAnalyticsDataService
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
      * Valid dimensions and metrics: https://developers.google.com/analytics/devguides/reporting/data/v1/exploration-api-schema
      */
-    public function funnelReport(Funnel $funnel, String $startDate, String $endDate, ?Array $disabledSteps = [])
+    public function funnelReport(FunnelData $funnel, String $startDate, String $endDate, ?Array $disabledSteps = [])
     {
         $this->report = [
             'steps' => [],
@@ -49,31 +51,31 @@ class GoogleAnalyticsDataService
             }
 
             // Process each metric within the step.
-            foreach ($step['metrics'] as $metric) {
+            foreach ($step->metrics as $metric) {
                 // Structure the metric based on its type.
-                if ($metric['metric'] === 'pageUsers') {
+                if ($metric->metric === 'pageUsers') {
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                             'stringFilter' => [
-                                'value' => $metric['pagePath'],
+                                'value' => $metric->pagePath,
                                 'matchType' => 'EXACT'
                             ]
                         ]
                     ];
                 } 
-                elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
+                elseif ($metric->metric === 'pagePlusQueryStringUsers') {
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
                             'stringFilter' => [
-                                'value' => $metric['pagePathPlusQueryString'],
+                                'value' => $metric->pagePathPlusQueryString,
                                 'matchType' => 'EXACT',
                             ]
                         ]
                     ];
                 } 
-                elseif ($metric['metric'] === 'outboundLinkUsers') {
+                elseif ($metric->metric === 'outboundLinkUsers') {
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
                             'expressions' => [
@@ -81,7 +83,7 @@ class GoogleAnalyticsDataService
                                     'funnelFieldFilter' => [
                                         'fieldName' => 'linkUrl',
                                         'stringFilter' => [
-                                            'value' => $metric['linkUrl'],
+                                            'value' => $metric->linkUrl,
                                             'matchType' => 'EXACT',
                                         ]
                                     ]
@@ -90,7 +92,7 @@ class GoogleAnalyticsDataService
                                     'funnelFieldFilter' => [
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
-                                            'value' => $metric['pagePath'],
+                                            'value' => $metric->pagePath,
                                             'matchType' => 'EXACT',
                                         ]
                                     ]
@@ -99,7 +101,7 @@ class GoogleAnalyticsDataService
                         ]
                     ];
                 } 
-                elseif ($metric['metric'] === 'formUserSubmissions') {
+                elseif ($metric->metric === 'formUserSubmissions') {
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
                             'expressions' => [
@@ -116,7 +118,7 @@ class GoogleAnalyticsDataService
                                     'funnelFieldFilter' => [
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
-                                            'value' => $metric['pagePath'],
+                                            'value' => $metric->pagePath,
                                             'matchType' => 'EXACT',
                                         ]
                                     ]
@@ -129,7 +131,7 @@ class GoogleAnalyticsDataService
                                                 'eventParameterName' => 'form_destination',
                                                 'stringFilter' => [
                                                     'matchType' => 'EXACT',
-                                                    'value' => $metric['formDestination']
+                                                    'value' => $metric->formDestination
                                                 ]
                                             ]
                                         ]
@@ -143,7 +145,7 @@ class GoogleAnalyticsDataService
                                                 'eventParameterName' => 'form_id',
                                                 'stringFilter' => [
                                                     'matchType' => 'EXACT',
-                                                    'value' => $metric['formId']
+                                                    'value' => $metric->formId
                                                 ]
                                             ]
                                         ]
@@ -157,7 +159,7 @@ class GoogleAnalyticsDataService
                                                 'eventParameterName' => 'form_length',
                                                 'stringFilter' => [
                                                     'matchType' => 'EXACT',
-                                                    'value' => $metric['formLength']
+                                                    'value' => $metric->formLength
                                                 ]
                                             ]
                                         ]
@@ -171,7 +173,7 @@ class GoogleAnalyticsDataService
                                                 'eventParameterName' => 'form_submit_text',
                                                 'stringFilter' => [
                                                     'matchType' => 'EXACT',
-                                                    'value' => $metric['formSubmitText']
+                                                    'value' => $metric->formSubmitText
                                                 ]
                                             ]
                                         ]
@@ -185,7 +187,7 @@ class GoogleAnalyticsDataService
 
             // Add the structured step to the funnel report API request as a filter expression.
             $funnelSteps[] = [
-                'name' => $step['name'],
+                'name' => $step->name,
                 'filterExpression' => [
                     'orGroup' => [
                         'expressions' => $funnelFilterExpressionList
@@ -235,7 +237,7 @@ class GoogleAnalyticsDataService
              * Get users for each step
              */
             foreach ($funnel->steps as $index => $step) {
-                $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step['name']);
+                $users = $this->getReportRowUsers($gaFunnelReport['funnelTable']['rows'], $step->name);
 
                 // If the step is not in the report, that means it has 0 users.
                 if (!$users) {
@@ -247,10 +249,10 @@ class GoogleAnalyticsDataService
                     ]);
                 } else {
                     array_push($this->report['steps'], [
-                        'id' => $step['id'],
-                        'name' => $step['name'],
+                        'id' => $step->id,
+                        'name' => $step->name,
                         'users' => $users,
-                        'metrics' => $step['metrics']
+                        'metrics' => $step->metrics
                     ]);
                 }
             }
@@ -268,7 +270,7 @@ class GoogleAnalyticsDataService
             $this->calculateOverallConversionRate();
             
             // Add report to funnel
-            $funnel['report'] = $this->report;
+            $funnel->report = $this->report;
             // $funnel['gaReport'] = $gaFunnelReport;
 
             return $funnel;
@@ -753,7 +755,7 @@ class GoogleAnalyticsDataService
      * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
      */
     // TODO: Should this be a constructor, or a standalone class or helper?
-    private function setupAccessToken(Connection $connection)
+    private function setupAccessToken(ConnectionData $connection)
     {
         $validConnection = GoogleAuth::validateConnection($connection);
 
