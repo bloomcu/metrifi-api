@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Mockery;
 use Illuminate\Support\Facades\Http;
 use DDD\App\Services\GoogleAnalyticsData\GoogleAnalyticsDataService;
-use DDD\Domain\Connections\Connection; // Import the Connection model
+use DDD\Domain\Connections\Connection;
 
 class PageUsersTest extends TestCase
 {
@@ -14,7 +14,8 @@ class PageUsersTest extends TestCase
     {
         // Arrange
 
-        // Mock the Connection model
+        // Mock the Connection class
+        /** @var Connection $connection */
         $connection = Mockery::mock(Connection::class)->makePartial();
         $connection->uid = 'properties/123456789';
         $connection->token = [

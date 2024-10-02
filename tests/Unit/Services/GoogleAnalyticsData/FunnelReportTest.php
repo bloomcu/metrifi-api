@@ -50,6 +50,7 @@ class FunnelReportTest extends TestCase
         ];
 
         // Mock the Funnel class
+        /** @var Funnel $funnel */
         $funnel = Mockery::mock(Funnel::class)->makePartial();
         $funnel->steps = collect([$step1, $step2]);
         $funnel->connection = $connection;
