@@ -23,7 +23,9 @@ class RecommendationController extends Controller
 {
     public function index(Organization $organization, Dashboard $dashboard)
     {
-        return RecommendationResource::collection($dashboard->recommendations);
+        $recommendations = $dashboard->recommendations()->latest()->get();
+
+        return RecommendationResource::collection($recommendations);
     }
 
     public function store(
