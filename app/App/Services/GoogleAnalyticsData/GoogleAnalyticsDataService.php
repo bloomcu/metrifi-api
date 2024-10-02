@@ -220,15 +220,15 @@ class GoogleAnalyticsDataService
                 // Build report steps with no users
                 foreach ($funnel->steps as $index => $step) {
                     array_push($this->report['steps'], [
-                        'id' => $step['id'],
-                        'name' => $step['name'],
+                        'id' => $step->id,
+                        'name' => $step->name,
                         'users' => 0,
                         'conversionRate' => 0,
                     ]);
                 }
 
                 // Add report to funnel
-                $funnel['report'] = $this->report;
+                $funnel->report = $this->report;
 
                 return $funnel;
             }
@@ -365,14 +365,14 @@ class GoogleAnalyticsDataService
     /**
      * Get a list of pages and the number of users who visited them
      *
-     * @param Connection $connection
+     * @param ConnectionData $connection
      * @param [type] $startDate
      * @param [type] $endDate
      * @param array $exact
      * @param string $contains
      * @return void
      */
-    public function pageUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
+    public function pageUsers(ConnectionData $connection, $startDate, $endDate, $exact = [], $contains = '')
     {
         // Build filer expression(s)
         if ($exact && count($exact)) {
@@ -438,13 +438,13 @@ class GoogleAnalyticsDataService
     /**
      * Get a list of pages with query strings and the number of users who visited them
      *
-     * @param Connection $connection
+     * @param ConnectionData $connection
      * @param [type] $startDate
      * @param [type] $endDate
      * @param array $pagePathPlusQueryStrings
      * @return void
      */
-    public function pagePlusQueryStringUsers(Connection $connection, $startDate, $endDate, $contains = '')
+    public function pagePlusQueryStringUsers(ConnectionData $connection, $startDate, $endDate, $contains = '')
     {
         // Build filer expression(s)
         if ($contains) {
@@ -497,13 +497,13 @@ class GoogleAnalyticsDataService
     /**
      * Get a list of pages with outbound link clicks
      *
-     * @param Connection $connection
+     * @param ConnectionData $connection
      * @param [type] $startDate
      * @param [type] $endDate
      * @param [type] $linkUrls
      * @return void
      */
-    public function outboundLinkUsers(Connection $connection, $startDate, $endDate, $contains = '')
+    public function outboundLinkUsers(ConnectionData $connection, $startDate, $endDate, $contains = '')
     {
         // Build filer expression(s)
         if ($contains) {
@@ -554,14 +554,14 @@ class GoogleAnalyticsDataService
     /**
      * Get number of users who clicked on an outbound link from a specific page
      *
-     * @param Connection $connection
+     * @param ConnectionData $connection
      * @param [string] $startDate
      * @param [string] $endDate
      * @param [type] $linkUrls
      * @param [type] $sourcePagePath
      * @return void
      */
-    public function outboundLinkByPagePathUsers(Connection $connection, $startDate, $endDate, $linkUrls = null, $sourcePagePath)
+    public function outboundLinkByPagePathUsers(ConnectionData $connection, $startDate, $endDate, $linkUrls = null, $sourcePagePath)
     {
         $fullReport = $this->outboundLinkUsers($connection, $startDate, $endDate, $linkUrls);
 
@@ -609,12 +609,12 @@ class GoogleAnalyticsDataService
      * Tracking form submissions: https://ezsegment.com/automatic-form-interaction-tracking-in-ga4/
      * 
      * 
-     * @param Connection $connection
+     * @param ConnectionData $connection
      * @param [string] $startDate
      * @param [string] $endDate
      * @return void
      */
-    public function formUserSubmissions(Connection $connection, $startDate, $endDate, $contains = '')
+    public function formUserSubmissions(ConnectionData $connection, $startDate, $endDate, $contains = '')
     {
         // Build filer expression(s)
         if ($contains) {
@@ -734,7 +734,7 @@ class GoogleAnalyticsDataService
      * Docs: https://cloud.google.com/php/docs/reference/analytics-data/latest/Google.Analytics.Data.V1beta.BetaAnalyticsDataClient#_runReport
      * PHP Client: https://github.com/googleapis/php-analytics-data/blob/master/samples/V1beta/BetaAnalyticsDataClient/run_report.php
      */
-    public function runReport(Connection $connection, $params)
+    public function runReport(ConnectionData $connection, $params)
     {
         try {
             $accessToken = $this->setupAccessToken($connection);

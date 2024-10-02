@@ -9,15 +9,12 @@ use DDD\Domain\Funnels\Data\FunnelData;
 use DDD\Domain\Funnels\Data\StepData;
 use DDD\Domain\Funnels\Data\MetricData;
 use DDD\Domain\Connections\Data\ConnectionData;
-use Illuminate\Support\Collection;
 use Mockery;
 
-class GoogleAnalyticsDataServiceTest extends TestCase
+class FunnelReportTest extends TestCase
 {
-    public function testFunnelReport()
+    public function test_it_returns_a_funnel_report()
     {
-        // Arrange
-
         // Create metrics with named arguments
         $metric1 = new MetricData(
             metric: 'pageUsers',
