@@ -5,62 +5,55 @@ namespace Tests\Unit\Services\GoogleAnalyticsData;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Http;
 use DDD\App\Services\GoogleAnalyticsData\GoogleAnalyticsDataService;
-use DDD\Domain\Funnels\Data\FunnelData;
-use DDD\Domain\Funnels\Data\StepData;
-use DDD\Domain\Funnels\Data\MetricData;
-use DDD\Domain\Connections\Data\ConnectionData;
 use Mockery;
+use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Funnels\FunnelStep;
+use DDD\Domain\Connections\Connection;
 
 class FunnelReportTest extends TestCase
 {
     public function test_it_returns_a_funnel_report()
     {
-        // Create metrics with named arguments
-        $metric1 = new MetricData(
-            metric: 'pageUsers',
-            attributes: [
-                'pagePath' => '/home'
-            ]
-        );
+        // Arrange
 
-        $metric2 = new MetricData(
-            metric: 'formUserSubmissions',
-            attributes: [
-                'pagePath' => '/contact',
-                'formDestination' => '/thank-you',
-                'formId' => 'contact-form',
-                'formLength' => 'short',
-                'formSubmitText' => 'Submit'
-            ]
-        );
+        // Create metrics as associative arrays
+        $metric1 = [
+            'metric' => 'pageUsers',
+            'pagePath' => '/home',
+        ];
 
-        // Create steps with named arguments
-        $step1 = new StepData(
-            id: 'step1',
-            name: 'Homepage Visits',
-            metrics: collect([$metric1])
-        );
+        $metric2 = [
+            'metric' => 'formUserSubmissions',
+            'pagePath' => '/contact',
+            'formDestination' => '/thank-you',
+            'formId' => 'contact-form',
+            'formLength' => 'short',
+            'formSubmitText' => 'Submit'
+        ];
 
-        $step2 = new StepData(
-            id: 'step2',
-            name: 'Contact Form Submissions',
-            metrics: collect([$metric2])
-        );
+        // Mock the FunnelStep instances
+        $step1 = Mockery::mock(FunnelStep::class)->makePartial();
+        $step1->id = 'step1';
+        $step1->name = 'Homepage Visits';
+        $step1->metrics = collect([$metric1]);
 
-        // Create a connection object with named arguments
-        $connection = new ConnectionData(
-            uid: 'properties/123456789',
-            token: [
-                'access_token' => 'test_access_token'
-            ]
-        );
+        $step2 = Mockery::mock(FunnelStep::class)->makePartial();
+        $step2->id = 'step2';
+        $step2->name = 'Contact Form Submissions';
+        $step2->metrics = collect([$metric2]);
 
-        // Create the Funnel object with named arguments
-        $funnel = new FunnelData(
-            steps: collect([$step1, $step2]),
-            connection: $connection,
-            conversion_value: 100
-        );
+        // Mock the Connection model
+        $connection = Mockery::mock(Connection::class)->makePartial();
+        $connection->uid = 'properties/123456789';
+        $connection->token = [
+            'access_token' => 'test_access_token'
+        ];
+
+        // Mock the Funnel class
+        $funnel = Mockery::mock(Funnel::class)->makePartial();
+        $funnel->steps = collect([$step1, $step2]);
+        $funnel->connection = $connection;
+        $funnel->conversion_value = 100;
 
         $startDate = '2023-01-01';
         $endDate = '2023-01-31';
@@ -93,8 +86,8 @@ class FunnelReportTest extends TestCase
         ]);
 
         // Mock the GoogleAuth facade
-        $googleAuthMock = Mockery::mock('alias:DDD\App\Facades\Google\GoogleAuth');
-        $googleAuthMock->shouldReceive('validateConnection')
+        Mockery::mock('alias:DDD\App\Facades\Google\GoogleAuth')
+            ->shouldReceive('validateConnection')
             ->with($connection)
             ->andReturn((object)['token' => ['access_token' => 'test_access_token']]);
 

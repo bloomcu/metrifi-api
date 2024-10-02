@@ -5,20 +5,22 @@ namespace Tests\Unit\Services\GoogleAnalyticsData;
 use Tests\TestCase;
 use Mockery;
 use Illuminate\Support\Facades\Http;
-use DDD\Domain\Connections\Data\ConnectionData;
 use DDD\App\Services\GoogleAnalyticsData\GoogleAnalyticsDataService;
+use DDD\Domain\Connections\Connection; // Import the Connection model
 
 class PageUsersTest extends TestCase
 {
     public function test_it_returns_a_page_user_report()
     {
         // Arrange
-        $connection = new ConnectionData(
-            uid: 'properties/123456789',
-            token: [
-                'access_token' => 'test_access_token'
-                ]
-        );
+
+        // Mock the Connection model
+        $connection = Mockery::mock(Connection::class)->makePartial();
+        $connection->uid = 'properties/123456789';
+        $connection->token = [
+            'access_token' => 'test_access_token'
+        ];
+
         $startDate = '2023-01-01';
         $endDate = '2023-01-31';
         $exact = ['/home', '/contact'];
@@ -50,8 +52,8 @@ class PageUsersTest extends TestCase
         ]);
 
         // Mock the GoogleAuth facade
-        $googleAuthMock = Mockery::mock('alias:DDD\App\Facades\Google\GoogleAuth');
-        $googleAuthMock->shouldReceive('validateConnection')
+        Mockery::mock('alias:DDD\App\Facades\Google\GoogleAuth')
+            ->shouldReceive('validateConnection')
             ->with($connection)
             ->andReturn((object)['token' => ['access_token' => 'test_access_token']]);
 
