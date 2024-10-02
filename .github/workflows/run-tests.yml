@@ -26,3 +26,7 @@ jobs:
  
       - name: Run tests
         run: php artisan test
+
+      - name: Deploy staging
+        if: github.ref == 'refs/heads/staging'
+        run: curl ${{ secrets.ENVOYER_DEPLOY_WEBHOOK }}?sha=${{ github.sha }}
