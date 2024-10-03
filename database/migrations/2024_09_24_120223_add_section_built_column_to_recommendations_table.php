@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->integer('sections_built')->after('sections_count')->default(0);
+            if (!Schema::hasColumn('recommendations', 'sections_built')) {
+                $table->integer('sections_built')->after('sections_count')->default(0);
+            }
         });
     }
 

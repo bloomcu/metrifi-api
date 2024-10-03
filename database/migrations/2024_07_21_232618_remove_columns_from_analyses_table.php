@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('analyses', function (Blueprint $table) {
-            $table->dropColumn('bofi_step_name');
+            if (Schema::hasColumn('analyses', 'bofi_step_name')) {
+                $table->dropColumn('bofi_step_name');
+            }
         });
     }
 
