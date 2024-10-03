@@ -33,7 +33,6 @@ class RecommendationController extends Controller
         Dashboard $dashboard, 
         StoreRecommendationRequest $request, 
         AssistantService $assistant,
-        ScreenshotInterface $screenshotter
     ){
         $thread = $assistant->createThread();
 
@@ -41,18 +40,12 @@ class RecommendationController extends Controller
             'title' => $request->metadata['focus']['name'],
             'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
+            'prompt' => $request->prompt,
             'metadata' => $request->metadata,
         ]);
 
         // UIAnalyzer::dispatch($recommendation);
-        ScreenshotGrabber::dispatch($recommendation);
-
-        // Bus::chain([
-        //     UIAnalyzer::makeJob($recommendation),
-        //     ContentWriter::makeJob($recommendation),
-        //     ComponentPicker::makeJob($recommendation),
-        //     PageBuilder::makeJob($recommendation),
-        // ])->dispatch();
+        // ScreenshotGrabber::dispatch($recommendation);
 
         return new RecommendationResource($recommendation);
     }
