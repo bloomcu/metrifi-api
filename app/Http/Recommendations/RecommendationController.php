@@ -44,8 +44,7 @@ class RecommendationController extends Controller
             'metadata' => $request->metadata,
         ]);
 
-        // UIAnalyzer::dispatch($recommendation);
-        // ScreenshotGrabber::dispatch($recommendation);
+        ScreenshotGrabber::dispatch($recommendation);
 
         return new RecommendationResource($recommendation);
     }
