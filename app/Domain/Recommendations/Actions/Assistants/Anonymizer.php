@@ -12,11 +12,11 @@ use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class ConfidentialityRuleQA implements ShouldQueue
+class Anonymizer implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
-    public $name = 'confidentiality_rule_qa';
+    public $name = 'anonymizer';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;

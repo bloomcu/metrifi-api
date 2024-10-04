@@ -8,65 +8,46 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
-use Exception;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\Synthesizer;
-use DDD\App\Services\Screenshot\ScreenshotInterface;
+use DDD\Domain\Recommendations\Actions\Assistants\Anonymizer;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class UIAnalyzer implements ShouldQueue
+class Synthesizer implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $name = 'ui_analyzer';
+    public $name = 'synthesizer';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;
 
-    protected ScreenshotInterface $screenshotter;
     protected AssistantService $assistant;
 
-    public function __construct(ScreenshotInterface $screenshotter, AssistantService $assistant)
+    public function __construct(AssistantService $assistant)
     {
-        $this->screenshotter = $screenshotter;
         $this->assistant = $assistant;
     }
 
     function handle(Recommendation $recommendation)
     {
-        $recommendation->update(['status' => $this->name . '_in_progress']);
-
-        // Upload the screenshots
-        try {
-            $focusScreenshotId = $this->assistant->uploadFile(
-                url: $recommendation->metadata['focusScreenshot']
-            );
-    
-            $comparisonScreenshotIds = [];
-            foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
-                $comparisonScreenshotIds[] = $this->assistant->uploadFile(
-                    url: $comparisonScreenshot
-                );
-            }
-        } catch (Exception $e) {
-            $recommendation->update(['status' => $this->name . '_failed']);
+        if (!$recommendation->prompt) {
+            $recommendation->update(['status' => $this->name . '_completed']);
+            Anonymizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
+
+        $recommendation->update(['status' => $this->name . '_in_progress']);
 
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent files)',
-                fileIds: [
-                    $focusScreenshotId,
-                    ...$comparisonScreenshotIds,
-                ]
+                message: $recommendation->prompt,
             );
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
-                assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
+                assistantId: 'asst_x5feSpZ18zAMOayaItrTDMz9',
                 // maxPromptTokens: 2000,
                 // maxCompletionTokens: 2000,
             );
@@ -109,7 +90,7 @@ class UIAnalyzer implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
-            Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
+            Anonymizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
         

@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->integer('sections_count')->after('content')->nullable();
+            if (!Schema::hasColumn('recommendations', 'sections_built')) {
+                $table->integer('sections_built')->after('sections_count')->default(0);
+            }
         });
     }
 
@@ -26,7 +28,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->dropColumn('sections_count');
+            $table->dropColumn('sections_built');
         });
     }
 };

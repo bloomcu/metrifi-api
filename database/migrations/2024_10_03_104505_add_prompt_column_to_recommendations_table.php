@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->integer('sections_count')->after('content')->nullable();
+            $table->longText('prompt')->after('step_index')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('recommendations', function (Blueprint $table) {
-            $table->dropColumn('sections_count');
+            $table->dropColumn('prompt');
         });
     }
 };

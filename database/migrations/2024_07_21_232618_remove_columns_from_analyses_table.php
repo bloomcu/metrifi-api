@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('recommendations', function (Blueprint $table) {
-            $table->integer('sections_count')->after('content')->nullable();
+        Schema::table('analyses', function (Blueprint $table) {
+            if (Schema::hasColumn('analyses', 'bofi_step_name')) {
+                $table->dropColumn('bofi_step_name');
+            }
         });
     }
 
@@ -25,8 +27,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('recommendations', function (Blueprint $table) {
-            $table->dropColumn('sections_count');
+        Schema::table('analyses', function (Blueprint $table) {
+            $table->string('bofi_step_name')->after('bofi_step_index')->nullable();
         });
     }
 };

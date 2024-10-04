@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::table('analyses', function (Blueprint $table) {
             $table->dropColumn('subject_funnel_assets');
-            $table->dropColumn('bofi_step_name');
         });
     }
 
@@ -28,7 +27,6 @@ return new class extends Migration
     {
         Schema::table('analyses', function (Blueprint $table) {
             $table->decimal('subject_funnel_assets')->after('subject_funnel_performance')->nullable();
-            $table->string('bofi_step_name')->after('bofi_step_index')->nullable();
         });
     }
 };
