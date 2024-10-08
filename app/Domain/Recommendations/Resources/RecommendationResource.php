@@ -3,6 +3,7 @@
 namespace DDD\Domain\Recommendations\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use DDD\Domain\Users\Resources\UserResource;
 
 class RecommendationResource extends JsonResource
 {
@@ -17,6 +18,7 @@ class RecommendationResource extends JsonResource
         return [
             'id' => $this->id,
             'dashboard_id' => $this->dashboard_id,
+            'user' => new UserResource($this->user),
             'thread_id' => $this->thread_id,
             'runs' => $this->runs,
             'status' => $this->status ?? 'queued',

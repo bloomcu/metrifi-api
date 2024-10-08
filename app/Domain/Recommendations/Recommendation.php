@@ -5,12 +5,14 @@ namespace DDD\Domain\Recommendations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Dashboards\Dashboard;
+use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 
 class Recommendation extends Model
 {
     use HasFactory,
-        BelongsToOrganization;
+        BelongsToOrganization,
+        BelongsToUser;
 
     protected $guarded = [
         'id',
