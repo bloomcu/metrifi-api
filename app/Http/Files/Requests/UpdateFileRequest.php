@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Domain\Base\Files\Requests;
+namespace DDD\Http\Files\Requests;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Exception;
 
-class StoreFileRequest extends FormRequest
+class UpdateFileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,11 @@ class StoreFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|max:100000', // Max 100mb
+            'file' => 'nullable|max:100000', // Max 100mb
+            'folder_id' => 'nullable|integer',
+            'title' => 'nullable|string',
+            'alt' => 'nullable|string',
+            'description' => 'nullable|string',
         ];
     }
 

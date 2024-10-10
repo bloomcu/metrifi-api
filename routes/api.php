@@ -13,6 +13,7 @@ use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
 use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
+use DDD\Http\Files\FileController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
@@ -93,6 +94,15 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::delete('/{user}', [UserController::class, 'destroy']);
+        });
+
+        // Files
+        Route::prefix('files')->group(function () {
+            Route::get('/', [FileController::class, 'index']);
+            Route::post('/', [FileController::class, 'store']);
+            Route::get('/{file}', [FileController::class, 'show']);
+            Route::post('/{file}', [FileController::class, 'update']);
+            Route::delete('/{file}', [FileController::class, 'destroy']);
         });
 
         // Connections

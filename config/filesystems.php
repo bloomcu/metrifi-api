@@ -79,6 +79,7 @@ return [
             'folder' => env('DO_FOLDER'),
             'cdn_endpoint' => env('DO_CDN_ENDPOINT'),
             'url' => env('DO_URL'),
+            'visibility' => 'public',
             'endpoint' => env('DO_ENDPOINT'),
             'use_path_style_endpoint' => env('DO_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => env('DO_THROW', false),

@@ -1,15 +1,18 @@
 <?php
 
-namespace DDD\Http\Base\Files;
+namespace DDD\Http\Files;
 
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Support\Facades\Storage;
+use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use DDD\Http\Files\Resources\FileResource;
+use DDD\Http\Files\Requests\UpdateFileRequest;
+use DDD\Http\Files\Requests\StoreFileRequest;
 use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Base\Files\Resources\FileResource;
-use DDD\Domain\Base\Files\Requests\StoreFileRequest;
-use DDD\Domain\Base\Files\File;
+use DDD\Domain\Files\File;
+use DDD\Domain\Files\Actions\UpdateFileAction;
+use DDD\Domain\Files\Actions\StoreFileAction;
 use DDD\App\Controllers\Controller;
 
 class FileController extends Controller
@@ -18,6 +21,9 @@ class FileController extends Controller
     {
         $file = QueryBuilder::for(File::class)
             ->where('organization_id', $organization->id)
+            // ->allowedFilters([
+            //     AllowedFilter::exact('folder_id')
+            // ])
             ->latest()
             ->get();
 
@@ -26,19 +32,7 @@ class FileController extends Controller
 
     public function store(Organization $organization, StoreFileRequest $request)
     {
-        // Store file in storage
-        $disk = config('filesystems.default');
-        $path = $request->file->store($organization->slug, $disk);
-
-        // Store file in database
-        $file = $organization->files()->create([
-            'path' => $path,
-            'name' => pathinfo($request->file->getClientOriginalName(), PATHINFO_FILENAME),
-            'filename' => basename($path),
-            'extension' => $request->file->extension(),
-            'mime' => $request->file->getMimeType(),
-            'disk' => $disk,
-        ]);
+        $file = StoreFileAction::run($organization, $request->file);
 
         return new FileResource($file);
     }
@@ -48,13 +42,16 @@ class FileController extends Controller
         return new FileResource($file);
     }
 
+    public function update(Organization $organization, File $file, UpdateFileRequest $request)
+    {
+        $file = UpdateFileAction::run($file, $request->file);
+
+        return new FileResource($file);
+    }
+
     public function destroy(Organization $organization, File $file): JsonResponse
     {
-        // Remove database record
         $file->delete();
-
-        // Remove file from storage
-        Storage::delete($file->path);
 
         return response()->json(['message' => 'File destroyed'], 200);
     }
