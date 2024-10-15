@@ -6,6 +6,7 @@ namespace DDD\Domain\Files;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use DDD\Domain\Recommendations\Recommendation;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 
@@ -35,5 +36,10 @@ class File extends Model
     public function getStorageUrl()
     {
         return config('cdn.cdn_url') . '/' . $this->filename;
+    }
+
+    public function recommendations()
+    {
+        return $this->belongsToMany(Recommendation::class, 'recommendation_files');
     }
 }

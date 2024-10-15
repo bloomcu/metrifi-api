@@ -34,15 +34,15 @@ class RecommendationController extends Controller
         StoreRecommendationRequest $request, 
         AssistantService $assistant,
     ){
-        $thread = $assistant->createThread();
+        // $thread = $assistant->createThread();
 
         $recommendation = $dashboard->recommendations()->create([
             // 'status' => $request->status ?? 'queued',
             'title' => $request->metadata['focus']['name'],
-            'thread_id' => $thread['id'],
+            // 'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
-            'file_ids' => $request->file_ids,
+            // 'file_ids' => $request->file_ids,
             'metadata' => $request->metadata,
         ]);
 

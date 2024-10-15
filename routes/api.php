@@ -5,6 +5,7 @@ use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
@@ -89,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
     });
 
-    Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
+    Route::prefix('{organization:slug}')->group(function() {
         // Users
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
@@ -181,6 +182,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
+        });
+
+        // Recommendation files
+        Route::prefix('/recommendations')->group(function() {
+            Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
         });
     }); 
 });

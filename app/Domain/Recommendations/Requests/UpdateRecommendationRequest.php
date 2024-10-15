@@ -31,7 +31,7 @@ class UpdateRecommendationRequest extends FormRequest
             'period' => 'nullable|string',
             'step_index' => 'nullable|integer',
             'prompt' => 'nullable|string',
-            'file_ids' => 'nullable|array',
+            // 'file_ids' => 'nullable|array',
             'metadata' => 'nullable|array',
         ];
     }
