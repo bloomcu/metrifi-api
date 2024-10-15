@@ -21,17 +21,13 @@ class Recommendation extends Model
     protected $casts = [
         'runs' => 'array',
         'metadata' => 'array',
+        'file_ids' => 'array',
     ];
-
+    
     protected $attributes = [
         'runs' => '[]',
     ];
 
-    /**
-     * Dashboard this recommendation belongs to.
-     *
-     * @return BelongsTo
-     */
     public function dashboard()
     {
         return $this->belongsTo(Dashboard::class);

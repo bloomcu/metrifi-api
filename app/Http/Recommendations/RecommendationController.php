@@ -37,26 +37,22 @@ class RecommendationController extends Controller
         $thread = $assistant->createThread();
 
         $recommendation = $dashboard->recommendations()->create([
+            // 'status' => $request->status ?? 'queued',
             'title' => $request->metadata['focus']['name'],
             'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
+            'file_ids' => $request->file_ids,
             'metadata' => $request->metadata,
         ]);
 
-        ScreenshotGrabber::dispatch($recommendation);
+        // ScreenshotGrabber::dispatch($recommendation);
 
         return new RecommendationResource($recommendation);
     }
 
     public function show(Organization $organization, Dashboard $dashboard, AssistantService $assistant, Recommendation $recommendation)
     {
-        // $message = $assistant->getFinalMessage(threadId: $recommendation->thread_id);
-        // return $message;
-        // $result = preg_match('/<body[^>]*>(.*?)<\/body>/is', $message, $matches);
-        // return $result;
-
-
         return new RecommendationResource($recommendation);
     }
 

@@ -29,6 +29,7 @@ class RecommendationResource extends JsonResource
             'reference' => $this->reference,
             'step_index' => $this->step_index,
             'prompt' => $this->prompt,
+            'file_ids' => $this->file_ids,
             'metadata' => $this->metadata,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
