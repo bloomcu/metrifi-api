@@ -23,7 +23,7 @@ class StoreFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|mimes:jpg,jpeg,png,gif,webp,svg,ico,pdf,mp4,mov,webm,mpeg|max:30000', // Max 30mb
+            'file' => 'required|mimes:jpg,jpeg,png,gif,webp,svg,pdf,mp4,mov,webm,mpeg,html,css,js|max:30000', // Max 30mb
             'folder_id' => 'nullable|integer',
         ];
     }
