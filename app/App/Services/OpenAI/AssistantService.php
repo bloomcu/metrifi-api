@@ -4,6 +4,7 @@ namespace DDD\App\Services\OpenAI;
 
 use OpenAI\Laravel\Facades\OpenAI;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class AssistantService
@@ -203,18 +204,18 @@ class AssistantService
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
-    public function uploadFile(string $url) {
+    public function uploadFile(string $url, string $name, string $extension) {
         // Download the image
         $client = new Client();
         $response = $client->get($url);
         $imageContent = $response->getBody()->getContents();
 
         // Save the image temporarily
-        $tempImagePath = storage_path('app/screenshot.png');
+        // $tempImagePath = storage_path('app/screenshot.png');
+        $tempImagePath = storage_path('app/' . $name . '_' . uniqid() . '.' . $extension);
         file_put_contents($tempImagePath, $imageContent);
 
         try {
-            // Upload file
             $response = OpenAI::files()->upload([
                 'purpose' => 'vision',
                 'file' => fopen($tempImagePath, 'r')
@@ -225,7 +226,10 @@ class AssistantService
 
             return $response->id;
         } catch (Exception $e) {
-            throw $e;
+            // Log the error details
+            Log::error("OpenAI API error:", ['errorData' => $e]);
+
+            throw $e; // Rethrow the exception if you want it to propagate
         }
     }
 
