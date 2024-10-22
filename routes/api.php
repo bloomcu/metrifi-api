@@ -5,6 +5,7 @@ use DDD\Http\Users\UserController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
@@ -13,6 +14,7 @@ use DDD\Http\Funnels\FunnelSearchController;
 use DDD\Http\Funnels\FunnelReplicateController;
 use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
+use DDD\Http\Files\FileController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
@@ -88,11 +90,20 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
     });
 
-    Route::prefix('{organization:slug}')->scopeBindings()->group(function() {
+    Route::prefix('{organization:slug}')->group(function() {
         // Users
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::delete('/{user}', [UserController::class, 'destroy']);
+        });
+
+        // Files
+        Route::prefix('files')->group(function () {
+            Route::get('/', [FileController::class, 'index']);
+            Route::post('/', [FileController::class, 'store']);
+            Route::get('/{file}', [FileController::class, 'show']);
+            Route::post('/{file}', [FileController::class, 'update']);
+            Route::delete('/{file}', [FileController::class, 'destroy']);
         });
 
         // Connections
@@ -171,6 +182,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
+        });
+
+        // Recommendation files
+        Route::prefix('/recommendations')->group(function() {
+            Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
         });
     }); 
 });

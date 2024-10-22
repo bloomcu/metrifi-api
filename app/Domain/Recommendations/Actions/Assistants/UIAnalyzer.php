@@ -34,18 +34,44 @@ class UIAnalyzer implements ShouldQueue
 
     function handle(Recommendation $recommendation)
     {
+        // Refresh the recommendation so we get the file ids
+        $recommendation = $recommendation->fresh();
+
+        // Set status to in progress
         $recommendation->update(['status' => $this->name . '_in_progress']);
+
+        // Upload the additional information files
+        try {
+            $files = [];
+            foreach ($recommendation->files as $file) {
+                Log::info('PDF', ['pdf' => $file->getStorageUrl()]);
+
+                $files[] = $this->assistant->uploadFile(
+                    url: $file->getStorageUrl(),
+                    name: 'additional_information',
+                    extension: $file->extension
+                );
+            }
+        } catch (Exception $e) {
+            $recommendation->update(['status' => $this->name . '_failed']);
+            Log::info('UIAnalyzer: Failed to upload additional information files');
+            return;
+        }
 
         // Upload the screenshots
         try {
             $focusScreenshotId = $this->assistant->uploadFile(
-                url: $recommendation->metadata['focusScreenshot']
+                url: $recommendation->metadata['focusScreenshot'],
+                name: 'screenshot',
+                extension: 'png'
             );
     
             $comparisonScreenshotIds = [];
             foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
                 $comparisonScreenshotIds[] = $this->assistant->uploadFile(
-                    url: $comparisonScreenshot
+                    url: $comparisonScreenshot,
+                    name: 'screenshot',
+                    extension: 'png'
                 );
             }
         } catch (Exception $e) {
@@ -57,10 +83,11 @@ class UIAnalyzer implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent files)',
+                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent ' . count($comparisonScreenshotIds) . ' files). Any remaining files attached are additional information for your consideration (there are ' . count($files) . ' additional files).',
                 fileIds: [
                     $focusScreenshotId,
                     ...$comparisonScreenshotIds,
+                    ...$files,
                 ]
             );
     

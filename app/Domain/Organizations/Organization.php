@@ -19,7 +19,7 @@ use DDD\Domain\Connections\Connection;
 use DDD\Domain\Base\Teams\Team;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use DDD\Domain\Base\Invitations\Invitation;
-use DDD\Domain\Base\Files\File;
+use DDD\Domain\Files\File;
 use DDD\App\Traits\HasSlug;
 
 class Organization extends Model {

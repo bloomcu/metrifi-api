@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\Domain\Base\Files\Requests;
+namespace DDD\Http\Files\Requests;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,7 +23,9 @@ class StoreFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|max:100000', // Max 100mb
+            // 'file' => 'required|mimes:jpg,jpeg,png,gif,webp,svg,pdf,mp4,mov,webm,mpeg,html,css,js|max:30000', // Max 30mb
+            'file' => 'required|mimes:jpg,jpeg,png,gif,webp|max:30000', // Max 30mb
+            'folder_id' => 'nullable|integer',
         ];
     }
 
