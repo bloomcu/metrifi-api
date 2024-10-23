@@ -27,8 +27,8 @@ class StripeController extends Controller
                 ],
             ],
             'mode' => 'subscription',
-            'success_url' => 'http://localhost:3000/' . $organization->slug . '/settings/billing?success=true',
-            'cancel_url'  => 'http://localhost:3000/' . $organization->slug . '/settings/billing?cancel=true',
+            'success_url' => 'https://staging.metrifi.com/' . $organization->slug . '/settings/billing?success=true',
+            'cancel_url'  => 'https://staging.metrifi.com/' . $organization->slug . '/settings/billing?cancel=true',
         ]);
 
         // return redirect()->away($session->url);
