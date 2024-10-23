@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Users\UserController;
+use DDD\Http\Stripe\StripeController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
@@ -91,6 +92,15 @@ Route::middleware('auth:sanctum')->group(function() {
     });
 
     Route::prefix('{organization:slug}')->group(function() {
+        // Stripe
+        Route::prefix('stripe')->group(function() {
+            // Route::get('/checkout', [StripeController::class, 'checkout']);
+            Route::post('/test', [StripeController::class, 'test']);
+            // Route::post('/live', [StripeController::class, 'live']);
+            // Route::get('/success', [StripeController::class, 'success']);
+            // Route::get('/fail', [StripeController::class, 'fail']);
+        });
+
         // Users
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
