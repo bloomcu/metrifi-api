@@ -29,6 +29,7 @@
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-query-builder": "^5.1",
         "staudenmeir/laravel-adjacency-list": "^1.13",
+        "stripe/stripe-php": "^10.21",
         "symfony/http-client": "^6.2",
         "symfony/mailgun-mailer": "^6.2"
     },

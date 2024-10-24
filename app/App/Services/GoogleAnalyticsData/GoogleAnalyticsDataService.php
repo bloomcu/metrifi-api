@@ -225,6 +225,9 @@ class GoogleAnalyticsDataService
                     ]);
                 }
 
+                // Remove disabled steps from report
+                $this->removeDisabledSteps($funnel, $disabledSteps);
+
                 // Add report to funnel
                 $funnel['report'] = $this->report;
 
@@ -289,8 +292,12 @@ class GoogleAnalyticsDataService
                 // Find the index of the step
                 $index = $this->getStepIndex($this->report['steps'], $step['id']);
 
+                if ($index !== false && $index >= 0) {
+                    array_splice($this->report['steps'], $index, 1);
+                }
+
                 // Remove the step from the report
-                array_splice($this->report['steps'], $index, 1);
+                // array_splice($this->report['steps'], $index, 1);
             }
         }
     }
