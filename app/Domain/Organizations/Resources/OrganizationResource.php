@@ -2,6 +2,7 @@
 
 namespace DDD\Domain\Organizations\Resources;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Domain\Base\Subscriptions\Plans\Resources\PlanResource;
 
@@ -25,9 +26,13 @@ class OrganizationResource extends JsonResource
             'automation_msg' => $this->automation_msg,
             'onboarding' => $this->onboarding,
             'assets' => $this->assets,
-            // 'subscribed' => $this->subscribed('default'),
+            'subscribed' => $this->subscribed('default'),
             // 'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
-            // 'plan' => new PlanResource($this->plan),
+            // 'subscription_renews_at' => Carbon::createFromTimeStamp($this->subscription('default')->asStripeSubscription()->current_period_end),
+            'subscription_renews_at' => $this->when($this->subscribed('default'), function () {
+                return Carbon::createFromTimeStamp($this->subscription('default')->asStripeSubscription()->current_period_end);
+            }),
+            'plan' => new PlanResource($this->plan),
             // 'created_at' => $this->created_at,
         ];
     }
