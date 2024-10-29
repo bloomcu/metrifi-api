@@ -2,6 +2,7 @@
 
 namespace DDD\App\Console;
 
+use DDD\App\Console\Commands\SyncRecommendationOrgs;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Scheduling\Schedule;
 use DDD\Domain\Admin\Commands\AnalyzeAllDashboardsCommand;
@@ -14,6 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        SyncRecommendationOrgs::class,
         AnalyzeAllDashboardsCommand::class,
     ];
 
@@ -24,10 +26,7 @@ class Kernel extends ConsoleKernel
     {
         // cd /home/forge/staging-api.metrifi && php artisan schedule:run
         // php /home/forge/staging-api.metrifi/artisan schedule:run
-
         $schedule->command('admin:analyze-all-dashboards')->dailyAt('02:00')->timezone('America/Denver'); // 00:00 is midnight
-        // $schedule->command('admin:analyze-all-dashboards')->dailyAt('02:00'); // 2:00 AM UTC (https://www.timeanddate.com/worldclock/timezone/utc)
-        // $schedule->command('admin:analyze-all-dashboards')->dailyAt('17:00')->timezone('America/Denver'); // https://www.timeanddate.com/worldclock/timezone/utc
     }
 
     /**

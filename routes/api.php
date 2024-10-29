@@ -8,6 +8,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
+use DDD\Http\Organizations\OrganizationSubscriptionController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
@@ -46,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
         Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
         Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+
+        // Subscription
+        Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
     });
 
     // Benchmarks
