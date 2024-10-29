@@ -38,6 +38,7 @@ class RecommendationController extends Controller
 
         $recommendation = $dashboard->recommendations()->create([
             // 'status' => $request->status ?? 'queued',
+            'organization_id' => $organization->id,
             'title' => $request->metadata['focus']['name'],
             'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
