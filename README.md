@@ -19,6 +19,11 @@ Restart workers
 php artisan queue:restart
 ```
 
+Expose app using Herd
+```
+expose share http://metrifi-api.test
+```
+
 ## Install Locally
 
 **Step 1:** Clone this repository
