@@ -13,7 +13,9 @@ use DDD\Domain\Users\User;
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature');
+uses(Tests\TestCase::class)
+    ->beforeEach(fn() => $this->seed(\Database\Seeders\DatabaseSeeder::class))
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
