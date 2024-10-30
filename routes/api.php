@@ -98,11 +98,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::prefix('{organization:slug}')->group(function() {
         // Stripe
         Route::prefix('stripe')->group(function() {
-            // Route::get('/checkout', [StripeController::class, 'checkout']);
             Route::post('/checkout', [StripeController::class, 'checkout']);
-            // Route::post('/live', [StripeController::class, 'live']);
-            // Route::get('/success', [StripeController::class, 'success']);
-            // Route::get('/fail', [StripeController::class, 'fail']);
+            Route::post('/cancel', [StripeController::class, 'cancel']);
         });
 
         // Users

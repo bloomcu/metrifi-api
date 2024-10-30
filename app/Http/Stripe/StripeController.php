@@ -15,6 +15,17 @@ class StripeController extends Controller
             'cancel_url' => 'https://staging.metrifi.com/' . $organization->slug . '/settings/billing?cancel=true',
         ]);
 
-        return response()->json(['redirect_url' => $session->url]);
+        return response()->json([
+            'redirect_url' => $session->url
+        ]);
+    }
+
+    public function cancel(Organization $organization)
+    {
+        $organization->subscription('default')->cancel();
+
+        return response()->json([
+            'message' => 'Subscription canceled successfully',
+        ]);
     }
 }

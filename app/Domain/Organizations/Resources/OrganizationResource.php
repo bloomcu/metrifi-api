@@ -34,7 +34,7 @@ class OrganizationResource extends JsonResource
             // 'subscription_renews_at' => $this->when($this->subscribed('default'), function () {
             //     return Carbon::createFromTimeStamp($this->subscription('default')->asStripeSubscription()->current_period_end);
             // }),
-            'plan' => new PlanResource($this->plan),
+            // 'plan' => new PlanResource($this->plan),
             // 'created_at' => $this->created_at,
         ];
     }
