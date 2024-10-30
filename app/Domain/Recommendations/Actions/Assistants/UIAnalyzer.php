@@ -40,24 +40,6 @@ class UIAnalyzer implements ShouldQueue
         // Set status to in progress
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
-        // Upload the additional information files
-        try {
-            $files = [];
-            foreach ($recommendation->files as $file) {
-                Log::info('PDF', ['pdf' => $file->getStorageUrl()]);
-
-                $files[] = $this->assistant->uploadFile(
-                    url: $file->getStorageUrl(),
-                    name: 'additional_information',
-                    extension: $file->extension
-                );
-            }
-        } catch (Exception $e) {
-            $recommendation->update(['status' => $this->name . '_failed']);
-            Log::info('UIAnalyzer: Failed to upload additional information files');
-            return;
-        }
-
         // Upload the screenshots
         try {
             $focusScreenshotId = $this->assistant->uploadFile(
@@ -83,19 +65,16 @@ class UIAnalyzer implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent ' . count($comparisonScreenshotIds) . ' files). Any remaining files attached are additional information for your consideration (there are ' . count($files) . ' additional files).',
+                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent ' . count($comparisonScreenshotIds) . ' files).',
                 fileIds: [
                     $focusScreenshotId,
                     ...$comparisonScreenshotIds,
-                    ...$files,
                 ]
             );
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
-                // maxPromptTokens: 2000,
-                // maxCompletionTokens: 2000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -112,7 +91,7 @@ class UIAnalyzer implements ShouldQueue
         );
 
         // Log the status
-        Log::info($this->name . ': ' . $run['status']);
+        // Log::info($this->name . ': ' . $run['status']);
 
         // Issue, end the job
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
@@ -121,13 +100,11 @@ class UIAnalyzer implements ShouldQueue
         }
 
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
-            // Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
-            if (isset($run['usage'])) {
-                Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-                Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-                Log::info('Current time: ' . now());
-            }
+            // if (isset($run['usage'])) {
+            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+            //     Log::info('Current time: ' . now());
+            // }
 
             // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));

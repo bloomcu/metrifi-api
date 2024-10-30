@@ -37,13 +37,11 @@ class RecommendationController extends Controller
         $thread = $assistant->createThread();
 
         $recommendation = $dashboard->recommendations()->create([
-            // 'status' => $request->status ?? 'queued',
             'organization_id' => $organization->id,
             'title' => $request->metadata['focus']['name'],
             'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
-            // 'file_ids' => $request->file_ids,
             'metadata' => $request->metadata,
         ]);
 

@@ -61,7 +61,7 @@ class ContentWriter implements ShouldQueue
         );
 
         // Log the status
-        Log::info($this->name . ': ' . $run['status']);
+        // Log::info($this->name . ': ' . $run['status']);
 
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
             // End the job
@@ -71,13 +71,11 @@ class ContentWriter implements ShouldQueue
         }
 
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
-            // Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
-            if (isset($run['usage'])) {
-                Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-                Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-                Log::info('Current time: ' . now());
-            }
+            // if (isset($run['usage'])) {
+            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+            //     Log::info('Current time: ' . now());
+            // }
 
             // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
