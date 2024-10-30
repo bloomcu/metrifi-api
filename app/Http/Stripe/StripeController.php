@@ -25,6 +25,15 @@ class StripeController extends Controller
         ]);
     }
 
+    public function billing(Organization $organization)
+    {
+        $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
+
+        return response()->json([
+            'redirect_url' => $redirect
+        ]);
+    }
+
     public function cancel(Organization $organization)
     {
         $organization->subscription('default')->cancelNow();

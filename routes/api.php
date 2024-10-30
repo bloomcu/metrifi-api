@@ -99,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function() {
         // Stripe
         Route::prefix('stripe')->group(function() {
             Route::post('/checkout', [StripeController::class, 'checkout']);
+            Route::post('/billing', [StripeController::class, 'billing']);
             Route::post('/cancel', [StripeController::class, 'cancel']);
         });
 
