@@ -27,19 +27,40 @@ class StripeController extends Controller
 
     public function billing(Organization $organization)
     {
+        // Staging
         $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
+
+        // Local
+        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
 
         return response()->json([
             'redirect_url' => $redirect
         ]);
     }
 
-    public function cancel(Organization $organization)
+    public function update(Organization $organization)
     {
-        $organization->subscription('default')->cancelNow();
+        // Staging
+        $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
+
+        // Local
+        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
 
         return response()->json([
-            'message' => 'Subscription canceled successfully',
+            'redirect_url' => $redirect . '/subscriptions/' . $organization->subscription('default')->stripe_id . '/update',
+        ]);
+    }
+
+    public function cancel(Organization $organization)
+    {
+        // Staging
+        $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
+
+        // Local
+        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
+
+        return response()->json([
+            'redirect_url' => $redirect . '/subscriptions/' . $organization->subscription('default')->stripe_id . '/cancel',
         ]);
     }
 }

@@ -76,7 +76,7 @@ class Organization extends Model {
             Plan::class, Subscription::class,
             'organization_id', 'stripe_price_id', 'id', 'stripe_price'
         )
-            ->whereNull('subscriptions.ends_at') // Not being cancelled
+            ->where('stripe_status', '=', 'active')
             ->withDefault(Plan::free()->toArray());
     }
 

@@ -29,7 +29,7 @@ class OrganizationSubscriptionController extends Controller
                 'started_at' => $startedAt,
                 'renews_at' => $renewsAt,
                 'recommendations_used' => $recommendationsUsed,
-                // 'ends_at' => Carbon::createFromTimeStamp($organization->subscription('default')->ends_at),
+                'ends_at' => $organization->subscription('default')->ends_at,
             ]);
 
         } else {
@@ -50,7 +50,7 @@ class OrganizationSubscriptionController extends Controller
                 'started_at' => $startedAt,
                 'renews_at' => $renewsAt,
                 'recommendations_used' => $recommendationsUsed,
-                // 'ends_at' => Carbon::createFromTimeStamp($organization->subscription('default')->ends_at),
+                'ends_at' => null,
             ]);
         }
     }
