@@ -24,10 +24,10 @@ class CountUsers extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle()
     {
         $count = User::count();
 
-        $this->info('Total users: '.$count);
+        $this->info('Total users: ' . $count);
     }
 }

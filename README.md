@@ -19,6 +19,16 @@ Restart workers
 php artisan queue:restart
 ```
 
+Expose app using Herd
+```
+expose share http://metrifi-api.test
+```
+
+Stripe webhook example
+```
+https://SESSION_ID.sharedwithexpose.com/stripe/webhook
+```
+
 ## Install Locally
 
 **Step 1:** Clone this repository

@@ -59,7 +59,7 @@ class PageBuilder implements ShouldQueue
         );
 
         // Log the status
-        Log::info($this->name . ': ' . $run['status']);
+        // Log::info($this->name . ': ' . $run['status']);
 
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'expired'])) {
             // End the job
@@ -69,13 +69,11 @@ class PageBuilder implements ShouldQueue
         }
 
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // Log::info($this->name . ' prompt tokens allowed: ' . $run['max_prompt_tokens']);
-            // Log::info($this->name . ' completion tokens allowed: ' . $run['max_completion_tokens']);
-            if (isset($run['usage'])) {
-                Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-                Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-                Log::info('Current time: ' . now());
-            }
+            // if (isset($run['usage'])) {
+            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
+            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
+            //     Log::info('Current time: ' . now());
+            // }
 
             // Dispatch a new instance of the job with a delay to check int
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
@@ -84,13 +82,8 @@ class PageBuilder implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $built = $recommendation->sections_built + 1;
-            // $status = $built < $recommendation->sections_count ? $this->name . '_in_progress' : $this->name . '_completed';
             $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
             $html = preg_match('/```html(.*?)```/s', $message, $matches) ? $matches[1] : '';
-    
-            // Log::info('HTML: ' . $html);
-            // Log::info('Built: ' . $built);
-            // Log::info('Prototype: ' . $recommendation->prototype . '\n\n' . $html);
     
             $recommendation->update([
                 'status' => $this->name . '_completed',

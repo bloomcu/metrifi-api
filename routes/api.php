@@ -8,6 +8,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
+use DDD\Http\Organizations\OrganizationSubscriptionController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
@@ -46,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
         Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
         Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+
+        // Subscription
+        Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
     });
 
     // Benchmarks
@@ -94,11 +98,10 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::prefix('{organization:slug}')->group(function() {
         // Stripe
         Route::prefix('stripe')->group(function() {
-            // Route::get('/checkout', [StripeController::class, 'checkout']);
-            Route::post('/test', [StripeController::class, 'test']);
-            // Route::post('/live', [StripeController::class, 'live']);
-            // Route::get('/success', [StripeController::class, 'success']);
-            // Route::get('/fail', [StripeController::class, 'fail']);
+            Route::post('/checkout', [StripeController::class, 'checkout']);
+            Route::post('/billing', [StripeController::class, 'billing']);
+            Route::post('/update', [StripeController::class, 'update']);
+            Route::post('/cancel', [StripeController::class, 'cancel']);
         });
 
         // Users
