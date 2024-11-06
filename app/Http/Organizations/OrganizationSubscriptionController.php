@@ -41,13 +41,13 @@ class OrganizationSubscriptionController extends Controller
 
             // Check for a subscription schedule
             $upcomingPlan = null;
-            $upcomingPlanStartDate = null;
+            $upcomingPlanStartAt = null;
             if ($subscription->schedule) {
                 $schedule = SubscriptionSchedule::retrieve($subscription->schedule);
                 $upcomingPhase = $schedule->phases[count($schedule->phases) - 1];
                 
                 $upcomingPlan = Plan::where('stripe_price_id', $upcomingPhase->plans[0]->price)->value('title');
-                $upcomingPlanStartDate = $upcomingPhase->start_date;
+                $upcomingPlanStartAt = Carbon::createFromTimeStamp($upcomingPhase->start_date);
             }
 
             return response()->json([
@@ -58,7 +58,7 @@ class OrganizationSubscriptionController extends Controller
                 'recommendations_used' => $recommendationsUsed,
                 'ends_at' => $organization->subscription('default')->ends_at,
                 'upcoming_plan' => $upcomingPlan,
-                'upcoming_plan_start_date' => $upcomingPlanStartDate,
+                'upcoming_plan_start_at' => $upcomingPlanStartAt,
             ]);
 
         } else {

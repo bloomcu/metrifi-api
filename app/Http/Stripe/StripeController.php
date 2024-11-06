@@ -12,16 +12,16 @@ class StripeController extends Controller
     {
         $session = $organization->newSubscription('default', $request->price_id)->checkout([
             // Production
-            'success_url' => 'https://app.metrifi.com/' . $organization->slug . '/settings/billing?success=true',
-            'cancel_url' => 'https://app.metrifi.com/' . $organization->slug . '/settings/billing?cancel=true',
+            // 'success_url' => 'https://app.metrifi.com/' . $organization->slug . '/settings/billing?success=true',
+            // 'cancel_url' => 'https://app.metrifi.com/' . $organization->slug . '/settings/billing?cancel=true',
 
             // // Staging
             // 'success_url' => 'https://staging.metrifi.com/' . $organization->slug . '/settings/billing?success=true',
             // 'cancel_url' => 'https://staging.metrifi.com/' . $organization->slug . '/settings/billing?cancel=true',
 
             // Local
-            // 'success_url' => 'http://localhost:3000/' . $organization->slug . '/settings/billing?success=true',
-            // 'cancel_url' => 'http://localhost:3000/' . $organization->slug . '/settings/billing?cancel=true',
+            'success_url' => 'http://localhost:3000/' . $organization->slug . '/settings/billing?success=true',
+            'cancel_url' => 'http://localhost:3000/' . $organization->slug . '/settings/billing?cancel=true',
         ]);
 
         return response()->json([
@@ -32,13 +32,13 @@ class StripeController extends Controller
     public function billing(Organization $organization)
     {
         // Production
-        $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
+        // $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // // Staging
         // $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // Local
-        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
+        $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
 
         return response()->json([
             'redirect_url' => $redirect
@@ -48,13 +48,13 @@ class StripeController extends Controller
     public function update(Organization $organization)
     {
         // Production
-        $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
+        // $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // // Staging
         // $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // Local
-        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
+        $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
 
         return response()->json([
             'redirect_url' => $redirect . '/subscriptions/' . $organization->subscription('default')->stripe_id . '/update',
@@ -64,13 +64,13 @@ class StripeController extends Controller
     public function cancel(Organization $organization)
     {
         // Production
-        $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
+        // $redirect = $organization->billingPortalUrl('https://app.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // Staging
         // $redirect = $organization->billingPortalUrl('https://staging.metrifi.com/' . $organization->slug . '/settings/billing');
 
         // Local
-        // $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
+        $redirect = $organization->billingPortalUrl('http://localhost:3000/' . $organization->slug . '/settings/billing');
 
         return response()->json([
             'redirect_url' => $redirect . '/subscriptions/' . $organization->subscription('default')->stripe_id . '/cancel',
