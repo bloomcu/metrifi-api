@@ -44,6 +44,10 @@ class Synthesizer implements ShouldQueue
         try {
             $files = [];
             foreach ($recommendation->files as $file) {
+                if ($file->pivot->type !== 'additional-information') {
+                    continue;
+                }
+
                 $files[] = $this->assistant->uploadFile(
                     url: $file->getStorageUrl(),
                     name: 'additional_information',
@@ -56,13 +60,43 @@ class Synthesizer implements ShouldQueue
             return;
         }
 
+        // Upload the secret shopper files
+        try {
+            $secretShopperFiles = [];
+            foreach ($recommendation->files as $file) {
+                if ($file->pivot->type !== 'secret-shopper') {
+                    continue;
+                }
+                
+                $secretShopperFiles[] = $this->assistant->uploadFile(
+                    url: $file->getStorageUrl(),
+                    name: 'secret_shopper',
+                    extension: $file->extension
+                );
+            }
+        } catch (Exception $e) {
+            $recommendation->update(['status' => $this->name . '_failed']);
+            Log::info('Synthesizer: Failed to upload additional information files');
+            return;
+        }
+
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
+            // Add additional information to the thread
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
                 message: 'The following information and files are additional information for your consideration: ' . $recommendation->prompt,
                 fileIds: [
                     ...$files,
+                ]
+            );
+
+            // Add secret shopper information to the thread
+            $this->assistant->addMessageToThread(
+                threadId: $recommendation->thread_id,
+                message: 'The following information and files are from a secret shopper study done on my website: ' . $recommendation->secret_shopper_prompt,
+                fileIds: [
+                    ...$secretShopperFiles,
                 ]
             );
     
