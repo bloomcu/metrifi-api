@@ -36,6 +36,6 @@ class Recommendation extends Model
 
     public function files()
     {
-        return $this->belongsToMany(File::class, 'recommendation_files');
+        return $this->belongsToMany(File::class, 'recommendation_files')->withPivot('type');
     }
 }
