@@ -99,4 +99,24 @@ class Organization extends Model {
     {
         return $this->hasMany(Recommendation::class);
     }
+
+    /**
+     * Set the domain attribute.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setDomainAttribute($value)
+    {
+        // Parse the URL to get the host part
+        $parsedUrl = parse_url($value, PHP_URL_HOST);
+
+        // If no host is found, try with the path (in cases where the user enters 'example.com' without http(s)://)
+        if (!$parsedUrl) {
+            $parsedUrl = parse_url('http://' . $value, PHP_URL_HOST);
+        }
+
+        // Remove any trailing slash or path segments
+        $this->attributes['domain'] = preg_replace('/\/.*$/', '', $parsedUrl);
+    }
 }
