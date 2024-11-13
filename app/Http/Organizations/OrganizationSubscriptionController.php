@@ -71,6 +71,9 @@ class OrganizationSubscriptionController extends Controller
             $recommendationsUsed = $organization->recommendations()
                 ->whereBetween('created_at', [$startedAt, $renewsAt])
                 ->where('status', 'done')
+                ->whereHas('user', function ($query) {
+                    $query->where('role', '!=', 'admin');
+                })
                 ->count();
 
             return response()->json([
