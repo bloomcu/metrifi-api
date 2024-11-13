@@ -11,10 +11,12 @@ class RecommendationFileController extends Controller
 {
     public function attach(Organization $organization, Recommendation $recommendation, Request $request)
     {   
-        $recommendation->files()->syncWithPivotValues(
-            $request->file_ids, 
-            ['type' => $request->type]
-        );
+        $fileIds = $request->file_ids;
+        $pivotData = ['type' => $request->type];
+
+        foreach ($fileIds as $fileId) {
+            $recommendation->files()->attach($fileId, $pivotData);
+        }
 
         return response()->json(['message' => 'Files attached to recommendation']);
     }
