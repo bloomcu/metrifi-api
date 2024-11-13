@@ -21,7 +21,9 @@ class RecommendationResource extends JsonResource
             'id' => $this->id,
             'dashboard_id' => $this->dashboard_id,
             'user' => new UserResource($this->user),
-            'files' => FileResource::collection($this->files),
+            'files' => FileResource::collection($this->files->where('pivot.type', 'additional-information')),
+            // Get files where the recommendation file pivot record has a type of 'screenshot'
+            'secret_shopper_files' => FileResource::collection($this->files->where('pivot.type', 'secret-shopper')),
             'thread_id' => $this->thread_id,
             'runs' => $this->runs,
             'status' => $this->status ?? 'queued',
@@ -32,6 +34,7 @@ class RecommendationResource extends JsonResource
             'reference' => $this->reference,
             'step_index' => $this->step_index,
             'prompt' => $this->prompt,
+            'secret_shopper_prompt' => $this->secret_shopper_prompt,
             // 'file_ids' => $this->file_ids,
             'metadata' => $this->metadata,
             'created_at' => $this->created_at,

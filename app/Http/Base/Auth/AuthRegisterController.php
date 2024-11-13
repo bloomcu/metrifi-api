@@ -16,6 +16,7 @@ class AuthRegisterController extends Controller
     {
         $organization = Organization::create([
             'title' => $request->organization_title,
+            'domain' => $request->organization_domain,
         ]);
 
         $user = User::create([

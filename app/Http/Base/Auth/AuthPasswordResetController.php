@@ -14,7 +14,7 @@ class AuthPasswordResetController extends Controller
     public function __invoke(AuthPasswordResetRequest $request): JsonResponse
     {
         $status = Password::reset(
-            $request->only('token', 'email', 'password', 'password_confirmation'),
+            $request->only('token', 'email', 'password'),
 
             function ($user, $password) {
                 $user->forceFill([

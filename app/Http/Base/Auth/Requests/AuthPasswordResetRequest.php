@@ -21,7 +21,7 @@ class AuthPasswordResetRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                'confirmed',
+                // 'confirmed',
                 Password::min(12)
                     ->mixedCase()
                     ->letters()

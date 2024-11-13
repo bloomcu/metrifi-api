@@ -19,10 +19,11 @@ class AuthRegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email:rfc,strict', 'max:255', 'unique:users', 'unique:invitations'],
             'organization_title' => ['required', 'string', 'max:255'],
+            'organization_domain' => ['required', 'regex:/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/', 'max:255'],
             'password' => [
                 'required',
                 'string',
-                'confirmed',
+                // 'confirmed',
                 Password::min(12)
                     ->mixedCase()
                     ->letters()
@@ -31,6 +32,13 @@ class AuthRegisterRequest extends FormRequest
                     ->uncompromised(),
             ],
             // 'accept_terms' => ['accepted'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'organization_domain.regex' => 'The domain must be a valid URL or domain name.',
         ];
     }
 
