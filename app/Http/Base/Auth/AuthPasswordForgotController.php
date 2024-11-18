@@ -16,7 +16,7 @@ class AuthPasswordForgotController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'If this is a valid account email, you will recieve a password reset email.',
+            'message' => 'If this is a valid account email, you will receive a password reset email.',
         ], 200);
     }
 }
