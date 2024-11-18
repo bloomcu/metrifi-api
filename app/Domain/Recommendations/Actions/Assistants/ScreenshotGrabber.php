@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use Exception;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
+use DDD\Domain\Recommendations\Actions\Assistants\ComparisonAnalyzer;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 
@@ -72,7 +72,7 @@ class ScreenshotGrabber implements ShouldQueue
 
         $recommendation->update(['status' => $this->name . '_completed']);
 
-        UIAnalyzer::dispatch($recommendation);
+        ComparisonAnalyzer::dispatch($recommendation);
 
         return;
     }

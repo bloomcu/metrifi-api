@@ -14,11 +14,11 @@ use DDD\Domain\Recommendations\Actions\Assistants\Synthesizer;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class UIAnalyzer implements ShouldQueue
+class ComparisonAnalyzer implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $name = 'ui_analyzer';
+    public $name = 'comparison_analyzer';
     public $timeout = 60;
     public $tries = 50;
     public $backoff = 5;
@@ -47,14 +47,17 @@ class UIAnalyzer implements ShouldQueue
                 name: 'screenshot',
                 extension: 'png'
             );
-    
-            $comparisonScreenshotIds = [];
-            foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
-                $comparisonScreenshotIds[] = $this->assistant->uploadFile(
-                    url: $comparisonScreenshot,
-                    name: 'screenshot',
-                    extension: 'png'
-                );
+            
+            if ($recommendation->metadata['comparisonScreenshots']) {
+                $comparisonScreenshotIds = [];
+                
+                foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
+                    $comparisonScreenshotIds[] = $this->assistant->uploadFile(
+                        url: $comparisonScreenshot,
+                        name: 'screenshot',
+                        extension: 'png'
+                    );
+                }
             }
         } catch (Exception $e) {
             $recommendation->update(['status' => $this->name . '_failed']);
