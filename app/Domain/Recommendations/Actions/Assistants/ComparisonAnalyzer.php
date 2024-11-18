@@ -34,20 +34,52 @@ class ComparisonAnalyzer implements ShouldQueue
 
     function handle(Recommendation $recommendation)
     {
+        // If there is not comparisons, skip to the next step
+        if (!$recommendation->metadata['comparisons']) {
+            $recommendation->update(['status' => $this->name . '_completed']);
+            Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
+            return;
+        }
+
         // Refresh the recommendation so we get the file ids
         $recommendation = $recommendation->fresh();
 
         // Set status to in progress
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
+        try {
+            // Iterate over the comparisons and get the screenshots
+            $comparisonScreenshots = [];
+
+            foreach ($recommendation->metadata['comparisons'] as $comparison) {
+                $comparisonScreenshot = $this->screenshotter->getScreenshot(
+                    url: $comparison['url'],
+                );
+
+                $comparisonScreenshots[] = $comparisonScreenshot;
+            }
+
+            $recommendation->update([
+                'metadata' => array_merge($recommendation->metadata, [
+                    'comparisonScreenshots' => $comparisonScreenshots,
+                ]),
+            ]);
+        } catch (Exception $e) {
+            // Log the error message for debugging purposes
+            Log::error("Error grabbing comparison screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
+
+            // Gracefully fail the job
+            $recommendation->update([
+                'status' => $this->name . '_failed',
+                'error_message' => $e->getMessage(), // Optionally store the error message in the metadata
+            ]);
+
+            // Rethrow the exception to retry based on $tries/backoff
+            throw $e;
+        }
+
         // Upload the screenshots
         try {
-            $focusScreenshotId = $this->assistant->uploadFile(
-                url: $recommendation->metadata['focusScreenshot'],
-                name: 'screenshot',
-                extension: 'png'
-            );
-            
             if ($recommendation->metadata['comparisonScreenshots']) {
                 $comparisonScreenshotIds = [];
                 
@@ -60,17 +92,25 @@ class ComparisonAnalyzer implements ShouldQueue
                 }
             }
         } catch (Exception $e) {
-            $recommendation->update(['status' => $this->name . '_failed']);
-            return;
+            // Log the error message for debugging purposes
+            Log::error("Error uploading comparison screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
+
+            // Gracefully fail the job
+            $recommendation->update([
+                'status' => $this->name . '_failed',
+                'error_message' => $e->getMessage(), // Optionally store the error message in the metadata
+            ]);
+
+            // Rethrow the exception to retry based on $tries/backoff
+            throw $e;
         }
 
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page (first file). I\'ve also attached screenshots of other higher performing pages (subsequent ' . count($comparisonScreenshotIds) . ' files).',
+                message: 'I\'ve attached screenshots of other higher performing pages (' . count($comparisonScreenshotIds) . ' files).',
                 fileIds: [
-                    $focusScreenshotId,
                     ...$comparisonScreenshotIds,
                 ]
             );
@@ -93,9 +133,6 @@ class ComparisonAnalyzer implements ShouldQueue
             runId: $recommendation->runs[$this->name]
         );
 
-        // Log the status
-        // Log::info($this->name . ': ' . $run['status']);
-
         // Issue, end the job
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
             $recommendation->update(['status' => $this->name . '_' . $run['status']]);
@@ -103,12 +140,6 @@ class ComparisonAnalyzer implements ShouldQueue
         }
 
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // if (isset($run['usage'])) {
-            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-            //     Log::info('Current time: ' . now());
-            // }
-
             // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;

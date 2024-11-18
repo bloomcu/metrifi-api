@@ -24,10 +24,12 @@ class ScreenshotGrabber implements ShouldQueue
     public $backoff = 5;
 
     protected ScreenshotInterface $screenshotter;
+    protected AssistantService $assistant;
 
     public function __construct(ScreenshotInterface $screenshotter, AssistantService $assistant)
     {
         $this->screenshotter = $screenshotter;
+        $this->assistant = $assistant;
     }
 
     function handle(Recommendation $recommendation)
@@ -40,25 +42,14 @@ class ScreenshotGrabber implements ShouldQueue
                 url: $recommendation->metadata['focus']['url'],
             );
 
-            // Iterate over the comparisons and get the screenshots
-            $comparisonScreenshots = [];
-            foreach ($recommendation->metadata['comparisons'] as $comparison) {
-                $comparisonScreenshot = $this->screenshotter->getScreenshot(
-                    url: $comparison['url'],
-                );
-
-                $comparisonScreenshots[] = $comparisonScreenshot;
-            }
-
             $recommendation->update([
                 'metadata' => array_merge($recommendation->metadata, [
                     'focusScreenshot' => $focusScreenshot,
-                    'comparisonScreenshots' => $comparisonScreenshots,
                 ]),
             ]);
         } catch (Exception $e) {
             // Log the error message for debugging purposes
-            Log::error("Error grabbing screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
+            Log::error("Error grabbing focus screenshot for recommendation ID {$recommendation->id}: " . $e->getMessage());
 
             // Gracefully fail the job
             $recommendation->update([
@@ -68,6 +59,40 @@ class ScreenshotGrabber implements ShouldQueue
 
             // Rethrow the exception to retry based on $tries/backoff
             throw $e;
+        }
+
+        // Upload the screenshot
+        try {
+            if ($recommendation->metadata['focusScreenshot']) {
+                $focusScreenshotId = $this->assistant->uploadFile(
+                    url: $recommendation->metadata['focusScreenshot'],
+                    name: 'screenshot',
+                    extension: 'png'
+                );
+            }
+        } catch (Exception $e) {
+            // Log the error message for debugging purposes
+            Log::error("Error uploading focus screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
+
+            // Gracefully fail the job
+            $recommendation->update([
+                'status' => $this->name . '_failed',
+                'error_message' => $e->getMessage(), // Optionally store the error message in the metadata
+            ]);
+
+            // Rethrow the exception to retry based on $tries/backoff
+            throw $e;
+        }
+
+        // Add message to thread, do not run
+        if (!isset($recommendation->runs[$this->name])) {
+            $this->assistant->addMessageToThread(
+                threadId: $recommendation->thread_id,
+                message: 'I\'ve attached a screenshot of my current ' . $recommendation->title . ' page.',
+                fileIds: [
+                    $focusScreenshotId,
+                ]
+            );
         }
 
         $recommendation->update(['status' => $this->name . '_completed']);
