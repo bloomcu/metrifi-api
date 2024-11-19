@@ -88,7 +88,7 @@ class ScreenshotGrabber implements ShouldQueue
         if (!isset($recommendation->runs[$this->name])) {
             $this->assistant->addMessageToThread(
                 threadId: $recommendation->thread_id,
-                message: 'I\'ve attached a screenshot of my current page called' . $recommendation->title . '.',
+                message: 'I\'ve attached a screenshot of my current page called: ' . $recommendation->title . '.',
                 fileIds: [
                     $focusScreenshotId,
                 ]
