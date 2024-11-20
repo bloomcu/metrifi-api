@@ -4,6 +4,7 @@ namespace DDD\Http\Base\Auth;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Http\JsonResponse;
 use DDD\Http\Base\Auth\Requests\AuthRegisterRequest;
 use DDD\Domain\Users\User;
@@ -31,7 +32,8 @@ class AuthRegisterController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        Mail::to('help@metrifi.com')->send(new OrganizationRegisteredEmail($organization, $user));
+        $notificationEmail = Config::get('mail.registration_notification_email');
+        Mail::to($notificationEmail)->send(new OrganizationRegisteredEmail($organization, $user));
 
         return response()->json([
             'message' => 'Registration successful',
