@@ -32,74 +32,82 @@ class Synthesizer implements ShouldQueue
     function handle(Recommendation $recommendation)
     {
         // If there is not additional information prompt/images, skip to the next step
-        if (!$recommendation->prompt) {
+        if (!$recommendation->prompt && !$recommendation->secret_shopper_prompt) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Anonymizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
 
+        // Start
         $recommendation->update(['status' => $this->name . '_in_progress']);
-
-        // Upload the additional information files
-        try {
-            $files = [];
-            foreach ($recommendation->files as $file) {
-                if ($file->pivot->type !== 'additional-information') {
-                    continue;
-                }
-
-                $files[] = $this->assistant->uploadFile(
-                    url: $file->getStorageUrl(),
-                    name: 'additional_information',
-                    extension: $file->extension
-                );
-            }
-        } catch (Exception $e) {
-            $recommendation->update(['status' => $this->name . '_failed']);
-            Log::info('Synthesizer: Failed to upload additional information files');
-            return;
-        }
-
-        // Upload the secret shopper files
-        try {
-            $secretShopperFiles = [];
-            foreach ($recommendation->files as $file) {
-                if ($file->pivot->type !== 'secret-shopper') {
-                    continue;
-                }
-                
-                $secretShopperFiles[] = $this->assistant->uploadFile(
-                    url: $file->getStorageUrl(),
-                    name: 'secret_shopper',
-                    extension: $file->extension
-                );
-            }
-        } catch (Exception $e) {
-            $recommendation->update(['status' => $this->name . '_failed']);
-            Log::info('Synthesizer: Failed to upload additional information files');
-            return;
-        }
 
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
-            // Add additional information to the thread
-            $this->assistant->addMessageToThread(
-                threadId: $recommendation->thread_id,
-                message: 'The following information and files are additional information for your consideration: ' . $recommendation->prompt,
-                fileIds: [
-                    ...$files,
-                ]
-            );
 
-            // Add secret shopper information to the thread
-            $this->assistant->addMessageToThread(
-                threadId: $recommendation->thread_id,
-                message: 'The following information and files are from a secret shopper study done on my website: ' . $recommendation->secret_shopper_prompt,
-                fileIds: [
-                    ...$secretShopperFiles,
-                ]
-            );
-    
+            // Handle additional information
+            if ($recommendation->prompt) {
+                // Upload files
+                try {
+                    $files = [];
+                    foreach ($recommendation->files as $file) {
+                        if ($file->pivot->type !== 'additional-information') {
+                            continue;
+                        }
+
+                        $files[] = $this->assistant->uploadFile(
+                            url: $file->getStorageUrl(),
+                            name: 'additional_information',
+                            extension: $file->extension
+                        );
+                    }
+                } catch (Exception $e) {
+                    $recommendation->update(['status' => $this->name . '_failed']);
+                    Log::info('Synthesizer: Failed to upload additional information files');
+                    return;
+                }
+
+                // Add message to thread
+                $this->assistant->addMessageToThread(
+                    threadId: $recommendation->thread_id,
+                    message: 'The following information (and files, if attached) are additional information for your consideration: ' . $recommendation->prompt,
+                    fileIds: [
+                        ...$files,
+                    ]
+                );
+            }
+
+            // Handle secret shopper info
+            if ($recommendation->secret_shopper_prompt) {
+                // Upload files
+                try {
+                    $secretShopperFiles = [];
+                    foreach ($recommendation->files as $file) {
+                        if ($file->pivot->type !== 'secret-shopper') {
+                            continue;
+                        }
+                        
+                        $secretShopperFiles[] = $this->assistant->uploadFile(
+                            url: $file->getStorageUrl(),
+                            name: 'secret_shopper',
+                            extension: $file->extension
+                        );
+                    }
+                } catch (Exception $e) {
+                    $recommendation->update(['status' => $this->name . '_failed']);
+                    Log::info('Synthesizer: Failed to upload additional information files');
+                    return;
+                }
+
+                // Add secret shopper information to the thread
+                $this->assistant->addMessageToThread(
+                    threadId: $recommendation->thread_id,
+                    message: 'The following information (and files, if attached) are from a secret shopper study done on my website: ' . $recommendation->secret_shopper_prompt,
+                    fileIds: [
+                        ...$secretShopperFiles,
+                    ]
+                );
+            }
+            
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_x5feSpZ18zAMOayaItrTDMz9',
@@ -118,27 +126,19 @@ class Synthesizer implements ShouldQueue
             runId: $recommendation->runs[$this->name]
         );
 
-        // Log the status
-        // Log::info($this->name . ': ' . $run['status']);
-
         // Issue, end the job
         if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
             $recommendation->update(['status' => $this->name . '_' . $run['status']]);
             return;
         }
 
+        // Dispatch a new instance of the job with a delay
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // if (isset($run['usage'])) {
-            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-            //     Log::info('Current time: ' . now());
-            // }
-
-            // Dispatch a new instance of the job with a delay
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;
         }
 
+        // Completed, continue
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Anonymizer::dispatch($recommendation)->delay(now()->addSeconds(8));
