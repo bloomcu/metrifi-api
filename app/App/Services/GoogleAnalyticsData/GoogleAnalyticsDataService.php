@@ -33,7 +33,6 @@ class GoogleAnalyticsDataService
          * TODO: Refactor this using Factory and Builder patterns.
          * 
          */
-
         // Initialize an array to hold the structured funnel steps for the API request.
         $funnelSteps = [];
 
@@ -52,6 +51,18 @@ class GoogleAnalyticsDataService
             foreach ($step['metrics'] as $metric) {
                 // Structure the metric based on its type.
                 if ($metric['metric'] === 'pageUsers') {
+                    // Match case-insensitive regex on page path
+                    // $funnelFilterExpressionList[] = [
+                    //     'funnelFieldFilter' => [
+                    //         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
+                    //         'stringFilter' => [
+                    //             'value' => '(?i)' . preg_quote($metric['pagePath']), // Case-insensitive regex
+                    //             'matchType' => 'FULL_REGEXP'
+                    //         ]
+                    //     ]
+                    // ];
+
+                    // Match exact page path
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
@@ -63,6 +74,18 @@ class GoogleAnalyticsDataService
                     ];
                 } 
                 elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
+                    // Match case-insensitive regex on page path plus query string
+                    // $funnelFilterExpressionList[] = [
+                    //     'funnelFieldFilter' => [
+                    //         'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
+                    //         'stringFilter' => [
+                    //             'value' => '(?i)' . preg_quote($metric['pagePathPlusQueryString']),
+                    //             'matchType' => 'FULL_REGEXP',
+                    //         ]
+                    //     ]
+                    // ];
+
+                    // Match exact page path plus query string
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
@@ -399,7 +422,7 @@ class GoogleAnalyticsDataService
                     'fieldName' => 'pagePath',
                     'stringFilter' => [
                         'matchType' => 'CONTAINS',
-                        'caseSensitive' => true,
+                        'caseSensitive' => false,
                         'value' => $contains
                     ]
                 ]
@@ -458,7 +481,7 @@ class GoogleAnalyticsDataService
                     'fieldName' => 'pagePathPlusQueryString',
                     'stringFilter' => [
                         'matchType' => 'CONTAINS',
-                        // 'caseSensitive' => true,
+                        'caseSensitive' => false,
                         'value' => $contains
                     ]
                 ]
@@ -517,6 +540,7 @@ class GoogleAnalyticsDataService
                     'fieldName' => 'linkUrl',
                     'stringFilter' => [
                         'matchType' => 'CONTAINS',
+                        'caseSensitive' => false,
                         'value' => $contains
                     ]
                 ]
@@ -629,6 +653,7 @@ class GoogleAnalyticsDataService
                         'fieldName' => 'pagePath',
                         'stringFilter' => [
                             'matchType' => 'CONTAINS',
+                            'caseSensitive' => false,
                             'value' => $contains
                         ]
                     ]

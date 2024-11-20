@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Registration Notification Email
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the email address that will receive notifications
+    |
+    */
+
+    'registration_notification_email' => env('REGISTRATION_NOTIFICATION_EMAIL', 'help@metrifi.com'),
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Mailer
     |--------------------------------------------------------------------------
     |
@@ -108,8 +120,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'help@metrifi.com'),
+        'name' => env('MAIL_FROM_NAME', 'MetriFi'),
     ],
 
     /*
