@@ -15,7 +15,7 @@ class OrganizationController extends Controller
      */
     public function show(Organization $organization)
     {
-        return new OrganizationResource($organization->load('funnels'));
+        return new OrganizationResource($organization->load(['funnels', 'connections']));
     }
 
     /**
