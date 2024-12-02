@@ -27,6 +27,9 @@ class OrganizationResource extends JsonResource
             'onboarding' => $this->onboarding,
             'assets' => $this->assets,
             'subscribed' => $this->subscribed('default'),
+            'funnels_count' => $this->whenLoaded('funnels', function () {
+                return $this->funnels->count();
+            }),
             // 'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
             // 'subscription_started_at' => $this->when($this->subscribed('default'), function () {
             //     return Carbon::createFromTimeStamp($this->subscription('default')->asStripeSubscription()->current_period_start);
