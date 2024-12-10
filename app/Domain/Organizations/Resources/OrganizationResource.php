@@ -30,6 +30,9 @@ class OrganizationResource extends JsonResource
             'funnels_count' => $this->whenLoaded('funnels', function () {
                 return $this->funnels->count();
             }),
+            'connections_count' => $this->whenLoaded('connections', function () {
+                return $this->connections->count();
+            }),
             // 'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
             // 'subscription_started_at' => $this->when($this->subscribed('default'), function () {
             //     return Carbon::createFromTimeStamp($this->subscription('default')->asStripeSubscription()->current_period_start);
