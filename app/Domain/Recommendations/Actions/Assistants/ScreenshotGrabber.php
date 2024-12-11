@@ -19,7 +19,7 @@ class ScreenshotGrabber implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'screenshot_grabber';
-    public $timeout = 60;
+    public $timeout = 120;
     public $tries = 50;
     public $backoff = 5;
 

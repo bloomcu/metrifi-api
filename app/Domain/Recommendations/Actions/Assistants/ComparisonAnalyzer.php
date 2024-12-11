@@ -19,7 +19,7 @@ class ComparisonAnalyzer implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'comparison_analyzer';
-    public $timeout = 60;
+    public $timeout = 120;
     public $tries = 50;
     public $backoff = 5;
 
