@@ -18,7 +18,7 @@ class Thumbio implements ScreenshotInterface
      */
     public function getScreenshot(
         string $url, 
-        string $wait = '0', 
+        string $wait = '10', 
         string $width = '1200', 
         string $height = '1200'
     ){
