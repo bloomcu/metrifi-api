@@ -22,6 +22,6 @@ class Thumbio implements ScreenshotInterface
         string $width = '1200', 
         string $height = '1200'
     ){
-        return 'https://image.thum.io/get/auth/' . $this->token . '/width/' . $width . '/crop/' . $height . '/png/noanimate/fullpage/wait/' . $wait . '/https://' . $url;
+        return 'https://image.thum.io/get/auth/' . $this->token . '/width/' . $width . '/crop/' . $height . '/png/noanimate/fullpage/wait/' . $wait . '/https://' . $url . '?cachebust=' . time();
     }
 }
