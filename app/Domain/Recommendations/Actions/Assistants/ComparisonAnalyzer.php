@@ -19,7 +19,7 @@ class ComparisonAnalyzer implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'comparison_analyzer';
-    public $timeout = 60;
+    public $timeout = 240;
     public $tries = 50;
     public $backoff = 5;
 
@@ -80,6 +80,9 @@ class ComparisonAnalyzer implements ShouldQueue
 
         // Upload the screenshots
         try {
+            // Wait before uploading the screenshot
+            sleep(5);
+            
             if ($recommendation->metadata['comparisonScreenshots']) {
                 $comparisonScreenshotIds = [];
                 

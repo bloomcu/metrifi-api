@@ -19,7 +19,7 @@ class ScreenshotGrabber implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'screenshot_grabber';
-    public $timeout = 60;
+    public $timeout = 120;
     public $tries = 50;
     public $backoff = 5;
 
@@ -63,6 +63,9 @@ class ScreenshotGrabber implements ShouldQueue
 
         // Upload the screenshot
         try {
+            // Wait before uploading the screenshot
+            sleep(5);
+            
             if ($recommendation->metadata['focusScreenshot']) {
                 $focusScreenshotId = $this->assistant->uploadFile(
                     url: $recommendation->metadata['focusScreenshot'],
