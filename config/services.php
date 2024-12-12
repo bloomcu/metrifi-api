@@ -57,4 +57,8 @@ return [
     'screenshotone' => [
         'accesskey' => env('SCREENSHOTONE_ACCESSKEY'),
     ],
+
+    'apiflash' => [
+        'accesskey' => env('APIFLASH_ACCESSKEY'),
+    ],
 ];
