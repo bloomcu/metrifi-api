@@ -566,6 +566,7 @@ class GoogleAnalyticsDataService
             'dimensions' => [
                 ['name' => 'linkUrl'],
                 ['name' => 'pagePath'],
+                ['name' => 'hostname'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
@@ -706,6 +707,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'customEvent:form_id'],
                 ['name' => 'customEvent:form_length'],
                 ['name' => 'customEvent:form_submit_text'],
+                ['name' => 'hostname'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
