@@ -37,6 +37,7 @@ class StepUpdateRequest extends FormRequest
             'metrics.*.formId' => 'nullable|string',
             'metrics.*.formLength' => 'nullable|string',
             'metrics.*.formSubmitText' => 'nullable|string',
+            'metrics.*.hostname' => 'nullable|string',
         ];
     }
 
