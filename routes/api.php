@@ -24,6 +24,7 @@ use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
+use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -33,6 +34,11 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('dashboards')->group(function () {
             Route::get('/', [AdminDashboardController::class, 'index']);
             Route::get('/analyze', [AdminDashboardController::class, 'analyzeAll']);
+        });
+
+        // Funnels
+        Route::prefix('funnels')->group(function () {
+            Route::get('/', [AdminFunnelController::class, 'index']);
         });
         
         // Organizations
