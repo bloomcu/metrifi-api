@@ -51,17 +51,6 @@ class GoogleAnalyticsDataService
             foreach ($step['metrics'] as $metric) {
                 // Structure the metric based on its type.
                 if ($metric['metric'] === 'pageUsers') {
-                    // Match case-insensitive regex on page path
-                    // $funnelFilterExpressionList[] = [
-                    //     'funnelFieldFilter' => [
-                    //         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
-                    //         'stringFilter' => [
-                    //             'value' => '(?i)' . preg_quote($metric['pagePath']), // Case-insensitive regex
-                    //             'matchType' => 'FULL_REGEXP'
-                    //         ]
-                    //     ]
-                    // ];
-
                     // Match exact page path
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
@@ -74,17 +63,6 @@ class GoogleAnalyticsDataService
                     ];
                 } 
                 elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
-                    // Match case-insensitive regex on page path plus query string
-                    // $funnelFilterExpressionList[] = [
-                    //     'funnelFieldFilter' => [
-                    //         'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
-                    //         'stringFilter' => [
-                    //             'value' => '(?i)' . preg_quote($metric['pagePathPlusQueryString']),
-                    //             'matchType' => 'FULL_REGEXP',
-                    //         ]
-                    //     ]
-                    // ];
-
                     // Match exact page path plus query string
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
@@ -295,7 +273,6 @@ class GoogleAnalyticsDataService
             
             // Add report to funnel
             $funnel['report'] = $this->report;
-            // $funnel['gaReport'] = $gaFunnelReport;
 
             return $funnel;
 
