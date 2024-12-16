@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function() {
         // Funnels
         Route::prefix('funnels')->group(function () {
             Route::get('/', [AdminFunnelController::class, 'index']);
+            Route::get('/snapshot', [AdminFunnelController::class, 'snapshotAll']);
         });
         
         // Organizations

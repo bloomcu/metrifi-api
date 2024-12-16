@@ -7,6 +7,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Http\Request;
 use DDD\Http\Admin\Resources\AdminFunnelResource;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 use DDD\App\Controllers\Controller;
 
 class AdminFunnelController extends Controller
@@ -23,5 +24,18 @@ class AdminFunnelController extends Controller
             );
 
         return AdminFunnelResource::collection($funnels);
+    }
+
+    public function snapshotAll()
+    {
+        Funnel::chunk(100, function ($funnels) {
+            foreach ($funnels as $funnel) {
+                FunnelSnapshotAction::dispatch($funnel, 'last28Days');
+            }
+        });
+        
+        return response()->json([
+            'message' => 'Funnel snapshot jobs dispatched.'
+        ]);
     }
 }

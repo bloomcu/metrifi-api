@@ -10,7 +10,11 @@ class FunnelSnapshotAction
 {
     use AsAction;
 
-    function handle(Funnel $funnel, string $period = 'last7Days')
+    public int $jobTries = 2; // number of times the job may be attempted
+    public int $jobBackoff = 120; // number of seconds to wait before retrying
+    public int $jobTimeout = 30; // number of seconds before the job should timeout
+
+    function handle(Funnel $funnel, string $period = 'last28Days')
     {
         // Bail early if funnel has no steps yet
         if (count($funnel->steps) === 0) {
@@ -32,16 +36,21 @@ class FunnelSnapshotAction
             ]
         };
 
-        $report = GoogleAnalyticsData::funnelReport(
-            connection: $funnel->connection, 
+        $funnel = GoogleAnalyticsData::funnelReport(
+            funnel: $funnel, 
             startDate: $p['startDate'], 
             endDate: $p['endDate'],
-            steps: $funnel->steps->toArray(),
         );
 
-        // update funnel snapshot
+        // Cache the funnel snapshots object
         $snapshots = $funnel->snapshots;
-        $snapshots[$period]['conversionRate'] = $report['overallConversionRate'];
+
+        // Update the snapshot for the given period
+        $snapshots[$period]['conversionRate'] = $funnel->report['overallConversionRate'];
+        $snapshots[$period]['users'] = (int) $funnel->report['steps'][0]['users'];
+
+        // Save
+        unset($funnel->report);
         $funnel->snapshots = $snapshots;
         $funnel->save();
     }

@@ -21,41 +21,18 @@ class SnapshotsCast implements CastsAttributes
 
         $defaultSnapshots = [
             'yesterday' => [
-                // 'period' => 'yesterday',
                 'conversionRate' => null,
-                // 'change' => null,
+                'users' => null,
             ],
             'last7Days' => [
-                // 'period' => 'last7Days',
                 'conversionRate' => null,
-                // 'change' => null,
+                'users' => null,
             ],
             'last28Days' => [
-                // 'period' => 'last28Days',
                 'conversionRate' => null,
-                // 'change' => null,
+                'users' => null,
             ],
         ];
-        
-        // return collect($defaultSnapshots)->map(function ($default) use ($value) {
-        //     // dd($default);
-        //     $period = $default['period'];
-
-        //     if (!isset($value[$period])) {
-        //         $value[$period] = $default;
-        //         return;
-        //     }
-
-        //     return array_merge($default, json_decode($value[$period], true));
-        // });
-        
-        // return collect($value)->map(function ($snapshot) use ($defaultSnapshots) {
-            
-        //     $defaults = $defaultSnapshots[$snapshot['period']];
-            
-
-        //     return array_merge($defaults, $snapshot);
-        // });
 
         return array_merge($defaultSnapshots, $value);
     }

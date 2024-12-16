@@ -21,7 +21,8 @@ class AnalyzeDashboardAction
      */
 
     public int $jobTries = 2; // number of times the job may be attempted
-    public int $jobBackoff = 30; // number of seconds to wait before retrying 
+    public int $jobBackoff = 120; // number of seconds to wait before retrying
+    public int $jobTimeout = 30; // number of seconds before the job should timeout
 
     function handle(Dashboard $dashboard)
     {
