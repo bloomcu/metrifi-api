@@ -16,6 +16,7 @@ class FunnelCategoryFilter implements Filter
 
         // Join categories without resetting select columns
         $query->join('categories', 'funnels.category_id', '=', 'categories.id')
-            ->where('categories.title', 'like', "%{$value}%");
+            // ->where('categories.title', 'like', "%{$value}%");
+            ->where('categories.title', '=', $value); // Exact category match
     }
 }
