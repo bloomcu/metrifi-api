@@ -12,6 +12,10 @@ use DDD\Domain\Funnels\Sorts\FunnelStepsSort;
 use DDD\Domain\Funnels\Sorts\FunnelConversionRateSort;
 use DDD\Domain\Funnels\Sorts\FunnelCategorySort;
 use DDD\Domain\Funnels\Funnel;
+use DDD\Domain\Funnels\Filters\FunnelUsersFilter;
+use DDD\Domain\Funnels\Filters\FunnelStepsFilter;
+use DDD\Domain\Funnels\Filters\FunnelConversionRateFilter;
+use DDD\Domain\Funnels\Filters\FunnelCategoryFilter;
 use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 use DDD\App\Controllers\Controller;
 
@@ -19,23 +23,30 @@ class AdminFunnelController extends Controller
 {
     public function index(Request $request)
     {
+        // return $request;
+
         $funnels = QueryBuilder::for(Funnel::class)
             ->allowedSorts([
+                AllowedSort::field('name', 'name'),
                 AllowedSort::custom('conversion_rate', new FunnelConversionRateSort()),
                 AllowedSort::custom('users', new FunnelUsersSort()),
-                AllowedSort::field('name', 'name'),
                 AllowedSort::custom('steps_count', new FunnelStepsSort()),
                 AllowedSort::custom('category', new FunnelCategorySort()),
                 AllowedSort::field('created', 'created_at'),
             ])
             ->allowedFilters([
-                AllowedFilter::exact('name', 'category.id')
+                AllowedFilter::partial('name'),
+                AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
+                AllowedFilter::custom('users', new FunnelUsersFilter()),
+                AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
+                AllowedFilter::custom('category', new FunnelCategoryFilter()),
+                // AllowedFilter::exact('created_at')
             ])
             ->paginate(20)
             ->appends(
                 request()->query()
             );
-
+        
         return AdminFunnelResource::collection($funnels);
     }
 
