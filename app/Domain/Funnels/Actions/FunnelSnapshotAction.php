@@ -22,18 +22,14 @@ class FunnelSnapshotAction
         }
 
         $p = match ($period) {
-            'yesterday' => [
-                'startDate' => now()->subDays(1)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last7Days' => [
-                'startDate' => now()->subDays(7)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
             'last28Days' => [
                 'startDate' => now()->subDays(28)->format('Y-m-d'),
                 'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ]
+            ],
+            'last90Days' => [
+                'startDate' => now()->subDays(90)->format('Y-m-d'),
+                'endDate' => now()->subDays(1)->format('Y-m-d'),
+            ],
         };
 
         $funnel = GoogleAnalyticsData::funnelReport(

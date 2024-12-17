@@ -20,15 +20,11 @@ class SnapshotsCast implements CastsAttributes
         $value = isset($value) ? json_decode($value, true) : [];
 
         $defaultSnapshots = [
-            'yesterday' => [
-                'conversion_rate' => null,
-                'users' => null,
-            ],
-            'last7Days' => [
-                'conversion_rate' => null,
-                'users' => null,
-            ],
             'last28Days' => [
+                'conversion_rate' => null,
+                'users' => null,
+            ],
+            'last90Days' => [
                 'conversion_rate' => null,
                 'users' => null,
             ],

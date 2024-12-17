@@ -20,7 +20,6 @@ class AdminFunnelController extends Controller
     public function index(Request $request)
     {
         $funnels = QueryBuilder::for(Funnel::class)
-        // $funnels = QueryBuilder::for(Funnel::query()->withCount('steps')) // Load steps_count
             ->allowedSorts([
                 AllowedSort::custom('conversion_rate', new FunnelConversionRateSort()),
                 AllowedSort::custom('users', new FunnelUsersSort()),
@@ -45,6 +44,7 @@ class AdminFunnelController extends Controller
         Funnel::chunk(100, function ($funnels) {
             foreach ($funnels as $funnel) {
                 FunnelSnapshotAction::dispatch($funnel, 'last28Days');
+                FunnelSnapshotAction::dispatch($funnel, 'last90Days');
             }
         });
         

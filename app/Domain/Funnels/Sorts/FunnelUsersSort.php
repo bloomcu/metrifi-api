@@ -10,6 +10,9 @@ class FunnelUsersSort implements Sort
     public function __invoke(Builder $query, bool $descending, string $property)
     {
         $direction = $descending ? 'desc' : 'asc';
-        $query->orderByRaw("JSON_EXTRACT(snapshots, '$.last28Days.users') $direction");
+
+        $period = request()->input('period', 'last28Days');
+
+        $query->orderByRaw("JSON_EXTRACT(snapshots, '$.$period.users') $direction");
     }
 }
