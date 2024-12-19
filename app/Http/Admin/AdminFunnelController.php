@@ -11,11 +11,13 @@ use DDD\Domain\Funnels\Sorts\FunnelUsersSort;
 use DDD\Domain\Funnels\Sorts\FunnelStepsSort;
 use DDD\Domain\Funnels\Sorts\FunnelConversionRateSort;
 use DDD\Domain\Funnels\Sorts\FunnelCategorySort;
+use DDD\Domain\Funnels\Sorts\FunnelAssetsSort;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Filters\FunnelUsersFilter;
 use DDD\Domain\Funnels\Filters\FunnelStepsFilter;
 use DDD\Domain\Funnels\Filters\FunnelConversionRateFilter;
 use DDD\Domain\Funnels\Filters\FunnelCategoryFilter;
+use DDD\Domain\Funnels\Filters\FunnelAssetsFilter;
 use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 use DDD\App\Controllers\Controller;
 
@@ -27,7 +29,8 @@ class AdminFunnelController extends Controller
 
         $funnels = QueryBuilder::for(Funnel::class)
             ->allowedSorts([
-                AllowedSort::field('name', 'name'),
+                AllowedSort::field('name'),
+                AllowedSort::custom('assets', new FunnelAssetsSort()),
                 AllowedSort::custom('conversion_rate', new FunnelConversionRateSort()),
                 AllowedSort::custom('users', new FunnelUsersSort()),
                 AllowedSort::custom('steps_count', new FunnelStepsSort()),
@@ -36,6 +39,7 @@ class AdminFunnelController extends Controller
             ])
             ->allowedFilters([
                 AllowedFilter::partial('name'),
+                AllowedFilter::custom('assets', new FunnelAssetsFilter()),
                 AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
                 AllowedFilter::custom('users', new FunnelUsersFilter()),
                 AllowedFilter::custom('steps_count', new FunnelStepsFilter()),

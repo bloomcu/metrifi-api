@@ -21,10 +21,12 @@ class SnapshotsCast implements CastsAttributes
 
         $defaultSnapshots = [
             'last28Days' => [
+                'assets' => null,
                 'conversion_rate' => null,
                 'users' => null,
             ],
             'last90Days' => [
+                'assets' => null,
                 'conversion_rate' => null,
                 'users' => null,
             ],
