@@ -2,7 +2,6 @@
 
 namespace DDD\Http\Admin;
 
-use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 use DDD\Domain\Dashboards\Resources\IndexDashboardResource;
@@ -12,26 +11,15 @@ use DDD\App\Controllers\Controller;
 
 class AdminDashboardController extends Controller
 {
-    /**
-     * List dashboards across all organizations.
-     */
     public function index()
     {
-        // $dashboards = Dashboard::all();
-
         $dashboards = Dashboard::query()
             ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
             ->get();
 
-
-        // return $dashboards;
-
         return IndexDashboardResource::collection($dashboards);
     }
 
-    /**
-     * Analyze all dashboards
-     */
     public function analyzeAll()
     {
         $dashboards = Dashboard::query()

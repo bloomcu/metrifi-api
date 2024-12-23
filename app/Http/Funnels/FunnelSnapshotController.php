@@ -12,7 +12,7 @@ class FunnelSnapshotController extends Controller
 {
     public function refresh(Organization $organization, Funnel $funnel)
     {
-        FunnelSnapshotAction::run($funnel, 'yesterday');
+        FunnelSnapshotAction::run($funnel, 'last28Days');
 
         return new FunnelResource($funnel);
     }

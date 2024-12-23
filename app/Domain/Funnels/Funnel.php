@@ -38,22 +38,6 @@ class Funnel extends Model
         'projections' => ProjectionsCast::class,
     ];
 
-    // /**
-    //  * Get the indexable data array for the model.
-    //  *
-    //  * @return array<string, mixed>
-    //  */
-    // public function toSearchableArray(): array
-    // {
-    //     return [
-    //         'id' => (int) $this->id,
-    //         'organization_id' => (int) $this->organization_id,
-    //         'name' => $this->name,
-    //         'created_at' => $this->created_at,
-    //         'updated_at' => $this->updated_at,
-    //     ];
-    // }
-
     /**
      * Steps associated with the funnel.
      *

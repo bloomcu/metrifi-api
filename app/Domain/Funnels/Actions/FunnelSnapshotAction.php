@@ -10,7 +10,11 @@ class FunnelSnapshotAction
 {
     use AsAction;
 
-    function handle(Funnel $funnel, string $period = 'last7Days')
+    public int $jobTries = 2; // number of times the job may be attempted
+    public int $jobBackoff = 120; // number of seconds to wait before retrying
+    public int $jobTimeout = 30; // number of seconds before the job should timeout
+
+    function handle(Funnel $funnel, string $period = 'last28Days')
     {
         // Bail early if funnel has no steps yet
         if (count($funnel->steps) === 0) {
@@ -18,30 +22,32 @@ class FunnelSnapshotAction
         }
 
         $p = match ($period) {
-            'yesterday' => [
-                'startDate' => now()->subDays(1)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
-            'last7Days' => [
-                'startDate' => now()->subDays(7)->format('Y-m-d'),
-                'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ],
             'last28Days' => [
                 'startDate' => now()->subDays(28)->format('Y-m-d'),
                 'endDate' => now()->subDays(1)->format('Y-m-d'),
-            ]
+            ],
+            'last90Days' => [
+                'startDate' => now()->subDays(90)->format('Y-m-d'),
+                'endDate' => now()->subDays(1)->format('Y-m-d'),
+            ],
         };
 
-        $report = GoogleAnalyticsData::funnelReport(
-            connection: $funnel->connection, 
+        $funnel = GoogleAnalyticsData::funnelReport(
+            funnel: $funnel, 
             startDate: $p['startDate'], 
             endDate: $p['endDate'],
-            steps: $funnel->steps->toArray(),
         );
 
-        // update funnel snapshot
+        // Cache the funnel snapshots object
         $snapshots = $funnel->snapshots;
-        $snapshots[$period]['conversionRate'] = $report['overallConversionRate'];
+
+        // Update the snapshot for the given period
+        $snapshots[$period]['assets'] = $funnel->report['assets'];
+        $snapshots[$period]['conversion_rate'] = $funnel->report['overallConversionRate'];
+        $snapshots[$period]['users'] = (int) $funnel->report['steps'][0]['users'];
+
+        // Save
+        unset($funnel->report);
         $funnel->snapshots = $snapshots;
         $funnel->save();
     }
