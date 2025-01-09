@@ -27,8 +27,6 @@ class AdminFunnelController extends Controller
 {
     public function index(Request $request)
     {
-        // return $request;
-
         $funnels = QueryBuilder::for(Funnel::class)
             ->allowedSorts([
                 AllowedSort::field('name'),
@@ -48,7 +46,6 @@ class AdminFunnelController extends Controller
                 AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                 AllowedFilter::custom('privacy', new FunnelOrganizationPrivacyFilter()),
                 AllowedFilter::custom('category', new FunnelCategoryFilter()),
-                // AllowedFilter::exact('created_at')
             ])
             ->paginate(20)
             ->appends(
