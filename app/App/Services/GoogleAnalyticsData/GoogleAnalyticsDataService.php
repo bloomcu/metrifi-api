@@ -623,7 +623,7 @@ class GoogleAnalyticsDataService
      */
     public function formUserSubmissions(Connection $connection, $startDate, $endDate, $contains = '')
     {
-        // Build filer expression(s)
+        // Build filter expression(s)
         if ($contains) {
             $filters[] = [
                 [
@@ -638,11 +638,26 @@ class GoogleAnalyticsDataService
                 ],
                 [
                     'notExpression' => [ 
-                        'filter' => [
-                            'fieldName' => 'customEvent:form_destination',
-                            'stringFilter' => [
-                                'matchType' => 'EXACT',
-                                'value' => '(not set)' // Cannot contain "(not set)"
+                        'orGroup' => [
+                            'expressions' => [
+                                [
+                                    'filter' => [
+                                        'fieldName' => 'customEvent:form_destination',
+                                        'stringFilter' => [
+                                            'matchType' => 'EXACT',
+                                            'value' => '(not set)'
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'filter' => [
+                                        'fieldName' => 'customEvent:form_destination',
+                                        'stringFilter' => [
+                                            'matchType' => 'EXACT',
+                                            'value' => ''
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
@@ -661,18 +676,33 @@ class GoogleAnalyticsDataService
                 ],
                 [
                     'notExpression' => [ 
-                        'filter' => [
-                            'fieldName' => 'customEvent:form_destination',
-                            'stringFilter' => [
-                                'matchType' => 'EXACT',
-                                'value' => '(not set)' // Cannot contain "(not set)"
+                        'orGroup' => [
+                            'expressions' => [
+                                [
+                                    'filter' => [
+                                        'fieldName' => 'customEvent:form_destination',
+                                        'stringFilter' => [
+                                            'matchType' => 'EXACT',
+                                            'value' => '(not set)'
+                                        ]
+                                    ]
+                                ],
+                                [
+                                    'filter' => [
+                                        'fieldName' => 'customEvent:form_destination',
+                                        'stringFilter' => [
+                                            'matchType' => 'EXACT',
+                                            'value' => ''
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
                 ]
             ];
         }
-
+    
         return $this->runReport($connection, [
             'dateRanges' => [
                 ['startDate' => $startDate, 'endDate' => $endDate]
@@ -689,44 +719,6 @@ class GoogleAnalyticsDataService
             'metrics' => [
                 ['name' => 'totalUsers']
             ],
-            // VERSION 1
-            // 'dimensionFilter' => [
-            //     'filter' => [
-            //         'fieldName' => 'eventName',
-            //         'stringFilter' => [
-            //             'matchType' => 'EXACT',
-            //             'value' => 'form_submit'
-            //         ]
-            //     ]
-            // ],
-            // VERSION 2
-            // 'dimensionFilter' => [
-            //     'andGroup' => [
-            //         'expressions' => [
-            //             [
-            //                 'filter' => [
-            //                     'fieldName' => 'eventName',
-            //                     'stringFilter' => [
-            //                         'matchType' => 'EXACT',
-            //                         'value' => 'form_submit'
-            //                     ]
-            //                 ]
-            //             ],
-            //             [
-            //                 'notExpression' => [ 
-            //                     'filter' => [
-            //                         'fieldName' => 'customEvent:form_destination',
-            //                         'stringFilter' => [
-            //                             'matchType' => 'EXACT',
-            //                             'value' => '(not set)' // Cannot contain "(not set)"
-            //                         ]
-            //                     ]
-            //                 ]
-            //             ]
-            //         ]
-            //     ]
-            // ],
-            // VERSION 3
             'dimensionFilter' => [
                 'andGroup' => [
                     'expressions' => $filters
@@ -736,6 +728,7 @@ class GoogleAnalyticsDataService
             'metricAggregations' => ['TOTAL'],
         ]);
     }
+    
 
     /**
      * Run a report
