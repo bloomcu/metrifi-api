@@ -26,6 +26,7 @@ use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
+use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -57,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
         // Subscription
         Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
+
+        // Weekly analysis email
+        Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
     });
 
     // Benchmarks
