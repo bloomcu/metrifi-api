@@ -70,7 +70,10 @@
                     </span>
                     <br>
                     <span style="font-weight: 700; color: #7c3aed">
-                        Your website is currently missing out on {{ '$' . number_format($organization->assets['median']['total_potential'] * 13.03, 0) }} per year
+                        @php 
+                            $annualizedOrganizationPotential = bcmul($organization->assets['median']['total_potential'], 13.04, 2); // Multiply with precision
+                        @endphp
+                        Your website is currently missing out on {{ '$' . number_format($annualizedOrganizationPotential, 2) }} per year
                     </span>
                   </h1>
 
@@ -93,6 +96,11 @@
                   </p>
 
                   @foreach ($dashboards as $dashboard)
+                  @php 
+                    $annualizedDashboardPotentialDollars = bcmul($dashboard['median_analysis']['subject_funnel_potential_assets'] / 100, 13.04, 2); // Multiply with precision
+                    // $annualizedDashboardPotentialDollars = bcdiv($annualizedDashboardPotential, 100, 2); // Divide with 2 decimal places to get dollars from cents
+                  @endphp
+
                   <div style="position: relative; margin-bottom: 16px; overflow: hidden; border-radius: 8px; background-color: rgba(245, 243, 255, 0.7); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
                     <div style="width: 100%;">
                         <div style="padding-left: 16px; padding-right: 16px; padding-top: 16px;">
@@ -110,7 +118,7 @@
                         <div role="separator" style="height: 1px; line-height: 1px; background-color: #cbd5e1; margin-top: 16px; margin-bottom: 0;">&zwj;</div>
                         <div style="padding-left: 16px; padding-right: 16px; padding-bottom: 20px; margin-top: 16px; margin-bottom: 0;">
                             <p style="margin: 0; font-size: 16px; line-height: 24px; font-weight: 700; color: #4c1d95;">
-                                {{ '$' . number_format($dashboard['median_analysis']['subject_funnel_potential_assets'] * 13.03, 0) }} per year
+                                {{ '$' . number_format($annualizedDashboardPotentialDollars, 2) }} per year
                             </p>
                             <p style="margin-bottom: 20px; font-size: 16px; line-height: 24px; color: #475569;">
                                 Step {{ $dashboard['median_analysis']['bofi_step_index'] + 1 }} of your funnel is converting {{ $dashboard['median_analysis']['bofi_performance'] }}% lower than comparisons ({{ $dashboard['median_analysis']['bofi_conversion_rate'] }}% vs {{ $dashboard['median_analysis']['bofi_median_of_comparisons'] }}%)
