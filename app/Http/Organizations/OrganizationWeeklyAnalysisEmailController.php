@@ -35,16 +35,15 @@ class OrganizationWeeklyAnalysisEmailController extends Controller
                 return optional($dashboard->medianAnalysis)->subject_funnel_potential_assets;
             })
             ->take(3)
-            ->values() // Reset the keys
-            ->toArray();
+            ->values(); // Reset the keys
 
         // No dashboards
         if ($dashboards->isEmpty()) {
             return response()->json(['message' => 'No dashboards found for the weekly analysis email.'], 404);
         }
 
-        // Send the email
-        Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards));
+        // // Send the email
+        Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         
         return $dashboards;
     }
