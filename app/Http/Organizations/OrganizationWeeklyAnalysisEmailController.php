@@ -5,7 +5,6 @@ namespace DDD\Http\Organizations;
 use Illuminate\Support\Facades\Mail;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Organizations\Mail\WeeklyAnalysisEmail;
-use DDD\Domain\Dashboards\Resources\ShowDashboardResource;
 use DDD\App\Controllers\Controller;
 
 class OrganizationWeeklyAnalysisEmailController extends Controller
@@ -39,12 +38,14 @@ class OrganizationWeeklyAnalysisEmailController extends Controller
             ->values() // Reset the keys
             ->toArray();
 
+        // No dashboards
+        if ($dashboards->isEmpty()) {
+            return response()->json(['message' => 'No dashboards found for the weekly analysis email.'], 404);
+        }
+
         // Send the email
         Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards));
         
-        // Return as json, the dashboards name
-        // return ShowDashboardResource::collection($dashboards);
         return $dashboards;
-        return 'check your email';
     }
 }
