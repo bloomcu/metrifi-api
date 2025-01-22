@@ -42,8 +42,19 @@ class OrganizationWeeklyAnalysisEmailController extends Controller
             return response()->json(['message' => 'No dashboards found for the weekly analysis email.'], 404);
         }
 
-        // // Send the email
-        Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
+        // Get the organizations users
+        $users = $organization->users()->get();
+
+        // Filter users collection by settings->send_weekly_analysis_email is true
+        $notifiableUsers = $users->filter(function ($user) {
+            return $user['settings']['send_weekly_website_analysis'] === true;
+        });
+
+        // Get the emails of these users
+        $emails = $notifiableUsers->pluck('email')->toArray();
+
+        // Send the email
+        Mail::to($emails)->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         
         return $dashboards;
     }
