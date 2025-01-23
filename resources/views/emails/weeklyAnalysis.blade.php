@@ -242,7 +242,7 @@ per year </p>
 <![endif]-->
 <!--[if !mso]>--><td class="t97" style="background-color:#FFFFFF;border:1px solid #BDBDBD;overflow:hidden;width:170px;border-radius:40px 40px 40px 40px;">
 <!--<![endif]-->
-<table class="t96" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t95" style="text-align:center;line-height:39px;mso-line-height-rule:exactly;mso-text-raise:7px;padding:0 21px 0 21px;"> <a class="t94" href="https://app.metrifi.com/{{ $organization['slug'] }}/{{ $dashboard['id'] }}" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:39px;font-weight:500;font-style:normal;font-size:15px;text-decoration:none;text-transform:none;direction:ltr;color:#884DFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:7px;"
+<table class="t96" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t95" style="text-align:center;line-height:39px;mso-line-height-rule:exactly;mso-text-raise:7px;padding:0 21px 0 21px;"> <a class="t94" href="{{ config('app.ui_url') }}/{{ $organization['slug'] }}/{{ $dashboard['id'] }}" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:39px;font-weight:500;font-style:normal;font-size:15px;text-decoration:none;text-transform:none;direction:ltr;color:#884DFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:7px;"
 target="_blank"> View dashboard </a>
 </td></tr></table>
 </td></tr></table>
@@ -322,8 +322,27 @@ target="_blank"> Let&#39;s talk </a>
 <![endif]-->
 <!--[if !mso]>--><td class="t154" style="width:420px;">
 <!--<![endif]-->
-<table class="t153" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t152"><p class="t151" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:12px;text-decoration:none;text-transform:none;direction:ltr;color:#888888;text-align:center;mso-line-height-rule:exactly;mso-text-raise:3px;">© 2025 MetriFi. All Rights Reserved<br/></p>
-</td></tr></table>
+<table class="t153" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;">
+    <tr>
+        <td class="t152">
+            <p class="t151" style="margin:0;Margin:0;direction:ltr;text-align:center;mso-line-height-rule:exactly;mso-text-raise:3px;">
+                <a href="{{ config('app.ui_url') }}/{{ $organization['slug'] }}/settings/notifications" style="font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:12px;text-decoration:underline;text-transform:none;color:#888888;">
+                    Manage Notifications
+                </a>
+            </p>
+        </td>
+    </tr>
+    <tr><td><div class="t54" style="mso-line-height-rule:exactly;mso-line-height-alt:32px;line-height:24px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr>
+</table>
+<table class="t153" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;">
+    <tr>
+        <td class="t152">
+            <p class="t151" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:12px;text-decoration:none;text-transform:none;direction:ltr;color:#888888;text-align:center;mso-line-height-rule:exactly;mso-text-raise:3px;">
+                © 2025 MetriFi. All Rights Reserved
+            </p>
+        </td>
+    </tr>
+</table>
 </td></tr></table>
 </td></tr></table>
 </td></tr></table>
