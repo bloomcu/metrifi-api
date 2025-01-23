@@ -55,7 +55,7 @@ class OrganizationWeeklyAnalysisEmailController extends Controller
 
         // Send the email
         // Mail::to($emails)->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
-        Mail::to(['ryan@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
+        Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         
         return $dashboards;
     }
