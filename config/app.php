@@ -55,8 +55,8 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
-
+    'url' => env('APP_URL', 'http://metrifi-api.test'),
+    'ui_url' => env('APP_UI_URL', 'http://localhost:3000'),
     'asset_url' => env('ASSET_URL', null),
 
     /*

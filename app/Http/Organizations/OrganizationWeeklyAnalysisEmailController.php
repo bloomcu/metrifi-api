@@ -54,7 +54,8 @@ class OrganizationWeeklyAnalysisEmailController extends Controller
         $emails = $notifiableUsers->pluck('email')->toArray();
 
         // Send the email
-        Mail::to($emails)->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
+        // Mail::to($emails)->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
+        Mail::to(['ryan@bloomcu.com'])->send(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         
         return $dashboards;
     }
