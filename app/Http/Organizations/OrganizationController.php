@@ -2,10 +2,11 @@
 
 namespace DDD\Http\Organizations;
 
+use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
+use DDD\Domain\Organizations\Requests\UpdateOrganizationRequest;
 use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class OrganizationController extends Controller
 {
@@ -21,7 +22,7 @@ class OrganizationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Organization $organization, Request $request)
+    public function update(Organization $organization, UpdateOrganizationRequest $request)
     {
         $organization->update($request->all());
 

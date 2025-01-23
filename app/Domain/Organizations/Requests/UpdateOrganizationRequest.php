@@ -23,8 +23,15 @@ class UpdateOrganizationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'string',
-            'domain' => 'required|string|unique:websites',
+            'title' => ['string', 'max:255'],
+            'domain' => ['regex:/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/', 'max:255'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'domain.regex' => 'The domain must be a valid URL or domain name.',
         ];
     }
 
