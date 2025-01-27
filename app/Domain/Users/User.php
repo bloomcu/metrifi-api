@@ -2,18 +2,19 @@
 
 namespace DDD\Domain\Users;
 
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
+use DDD\Domain\Users\Enums\RoleEnum;
+use DDD\Domain\Users\Casts\UserSettingsCast;
+use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Connections\Connection;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Users\Enums\RoleEnum;
-use DDD\Domain\Base\Files\File;
+use DDD\Domain\Files\File;
 
 class User extends Authenticatable
 {
@@ -23,38 +24,29 @@ class User extends Authenticatable
         SoftDeletes,
         CascadeSoftDeletes;
 
-    protected $cascadeDeletes = ['connections', 'funnels', 'dashboards'];
+    protected $cascadeDeletes = [
+        'connections', 
+        'funnels', 
+        'dashboards'
+    ];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
+        'role',
+        'organization_id',
+        'settings',
         'email',
-        'role',            // TODO: Remove
-        'organization_id', // TODO: Remove
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'role' => RoleEnum::class,
+        'settings' => UserSettingsCast::class,
         'email_verified_at' => 'datetime',
         'accepted_terms_at' => 'datetime',
     ];

@@ -1,13 +1,13 @@
 <?php
 
-namespace DDD\Domain\Organizations\Requests;
+namespace DDD\Domain\Users\Requests;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Exception;
 
-class UpdateOrganizationRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,15 +23,7 @@ class UpdateOrganizationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['string', 'max:255'],
-            'domain' => ['regex:/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/', 'max:255'],
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'domain.regex' => 'The domain must be a valid URL or domain name.',
+            'settings' => 'nullable|array',
         ];
     }
 

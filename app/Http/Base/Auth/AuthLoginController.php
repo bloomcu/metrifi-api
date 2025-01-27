@@ -33,6 +33,7 @@ class AuthLoginController extends Controller
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role,
+                'settings' => Auth::user()->settings,
                 'organization' => new OrganizationResource(Auth::user()->organization),
             ],
         ], 200);

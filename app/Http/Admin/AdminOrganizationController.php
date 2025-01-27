@@ -2,10 +2,11 @@
 
 namespace DDD\Http\Admin;
 
+use Illuminate\Http\Request;
+use DDD\Http\Admin\Requests\AdminStoreOrganizationRequest;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Organizations\Organization;
 use DDD\App\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class AdminOrganizationController extends Controller
 {
@@ -22,7 +23,7 @@ class AdminOrganizationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AdminStoreOrganizationRequest $request)
     {
         $organization = Organization::create($request->all());
 

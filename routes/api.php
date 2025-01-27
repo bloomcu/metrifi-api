@@ -26,6 +26,7 @@ use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
+use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -57,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
         // Subscription
         Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
+
+        // Weekly analysis email
+        Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
     });
 
     // Benchmarks
@@ -98,7 +102,6 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('outbound-link-by-page-path-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkByPagePathUsers']);
 
         // Form users
-        // Route::post('form-start-users/{connection}', [GoogleAnalyticsDataController::class, 'formStartUsers']);
         Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
     });
 
@@ -114,6 +117,8 @@ Route::middleware('auth:sanctum')->group(function() {
         // Users
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('/{user}', [UserController::class, 'show']);
+            Route::post('/{user}', [UserController::class, 'update']);
             Route::delete('/{user}', [UserController::class, 'destroy']);
         });
 
