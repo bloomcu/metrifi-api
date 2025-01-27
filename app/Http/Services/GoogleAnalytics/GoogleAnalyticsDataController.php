@@ -52,6 +52,21 @@ class GoogleAnalyticsDataController extends Controller
         ], 200);
     }
 
+    public function pageTitleUsers(Connection $connection, Request $request)
+    {   
+        $report = GoogleAnalyticsData::pageTitleUsers(
+            connection: $connection, 
+            startDate: $request->startDate,
+            endDate: $request->endDate,
+            exact: $request->exact,
+            contains: $request->contains,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
     public function outboundLinkUsers(Connection $connection, Request $request)
     {
         $report = GoogleAnalyticsData::outboundLinkUsers(

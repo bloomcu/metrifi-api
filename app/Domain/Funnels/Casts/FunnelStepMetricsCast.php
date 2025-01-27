@@ -21,15 +21,23 @@ class FunnelStepMetricsCast implements CastsAttributes
             'pageUsers' => [
                 'metric' => 'pageUsers',
                 'pagePath' => null,
+                'hostname' => null,
             ],
             'pagePlusQueryStringUsers' => [
                 'metric' => 'pagePlusQueryStringUsers',
                 'pagePathPlusQueryString' => null,
+                'hostname' => null,
+            ],
+            'pageTitleUsers' => [
+                'metric' => 'pageTitleUsers',
+                'pageTitle' => null,
+                'hostname' => null,
             ],
             'outboundLinkUsers' => [
                 'metric' => 'outboundLinkUsers',
                 'pagePath' => null,
                 'linkUrl' => null,
+                'hostname' => null,
             ],
             'formUserSubmissions' => [
                 'metric' => 'formUserSubmissions',
@@ -38,6 +46,7 @@ class FunnelStepMetricsCast implements CastsAttributes
                 'formId' => null,
                 'formLength' => null,
                 'formSubmitText' => null,
+                'hostname' => null,
             ],
         ];
 
