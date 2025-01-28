@@ -32,6 +32,7 @@ class StepCreateRequest extends FormRequest
             'metrics.*.metric' => 'nullable|string',
             'metrics.*.pagePath' => 'nullable|string',
             'metrics.*.pagePathPlusQueryString' => 'nullable|string',
+            'metrics.*.pageTitle' => 'nullable|string',
             'metrics.*.linkUrl' => 'nullable|string',
             'metrics.*.formDestination' => 'nullable|string',
             'metrics.*.formId' => 'nullable|string',

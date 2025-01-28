@@ -54,7 +54,9 @@ class GoogleAnalyticsDataService
                     // Match exact page path
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
-                            'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
+                            // The page path (web) or screen class (app) on which the event was logged. 
+                            // Synonymous with pagePath in GA4 reports.
+                            'fieldName' => 'unifiedPagePathScreen',
                             'stringFilter' => [
                                 'value' => $metric['pagePath'],
                                 'matchType' => 'EXACT'
@@ -62,11 +64,14 @@ class GoogleAnalyticsDataService
                         ]
                     ];
                 } 
+
                 elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
                     // Match exact page path plus query string
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
-                            'fieldName' => 'unifiedPageScreen', // Synonymous with pagePathPlusQueryString in GA4 reports
+                            // The page path and query string (web) or screen class (app) on which the event was logged. 
+                            // Synonymous with pagePathPlusQueryString in GA4 reports.
+                            'fieldName' => 'unifiedPageScreen', 
                             'stringFilter' => [
                                 'value' => $metric['pagePathPlusQueryString'],
                                 'matchType' => 'EXACT',
@@ -74,6 +79,21 @@ class GoogleAnalyticsDataService
                         ]
                     ];
                 } 
+
+                if ($metric['metric'] === 'pageTitleUsers') {
+                    // Match exact page path
+                    $funnelFilterExpressionList[] = [
+                        'funnelFieldFilter' => [
+                            // The page title (web) or screen name (app) on which the event was logged.
+                            'fieldName' => 'unifiedScreenName',
+                            'stringFilter' => [
+                                'value' => $metric['pageTitle'],
+                                'matchType' => 'EXACT'
+                            ]
+                        ]
+                    ];
+                } 
+
                 elseif ($metric['metric'] === 'outboundLinkUsers') {
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
@@ -280,92 +300,6 @@ class GoogleAnalyticsDataService
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
     }
-
-    private function removeDisabledSteps($funnel, $disabledSteps) {
-        if (!$disabledSteps) {
-            return;
-        }
-
-        foreach ($funnel->steps as $index => $step) {
-            if (in_array($step['id'], $disabledSteps)) {
-
-                // Find the index of the step
-                $index = $this->getStepIndex($this->report['steps'], $step['id']);
-
-                if ($index !== false && $index >= 0) {
-                    array_splice($this->report['steps'], $index, 1);
-                }
-
-                // Remove the step from the report
-                // array_splice($this->report['steps'], $index, 1);
-            }
-        }
-    }
-
-    private function calculateConversionRates() {
-        foreach ($this->report['steps'] as $index => $step) {
-            if ($index === 0) {
-                $this->report['steps'][$index]['conversionRate'] = 100;
-                continue;
-            }
-            
-            try {
-                $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
-            } catch (DivisionByZeroError $e) {
-                $conversionRate = 0;
-            }
-            
-            if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
-                $this->report['steps'][$index]['conversionRate'] = 0;
-                continue;
-            }
-
-            $formatted = $conversionRate * 100; // Get a percentage
-            // $formatted = round($formatted, 2); // Round to 2 decimal places
-            // $formatted = number_format($formatted, 2); // Format with commas
-            // $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
-
-            $this->report['steps'][$index]['conversionRate'] = $formatted;
-        }
-    }
-
-    private function calculateOverallConversionRate() {
-        // if (!$this->report['steps']) { return; }
-
-        $first = $this->report['steps'][0]['users'];
-        $last = end($this->report['steps'])['users'];
-
-        if ($first > 0) {
-            $ocr = ($last / $first) * 100;
-            $this->report['overallConversionRate'] = round($ocr, 5);
-            // $this->report['overallConversionRate'] = $ocr;
-        }
-    }
-
-    private function calculateFunnelAssets($funnel) {
-        $lastStep = end($this->report['steps']);
-        $users = $lastStep['users'];
-        $assets = $users * $funnel->conversion_value;
-
-        $this->report['assets'] = ($assets / 100);
-    }
-
-    private function getReportRowUsers($reportRows, $name) {
-        foreach ($reportRows as $row) {
-            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
-                $users = $row['metricValues'][0]['value'];
-                return $users;
-            }
-        }
-    }
-
-    private function getStepIndex($steps, $id) {
-        foreach ($steps as $index => $step) {
-            if (str_contains($step['id'], $id)) {
-                return $index;
-            }
-        }
-    }
     
     /**
      * Get a list of pages and the number of users who visited them
@@ -484,6 +418,79 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'pagePathPlusQueryString'],
+                ['name' => 'hostname']
+            ],
+            'metrics' => [
+                ['name' => 'totalUsers']
+            ],
+            'dimensionFilter' => [
+                'orGroup' => [
+                    'expressions' => $filters
+                ]
+            ],
+            'limit' => '500',
+            'metricAggregations' => ['TOTAL'],
+        ]);
+    }
+
+    /**
+     * Get a list of pages by their title and the number of users who visited them
+     *
+     * @param Connection $connection
+     * @param string $startDate
+     * @param string $endDate
+     * @param array $exact
+     * @param string $contains
+     * @return array
+     */
+    public function pageTitleUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
+    {
+        // Build filter expression(s)
+        if ($exact && count($exact)) {
+            foreach ($exact as $pageTitle) {
+                $filters[] = [
+                    'filter' => [
+                        'fieldName' => 'pageTitle',
+                        'stringFilter' => [
+                            'matchType' => 'EXACT',
+                            'caseSensitive' => true,
+                            'value' => $pageTitle
+                        ]
+                    ]
+                ];
+            }
+        } elseif ($contains) {
+            $filters[] = [
+                'filter' => [
+                    'fieldName' => 'pageTitle',
+                    'stringFilter' => [
+                        'matchType' => 'CONTAINS',
+                        'caseSensitive' => false,
+                        'value' => $contains
+                    ]
+                ]
+            ];
+        } else {
+            $filters = [
+                [
+                    'filter' => [
+                        'fieldName' => 'pageTitle',
+                        'stringFilter' => [
+                            'matchType' => 'FULL_REGEXP',
+                            'value' => '.+' // Cannot be empty
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        // Run the report
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                ['name' => 'pageTitle'],
                 ['name' => 'hostname']
             ],
             'metrics' => [
@@ -762,5 +769,97 @@ class GoogleAnalyticsDataService
         $validConnection = GoogleAuth::validateConnection($connection);
 
         return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
+    }
+
+    private function removeDisabledSteps($funnel, $disabledSteps) 
+    {
+        if (!$disabledSteps) {
+            return;
+        }
+
+        foreach ($funnel->steps as $index => $step) {
+            if (in_array($step['id'], $disabledSteps)) {
+
+                // Find the index of the step
+                $index = $this->getStepIndex($this->report['steps'], $step['id']);
+
+                if ($index !== false && $index >= 0) {
+                    array_splice($this->report['steps'], $index, 1);
+                }
+
+                // Remove the step from the report
+                // array_splice($this->report['steps'], $index, 1);
+            }
+        }
+    }
+
+    private function calculateConversionRates() 
+    {
+        foreach ($this->report['steps'] as $index => $step) {
+            if ($index === 0) {
+                $this->report['steps'][$index]['conversionRate'] = 100;
+                continue;
+            }
+            
+            try {
+                $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
+            } catch (DivisionByZeroError $e) {
+                $conversionRate = 0;
+            }
+            
+            if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
+                $this->report['steps'][$index]['conversionRate'] = 0;
+                continue;
+            }
+
+            $formatted = $conversionRate * 100; // Get a percentage
+            // $formatted = round($formatted, 2); // Round to 2 decimal places
+            // $formatted = number_format($formatted, 2); // Format with commas
+            // $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
+
+            $this->report['steps'][$index]['conversionRate'] = $formatted;
+        }
+    }
+
+    private function calculateOverallConversionRate() 
+    {
+        // if (!$this->report['steps']) { return; }
+
+        $first = $this->report['steps'][0]['users'];
+        $last = end($this->report['steps'])['users'];
+
+        if ($first > 0) {
+            $ocr = ($last / $first) * 100;
+            $this->report['overallConversionRate'] = round($ocr, 5);
+            // $this->report['overallConversionRate'] = $ocr;
+        }
+    }
+
+    private function calculateFunnelAssets($funnel) 
+    {
+        $lastStep = end($this->report['steps']);
+        $users = $lastStep['users'];
+        $assets = $users * $funnel->conversion_value;
+
+        $this->report['assets'] = ($assets / 100);
+    }
+
+    private function getReportRowUsers($reportRows, $name) 
+    {
+        foreach ($reportRows as $row) {
+            if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
+                $users = $row['metricValues'][0]['value'];
+                return $users;
+            }
+        }
+    }
+
+    private function getStepIndex($steps, $id) 
+    {
+        foreach ($steps as $index => $step) {
+            if (str_contains($step['id'], $id)) {
+                return $index;
+            }
+        }
     }
 }

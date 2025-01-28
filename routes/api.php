@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function() {
         // Page users
         Route::post('page-users/{connection}', [GoogleAnalyticsDataController::class, 'pageUsers']);
         Route::post('page-plus-query-string-users/{connection}', [GoogleAnalyticsDataController::class, 'pagePlusQueryStringUsers']);
+        Route::post('page-title-users/{connection}', [GoogleAnalyticsDataController::class, 'pageTitleUsers']);
 
         // Outbound link users
         Route::post('outbound-link-users/{connection}', [GoogleAnalyticsDataController::class, 'outboundLinkUsers']);
