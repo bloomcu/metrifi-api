@@ -419,7 +419,8 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'pagePathPlusQueryString'],
-                ['name' => 'hostname']
+                ['name' => 'hostname'],
+                ['name' => 'pageTitle'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
