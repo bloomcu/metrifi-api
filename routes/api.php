@@ -8,6 +8,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
+use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 use DDD\Http\Organizations\OrganizationSubscriptionController;
 use DDD\Http\Organizations\OrganizationController;
 use DDD\Http\Funnels\FunnelStepController;
@@ -17,6 +18,7 @@ use DDD\Http\Funnels\FunnelReplicateController;
 use DDD\Http\Funnels\FunnelGenerationController;
 use DDD\Http\Funnels\FunnelController;
 use DDD\Http\Files\FileController;
+use DDD\Http\Dashboards\DashboardReplicateController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
@@ -26,7 +28,6 @@ use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
-use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -194,6 +195,11 @@ Route::middleware('auth:sanctum')->group(function() {
                 Route::post('/{funnel}/enable-steps', [DashboardFunnelController::class, 'enableSteps']);
             });
         });
+
+        // Funnel replicate
+        Route::prefix('dashboards-replicate')->group(function() {
+          Route::post('/{dashboard}', [DashboardReplicateController::class, 'replicate']);
+      });
 
         // Analyses
         Route::prefix('/dashboards/{dashboard}/analyses')->group(function() {
