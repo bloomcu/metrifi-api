@@ -359,7 +359,8 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'pagePath'],
-                ['name' => 'hostname']
+                ['name' => 'hostname'],
+                ['name' => 'pageTitle'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
@@ -418,7 +419,8 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'pagePathPlusQueryString'],
-                ['name' => 'hostname']
+                ['name' => 'hostname'],
+                ['name' => 'pageTitle'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
@@ -491,7 +493,8 @@ class GoogleAnalyticsDataService
             ],
             'dimensions' => [
                 ['name' => 'pageTitle'],
-                ['name' => 'hostname']
+                ['name' => 'hostname'],
+                ['name' => 'pagePath'],
             ],
             'metrics' => [
                 ['name' => 'totalUsers']
