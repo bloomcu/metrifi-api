@@ -24,6 +24,7 @@ class OrganizationResource extends JsonResource
             'is_private' => $this->is_private,
             'automating' => $this->automating,
             'automation_msg' => $this->automation_msg,
+            'return_on_assets' => $this->return_on_assets,
             'onboarding' => $this->onboarding,
             'assets' => $this->assets,
             'subscribed' => $this->subscribed('default'),
