@@ -11,6 +11,7 @@ use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 use DDD\Http\Organizations\OrganizationSubscriptionController;
 use DDD\Http\Organizations\OrganizationController;
+use DDD\Http\Organizations\OrganizationAnalysisController;
 use DDD\Http\Funnels\FunnelStepController;
 use DDD\Http\Funnels\FunnelSnapshotController;
 use DDD\Http\Funnels\FunnelSearchController;
@@ -56,6 +57,9 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
         Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
         Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+
+        // Analyze organization dashboards
+        Route::post('{organization:slug}/analyze', [OrganizationAnalysisController::class, 'analyzeOrganizationDashboards']);
 
         // Subscription
         Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
@@ -196,7 +200,7 @@ Route::middleware('auth:sanctum')->group(function() {
             });
         });
 
-        // Funnel replicate
+        // Replicate dashboard
         Route::prefix('dashboards-replicate')->group(function() {
           Route::post('/{dashboard}', [DashboardReplicateController::class, 'replicate']);
       });
