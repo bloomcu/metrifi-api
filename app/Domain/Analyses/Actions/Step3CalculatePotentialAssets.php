@@ -18,12 +18,16 @@ class Step3CalculatePotentialAssets
             $potential = 0;
         }
 
-        // $potential = $assets + $change;
+        // Get profit per user by first getting assets per user
+        $assetsPerUser = ($assets / 100) / $analysis->subject_funnel_users;
+        $returnOnAssets = $analysis->dashboard->organization->return_on_assets;
+        $profitPerUser = $assetsPerUser * ($returnOnAssets / 100);
+
+        // $profitPerUser = $analysis->dashboard->organization->return_on_assets;
 
         // Build reference
         $reference = $analysis->reference .= $this->generateReference([
             'assets' => $assets,
-            // 'change' => $change,
             'potential' => $potential,
         ]);
 
@@ -31,6 +35,7 @@ class Step3CalculatePotentialAssets
         $analysis->update([
             'subject_funnel_assets' => $assets,
             'subject_funnel_potential_assets' => $potential,
+            'subject_funnel_profit_per_user' => $profitPerUser,
             'reference' => $reference,
         ]);
 
@@ -41,7 +46,6 @@ class Step3CalculatePotentialAssets
         $html = '';
 
         $html .= "<p><strong>Subject funnel assets:</strong> {$reference['assets']}</p>";
-        // $html .= "<p><strong>Biggest opportunity potential assets:</strong> {$reference['change']}</p>";
         $html .= "<p><strong>Subject funnel potential:</strong> {$reference['potential']}</p>";
 
         return $html;
