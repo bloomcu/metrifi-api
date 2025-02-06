@@ -21,8 +21,6 @@ class AnalysisController extends Controller
     public function store(Organization $organization, Dashboard $dashboard, Request $request)
     {   
         return AnalyzeDashboardAction::run($dashboard);
-
-        // Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
     }
 
     public function show(Organization $organization, Dashboard $dashboard, Analysis $analysis)

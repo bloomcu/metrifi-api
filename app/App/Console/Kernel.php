@@ -30,8 +30,8 @@ class Kernel extends ConsoleKernel
         // cd /home/forge/staging-api.metrifi && php artisan schedule:run
         // php /home/forge/staging-api.metrifi/artisan schedule:run
 
-        $schedule->command('admin:snapshot-all-funnels')->dailyAt('02:00')->timezone('America/Denver'); // 00:00 is midnight
-        $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:00')->timezone('America/Denver'); // 00:00 is midnight
+        $schedule->command('admin:snapshot-all-funnels')->dailyAt('04:00')->timezone('America/Denver'); // 00:00 is midnight
+        $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 00:00 is midnight
     }
 
     /**

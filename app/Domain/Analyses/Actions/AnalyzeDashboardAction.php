@@ -26,6 +26,11 @@ class AnalyzeDashboardAction
 
     function handle(Dashboard $dashboard)
     {
+        // Set analysis in progress
+        $dashboard->update([
+            'analysis_in_progress' => 1,
+        ]);
+        
         // Reset issue if dashboard has a previous issue
         if ($dashboard->issue) {
             $dashboard->update([
