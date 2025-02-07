@@ -363,7 +363,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'pageTitle'],
             ],
             'metrics' => [
-                ['name' => 'totalUsers']
+                ['name' => 'activeUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
@@ -423,7 +423,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'pageTitle'],
             ],
             'metrics' => [
-                ['name' => 'totalUsers']
+                ['name' => 'activeUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
@@ -497,7 +497,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'pagePath'],
             ],
             'metrics' => [
-                ['name' => 'totalUsers']
+                ['name' => 'activeUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
@@ -556,7 +556,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'hostname'],
             ],
             'metrics' => [
-                ['name' => 'totalUsers']
+                ['name' => 'activeUsers']
             ],
             'dimensionFilter' => [
                 'orGroup' => [
@@ -727,7 +727,7 @@ class GoogleAnalyticsDataService
                 ['name' => 'hostname'],
             ],
             'metrics' => [
-                ['name' => 'totalUsers']
+                ['name' => 'activeUsers']
             ],
             'dimensionFilter' => [
                 'andGroup' => [
