@@ -47,6 +47,7 @@ class AdminFunnelController extends Controller
                 AllowedFilter::custom('privacy', new FunnelOrganizationPrivacyFilter()),
                 AllowedFilter::custom('category', new FunnelCategoryFilter()),
             ])
+            ->withCount('steps')
             ->paginate(20)
             ->appends(
                 request()->query()

@@ -12,6 +12,6 @@ class FunnelStepsSort implements Sort
         $direction = $descending ? 'desc' : 'asc';
 
         // Join subquery to count steps and sort by the count
-        $query->withCount('steps')->orderBy('steps_count', $direction);
+        $query->orderBy('steps_count', $direction);
     }
 }
