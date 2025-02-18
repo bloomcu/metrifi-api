@@ -75,12 +75,12 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
               ->withCount('steps')
-              ->paginate(20)
+              ->paginate(30)
               ->appends(
                   request()->query()
               );
         }
-
+        
         return FunnelPublicResource::collection($funnels);
     }
 }
