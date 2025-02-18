@@ -35,7 +35,7 @@ class FunnelController extends Controller
               AllowedSort::custom('users', new FunnelUsersSort()),
               AllowedSort::custom('steps_count', new FunnelStepsSort()),
               AllowedSort::custom('category', new FunnelCategorySort()),
-              AllowedSort::field('created', 'created_at'),
+              AllowedSort::field('updated', 'updated_at'),
           ])
           ->allowedFilters([
               AllowedFilter::partial('name'),
