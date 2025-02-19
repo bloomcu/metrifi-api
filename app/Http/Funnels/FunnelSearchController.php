@@ -47,7 +47,8 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
-              ->withCount('steps');
+              ->withCount('steps')
+              ->distinct();
 
         } else {
             $query = QueryBuilder::for(Funnel::class)
@@ -70,7 +71,8 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
-              ->withCount('steps');
+              ->withCount('steps')
+              ->distinct();
         }
         
 
