@@ -28,7 +28,7 @@ class FunnelSearchController extends Controller
     {   
         // Private organization cannot see other funnels
         if ($organization->is_private) {
-            $funnels = QueryBuilder::for(Funnel::class)
+            $query = QueryBuilder::for(Funnel::class)
                 ->where('organization_id', $organization->id)
                 ->allowedSorts([
                   AllowedSort::field('name'),
@@ -47,14 +47,10 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
-              ->withCount('steps')
-              ->paginate(20)
-              ->appends(
-                  request()->query()
-              );
+              ->withCount('steps');
 
         } else {
-            $funnels = QueryBuilder::for(Funnel::class)
+            $query = QueryBuilder::for(Funnel::class)
                 ->whereRelation('organization', 'is_private', false) // Only return anonymous funnels
                 ->allowedSorts([
                   AllowedSort::field('name'),
@@ -74,13 +70,22 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
-              ->withCount('steps')
-              ->paginate(30)
-              ->appends(
-                  request()->query()
-              );
+              ->withCount('steps');
         }
         
-        return FunnelPublicResource::collection($funnels);
+
+        // Ids from all funnels before pagination
+        $allIds = $query->pluck('id');
+
+        // Paginate
+        $funnels = $query->paginate(30)->appends(
+            request()->query()
+        );
+
+        return FunnelPublicResource::collection($funnels)->additional([
+            'meta' => [
+                'all_ids' => $allIds
+            ]
+        ]);
     }
 }
