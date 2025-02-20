@@ -15,7 +15,7 @@ class FunnelAssetsSort implements Sort
 
         $query->orderByRaw("JSON_EXTRACT(snapshots, '$.$period.assets') $direction");
 
-        // Ensure unique results by grouping by funnel ID
-        // $query->groupBy('funnels.id');
+        $query->orderByRaw("JSON_EXTRACT(funnels.snapshots, '$.$period.assets') $direction")
+              ->orderBy('funnels.id', $direction); // Tiebreaker
     }
 }

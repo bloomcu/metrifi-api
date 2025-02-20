@@ -5,8 +5,6 @@ namespace DDD\Http\Funnels;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Sorts\FunnelUsersSort;
@@ -41,17 +39,15 @@ class FunnelSearchController extends Controller
                   AllowedSort::custom('category', new FunnelCategorySort()),
                   AllowedSort::field('created', 'created_at'),
               ])
-              // ->allowedFilters([
-              //     AllowedFilter::partial('name'),
-              //     AllowedFilter::custom('assets', new FunnelAssetsFilter()),
-              //     AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
-              //     AllowedFilter::custom('users', new FunnelUsersFilter()),
-              //     AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
-              //     AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              // ])
-              // ->withCount('steps')
-              ->select('funnels.*')
-              // ->groupBy('funnels.id')
+              ->allowedFilters([
+                  AllowedFilter::partial('name'),
+                  AllowedFilter::custom('assets', new FunnelAssetsFilter()),
+                  AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
+                  AllowedFilter::custom('users', new FunnelUsersFilter()),
+                  AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
+                  AllowedFilter::custom('category', new FunnelCategoryFilter()),
+              ])
+              ->withCount('steps')
               ->distinct();
 
         } else {
@@ -66,31 +62,21 @@ class FunnelSearchController extends Controller
                   AllowedSort::custom('category', new FunnelCategorySort()),
                   AllowedSort::field('updated', 'updated_at'),
               ])
-              // ->allowedFilters([
-              //     AllowedFilter::partial('name'),
-              //     AllowedFilter::custom('organization', new FunnelOrganizationFilter()),
-              //     AllowedFilter::custom('assets', new FunnelAssetsFilter()),
-              //     AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
-              //     AllowedFilter::custom('users', new FunnelUsersFilter()),
-              //     AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
-              //     AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              // ])
-              // ->withCount('steps')
-              ->select('funnels.*')
-              // ->groupBy('funnels.id')
+              ->allowedFilters([
+                  AllowedFilter::partial('name'),
+                  AllowedFilter::custom('organization', new FunnelOrganizationFilter()),
+                  AllowedFilter::custom('assets', new FunnelAssetsFilter()),
+                  AllowedFilter::custom('conversion_rate', new FunnelConversionRateFilter()),
+                  AllowedFilter::custom('users', new FunnelUsersFilter()),
+                  AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
+                  AllowedFilter::custom('category', new FunnelCategoryFilter()),
+              ])
+              ->withCount('steps')
               ->distinct();
         }
         
-        $funnels = $query->get(); // Use get() to see all results
-        Log::info($funnels->pluck('id')->toArray());
-
-        return;
-        
         // Ids from all funnels before pagination
         $allIds = (clone $query)->pluck('id');
-
-        Log::info($query->toSql());
-        Log::info($query->getBindings());
 
         // Paginate
         $funnels = $query->paginate(30)->appends(
@@ -98,25 +84,7 @@ class FunnelSearchController extends Controller
         );
 
         return FunnelPublicResource::collection($funnels)->additional([
-            'meta' => [
-                'all_ids' => $allIds
-            ]
+            'meta' => ['all_ids' => $allIds]
         ]);
-
-        // Paginate and deduplicate
-        // $funnels = $query->paginate(30);
-        // $uniqueItems = $funnels->getCollection()->unique('id');
-        // $funnels = new LengthAwarePaginator(
-        //     $uniqueItems,
-        //     $funnels->total(),
-        //     $funnels->perPage(),
-        //     $funnels->currentPage(),
-        //     ['path' => $funnels->path()]
-        // );
-        // $funnels->appends(request()->query());
-
-        // return FunnelPublicResource::collection($funnels)->additional([
-        //     'meta' => ['all_ids' => $allIds]
-        // ]);
     }
 }
