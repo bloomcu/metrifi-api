@@ -13,6 +13,10 @@ class FunnelConversionRateSort implements Sort
 
         $period = request()->input('period', 'last28Days');
 
-        $query->orderByRaw("JSON_EXTRACT(snapshots, '$.$period.conversion_rate') $direction");
+        // $query->orderByRaw("JSON_EXTRACT(snapshots, '$.$period.conversion_rate') $direction");
+
+        $query->select('funnels.*') // Ensure only funnels columns
+          ->orderByRaw("JSON_EXTRACT(funnels.snapshots, '$.$period.conversion_rate') $direction")
+          ->groupBy('funnels.id'); // Deduplicate within the sort
     }
 }

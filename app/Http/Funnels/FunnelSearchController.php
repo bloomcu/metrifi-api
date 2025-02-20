@@ -48,7 +48,7 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
               ->withCount('steps')
-              ->select('funnels.*') // Explicitly select funnels columns
+              ->select('funnels.*')
               ->groupBy('funnels.id')
               ->distinct();
 
@@ -74,7 +74,7 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
               ->withCount('steps')
-              ->select('funnels.*') // Explicitly select funnels columns
+              ->select('funnels.*')
               ->groupBy('funnels.id')
               ->distinct();
         }
