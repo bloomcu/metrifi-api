@@ -48,8 +48,7 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
               ->withCount('steps')
-              ->distinct()
-              ->groupBy('funnels.id');
+              ->distinct();
 
         } else {
             $query = QueryBuilder::for(Funnel::class)
@@ -73,8 +72,7 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
               ])
               ->withCount('steps')
-              ->distinct()
-              ->groupBy('funnels.id');
+              ->distinct();
         }
         
 
@@ -82,7 +80,7 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->paginate(30)->appends(
+        $funnels = $query->groupBy('funnels.id')->paginate(30)->appends(
             request()->query()
         );
 
