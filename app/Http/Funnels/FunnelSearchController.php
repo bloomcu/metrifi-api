@@ -5,6 +5,7 @@ namespace DDD\Http\Funnels;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Funnels\Sorts\FunnelUsersSort;
@@ -84,12 +85,30 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->paginate(30)->unique('id');
+        // $funnels = $query->paginate(30)->appends(
+        //     request()->query()
+        // );
+
+        // return FunnelPublicResource::collection($funnels)->additional([
+        //     'meta' => [
+        //         'all_ids' => $allIds
+        //     ]
+        // ]);
+
+        // Paginate and deduplicate
+        $funnels = $query->paginate(30);
+        $uniqueItems = $funnels->getCollection()->unique('id');
+        $funnels = new LengthAwarePaginator(
+            $uniqueItems,
+            $funnels->total(),
+            $funnels->perPage(),
+            $funnels->currentPage(),
+            ['path' => $funnels->path()]
+        );
+        $funnels->appends(request()->query());
 
         return FunnelPublicResource::collection($funnels)->additional([
-            'meta' => [
-                'all_ids' => $allIds
-            ]
+            'meta' => ['all_ids' => $allIds]
         ]);
     }
 }
