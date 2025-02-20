@@ -78,7 +78,7 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->groupby('funnels.id')->distinct()->paginate(30)->appends(
+        $funnels = $query->distinct()->paginate(30)->appends(
             request()->query()
         );
 
