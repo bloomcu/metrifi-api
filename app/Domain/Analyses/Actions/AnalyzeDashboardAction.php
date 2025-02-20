@@ -121,7 +121,7 @@ class AnalyzeDashboardAction
                 'end_date' => now()->subDays(1),
             ]);
 
-            if (!$dashboard->issue || !empty($comparisonFunnels)) {
+            if (!empty($comparisonFunnels)) {
                 Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
                 Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
                 Step3CalculatePotentialAssets::run($analysis, $subjectFunnel, $comparisonFunnels);  
