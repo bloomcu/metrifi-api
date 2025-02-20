@@ -46,8 +46,8 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('users', new FunnelUsersFilter()),
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              ])
-              ->withCount('steps');
+              ]);
+              // ->withCount('steps');
 
         } else {
             $query = QueryBuilder::for(Funnel::class)
@@ -69,8 +69,8 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('users', new FunnelUsersFilter()),
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              ])
-              ->withCount('steps');
+              ]);
+              // ->withCount('steps');
         }
         
 
@@ -78,7 +78,7 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->paginate(30)->appends(
+        $funnels = $query->distinct()->paginate(30)->appends(
             request()->query()
         );
 
