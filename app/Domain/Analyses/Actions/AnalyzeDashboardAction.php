@@ -20,16 +20,13 @@ class AnalyzeDashboardAction
     public int $jobTimeout = 30;
 
     function handle(Dashboard $dashboard)
-    {
+    { 
+        // Clean up past issues and warnings
         $dashboard->update([
-            'analysis_in_progress' => 1,
+          'analysis_in_progress' => 1,
+          'issue' => null,
+          'warning' => null,
         ]);
-        
-        if ($dashboard->issue) {
-            $dashboard->update([
-                'issue' => null,
-            ]);
-        }
         
         if (!$dashboard->funnels->count()) {
             $dashboard->update([
@@ -104,12 +101,21 @@ class AnalyzeDashboardAction
             }
         }
 
-        // Optional: Add warning if no comparison funnels remain after filtering
-        if (empty($comparisonFunnels) && count($dashboard->funnels) > 1) {
-            $dashboard->update([
-                'issue' => 'No comparison funnels have the same number of steps as the subject funnel.'
-            ]);
-        }
+        // Check comparison funnel matching status
+        if (count($dashboard->funnels) > 1) { // If there are comparison funnels
+          $matchingCount = count($comparisonFunnels);
+          $totalComparisonCount = count($dashboard->funnels) - 1;
+          
+          if ($matchingCount === 0) {
+              $dashboard->update([
+                  'issue' => 'No comparison funnels have the same number of steps as the subject funnel.'
+              ]);
+          } elseif ($matchingCount < $totalComparisonCount) {
+              $dashboard->update([
+                  'warning' => "Only $matchingCount out of $totalComparisonCount comparison funnels have the same number of steps as the subject funnel."
+              ]);
+          }
+      }
         
         foreach (['median', 'max'] as $analysisType) {
             $analysis = $dashboard->analyses()->create([
