@@ -17,7 +17,7 @@ class AdminFunnelResource extends JsonResource
             'name' => $this->name,
             'conversion_value' => $this->conversion_value,
             'snapshots' => $this->snapshots,
-            'steps_count' => $this->steps->count(),
+            'steps_count' => $this->steps_count,
             'messages' => $this->messages,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

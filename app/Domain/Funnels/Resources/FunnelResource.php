@@ -33,6 +33,7 @@ class FunnelResource extends JsonResource
             'zoom' => $this->zoom,
             'conversion_value' => $this->conversion_value,
             'snapshots' => $this->snapshots,
+            'steps_count' => $this->steps_count,
             'projections' => $this->projections,
             'steps' => FunnelStepResource::collection($this->steps),
             'messages' => $this->messages,

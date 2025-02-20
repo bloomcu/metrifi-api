@@ -22,6 +22,8 @@ class FunnelPublicResource extends JsonResource
             'category' => new CategoryResource($this->category),
             'name' => $this->name,
             'conversion_value' => $this->conversion_value,
+            'snapshots' => $this->snapshots,
+            'steps_count' => $this->steps_count,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

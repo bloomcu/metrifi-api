@@ -14,5 +14,8 @@ class FunnelAssetsSort implements Sort
         $period = request()->input('period', 'last28Days');
 
         $query->orderByRaw("JSON_EXTRACT(snapshots, '$.$period.assets') $direction");
+
+        $query->orderByRaw("JSON_EXTRACT(funnels.snapshots, '$.$period.assets') $direction")
+              ->orderBy('funnels.id', $direction); // Tiebreaker
     }
 }
