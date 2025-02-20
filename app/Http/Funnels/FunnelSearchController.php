@@ -46,8 +46,11 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('users', new FunnelUsersFilter()),
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              ]);
-              // ->withCount('steps');
+              ])
+              ->withCount('steps')
+              ->select('funnels.*') // Explicitly select funnels columns
+              ->groupBy('funnels.id')
+              ->distinct();
 
         } else {
             $query = QueryBuilder::for(Funnel::class)
@@ -69,8 +72,11 @@ class FunnelSearchController extends Controller
                   AllowedFilter::custom('users', new FunnelUsersFilter()),
                   AllowedFilter::custom('steps_count', new FunnelStepsFilter()),
                   AllowedFilter::custom('category', new FunnelCategoryFilter()),
-              ]);
-              // ->withCount('steps');
+              ])
+              ->withCount('steps')
+              ->select('funnels.*') // Explicitly select funnels columns
+              ->groupBy('funnels.id')
+              ->distinct();
         }
         
 
@@ -78,16 +84,14 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->distinct()->paginate(30)->appends(
+        $funnels = $query->paginate(30)->appends(
             request()->query()
         );
 
-        // return FunnelPublicResource::collection($funnels)->additional([
-        //     'meta' => [
-        //         'all_ids' => $allIds
-        //     ]
-        // ]);
-
-        return FunnelPublicResource::collection($funnels);
+        return FunnelPublicResource::collection($funnels)->additional([
+            'meta' => [
+                'all_ids' => $allIds
+            ]
+        ]);
     }
 }
