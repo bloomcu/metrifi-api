@@ -84,9 +84,7 @@ class FunnelSearchController extends Controller
         $allIds = (clone $query)->pluck('id');
 
         // Paginate
-        $funnels = $query->paginate(30)->appends(
-            request()->query()
-        );
+        $funnels = $query->paginate(30)->unique('id');
 
         return FunnelPublicResource::collection($funnels)->additional([
             'meta' => [
