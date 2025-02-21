@@ -96,8 +96,8 @@ class AnalyzeDashboardAction
             } else {
                 // Record issue on the pivot table for this funnel
                 $dashboard->funnels()->updateExistingPivot($comparisonFunnel->id, [
-                    'issue' => "This funnel has $comparisonStepCount steps, expected $subjectStepCount to match subject funnel."
-                ]);
+                  'issue' => "This funnel has $comparisonStepCount " . ($comparisonStepCount == 1 ? 'step' : 'steps') . ", expected $subjectStepCount to match subject funnel."
+              ]);
             }
         }
 
@@ -105,6 +105,7 @@ class AnalyzeDashboardAction
         if (count($dashboard->funnels) > 1) { // If there are comparison funnels
           $matchingCount = count($comparisonFunnels);
           $totalComparisonCount = count($dashboard->funnels) - 1;
+          $nonMatchingCount = $totalComparisonCount - $matchingCount;
           
           if ($matchingCount === 0) {
               $dashboard->update([
@@ -112,10 +113,10 @@ class AnalyzeDashboardAction
               ]);
           } elseif ($matchingCount < $totalComparisonCount) {
               $dashboard->update([
-                  'warning' => "Only $matchingCount out of $totalComparisonCount comparison funnels have the same number of steps as the subject funnel."
+                  'warning' => "$nonMatchingCount out of $totalComparisonCount comparison funnels do not have the same number of steps as the subject funnel."
               ]);
           }
-      }
+        }
         
         foreach (['median', 'max'] as $analysisType) {
             $analysis = $dashboard->analyses()->create([
