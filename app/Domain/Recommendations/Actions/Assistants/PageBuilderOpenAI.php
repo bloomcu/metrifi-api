@@ -11,7 +11,7 @@ use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class PageBuilder implements ShouldQueue
+class PageBuilderOpenAI implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     

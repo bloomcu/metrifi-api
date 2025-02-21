@@ -9,7 +9,7 @@ use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
 use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
-use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
+use DDD\Domain\Recommendations\Actions\Assistants\PageBuilderOpenAI;
 use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
 use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
 use DDD\Domain\Organizations\Organization;

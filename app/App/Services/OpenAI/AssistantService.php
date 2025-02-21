@@ -141,6 +141,19 @@ class AssistantService
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
+    // Get all messages as a single string
+    public function getMessagesAsString(string $threadId) {
+        $messages = $this->getMessages(threadId: $threadId);
+
+        $messageString = '';
+
+        foreach ($messages['data'] as $message) {
+            $messageString .= $message['content'][0]['text']['value'] . ' ';
+        }
+
+        return $messageString;
+    }
+
     // public function getAssistantResponse(string $assistantId, string $message) {
     //     $run = $this->createAndRunThread($assistantId, $message);
 
