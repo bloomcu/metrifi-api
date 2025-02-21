@@ -82,11 +82,14 @@ class PageBuilderMagicPatterns implements ShouldQueue
                 message: $generatedCode
             );
 
+            // Extract the HTML/CSS section from the Grok response
+            $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? $matches[1] : '';
+
             // Update the recommendation with the converted section
             $built = $recommendation->sections_built + 1;
             $recommendation->update([
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $htmlCss,
+                'prototype' => $recommendation->prototype . $cleanHtmlCss,
             ]);
 
             // If there are more sections to build, dispatch a new instance of the job with a delay
