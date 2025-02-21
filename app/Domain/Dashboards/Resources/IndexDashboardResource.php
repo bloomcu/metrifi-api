@@ -26,6 +26,7 @@ class IndexDashboardResource extends JsonResource
             'name' => $this->name,
             'analysis_in_progress' => $this->analysis_in_progress,
             'issue' => $this->issue,
+            'warning' => $this->warning,
             'subject_funnel_performance' => $this->subject_funnel_performance,
             // 'latest_analysis' => new AnalysisResource($this->latestAnalysis),
             // 'latest_analysis' => $this->latestAnalysis,

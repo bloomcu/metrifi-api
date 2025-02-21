@@ -15,47 +15,33 @@ class AnalyzeDashboardAction
 {
     use AsAction;
 
-    /**
-     * Locally run:
-     * php artisan queue:work --sleep=3 --tries=2 --backoff=30
-     */
-
-    public int $jobTries = 2; // number of times the job may be attempted
-    public int $jobBackoff = 120; // number of seconds to wait before retrying
-    public int $jobTimeout = 30; // number of seconds before the job should timeout
+    public int $jobTries = 2;
+    public int $jobBackoff = 120;
+    public int $jobTimeout = 30;
 
     function handle(Dashboard $dashboard)
-    {
-        // Set analysis in progress
+    { 
+        // Clean up past issues and warnings
         $dashboard->update([
-            'analysis_in_progress' => 1,
+          'analysis_in_progress' => 1,
+          'issue' => null,
+          'warning' => null,
         ]);
         
-        // Reset issue if dashboard has a previous issue
-        if ($dashboard->issue) {
-            $dashboard->update([
-                'issue' => null,
-            ]);
-        }
-        
-        // Bail early if dashboard has no subject funnel
         if (!$dashboard->funnels->count()) {
             $dashboard->update([
                 'analysis_in_progress' => 0,
                 'issue' => 'Dashboard has no funnels.'
             ]);
-
             return new ShowDashboardResource($dashboard);
         }
 
-        // Set issue: dashboard has no comparison funnels
         if (count($dashboard->funnels) === 1) {
             $dashboard->update([
                 'issue' => 'Dashboard has no comparison funnels.'
             ]);
         }
 
-        // Setup time period (TODO: accept this as a parameter from the request)
         $period = match ('last28Days') {
             'yesterday' => [
                 'startDate' => now()->subDays(1)->format('Y-m-d'),
@@ -71,7 +57,6 @@ class AnalyzeDashboardAction
             ]
         };
 
-        // Get subject funnel report
         $subjectFunnel = GoogleAnalyticsData::funnelReport(
             funnel: $dashboard->funnels[0], 
             startDate: $period['startDate'], 
@@ -79,49 +64,71 @@ class AnalyzeDashboardAction
             disabledSteps: json_decode($dashboard->funnels[0]->pivot->disabled_steps),
         );
 
-        // Set issue: subject funnel has less than 2 steps
-        // We may learn this after removing user hidden funnels in the report 
         if (count($subjectFunnel['report']['steps']) < 2) {
             $dashboard->update([
                 'issue' => 'Focus funnel has less than two steps.'
             ]);
         }
 
-        // Build array of comparison funnel reports
+        // Build array of comparison funnel reports, only including those with matching step counts
         $comparisonFunnels = [];
         foreach ($dashboard->funnels as $key => $comparisonFunnel) {
-            if ($key === 0) continue; // Skip subject funnel (already processed above)
+            if ($key === 0) continue; // Skip subject funnel
+
             $funnel = GoogleAnalyticsData::funnelReport(
                 funnel: $comparisonFunnel, 
                 startDate: $period['startDate'], 
                 endDate: $period['endDate'],
                 disabledSteps: json_decode($comparisonFunnel->pivot->disabled_steps),
             );
-            array_push($comparisonFunnels, $funnel);
+
+            $subjectStepCount = count($subjectFunnel['report']['steps']);
+            $comparisonStepCount = count($funnel['report']['steps']);
+
+            if ($comparisonStepCount === $subjectStepCount) {
+                $comparisonFunnels[] = $funnel;
+                // Clear any previous issue on the pivot if it matches now
+                if ($comparisonFunnel->pivot->issue) {
+                    $dashboard->funnels()->updateExistingPivot($comparisonFunnel->id, [
+                        'issue' => null
+                    ]);
+                }
+            } else {
+                // Record issue on the pivot table for this funnel
+                $dashboard->funnels()->updateExistingPivot($comparisonFunnel->id, [
+                  'issue' => "This funnel has $comparisonStepCount " . ($comparisonStepCount == 1 ? 'step' : 'steps') . ", expected $subjectStepCount to match subject funnel."
+              ]);
+            }
         }
 
-        // Set issue: if all comparison funnels do not have the same number of steps as subject funnel
-        foreach ($comparisonFunnels as $comparisonFunnel) {
-            if (count($comparisonFunnel['report']['steps']) !== count($subjectFunnel['report']['steps'])) {
-                $dashboard->update([
-                    'issue' => 'One or more funnels do not have the same number of steps.'
-                ]);
-            }
+        // Check comparison funnel matching status
+        if (count($dashboard->funnels) > 1) { // If there are comparison funnels
+          $matchingCount = count($comparisonFunnels);
+          $totalComparisonCount = count($dashboard->funnels) - 1;
+          $nonMatchingCount = $totalComparisonCount - $matchingCount;
+          
+          if ($matchingCount === 0) {
+              $dashboard->update([
+                  'issue' => 'No comparison funnels have the same number of steps as the subject funnel.'
+              ]);
+          } elseif ($matchingCount < $totalComparisonCount) {
+              $dashboard->update([
+                  'warning' => "$nonMatchingCount out of $totalComparisonCount comparison funnels do not have the same number of steps as the subject funnel."
+              ]);
+          }
         }
         
         foreach (['median', 'max'] as $analysisType) {
-            // Create a fresh analysis
             $analysis = $dashboard->analyses()->create([
                 'subject_funnel_id' => $dashboard->funnels[0]->id,
                 'subject_funnel_conversion_value' => $dashboard->funnels[0]->conversion_value,
-                'subject_funnel_assets' => $subjectFunnel['report']['assets'] * 100, // In cents,
+                'subject_funnel_assets' => $subjectFunnel['report']['assets'] * 100,
                 'type' => $analysisType,
-                'start_date' => now()->subDays(28), // 28 days ago
-                'end_date' => now()->subDays(1), // yesterday
+                'start_date' => now()->subDays(28),
+                'end_date' => now()->subDays(1),
             ]);
 
-            // If analysis has no errors, continue with analysis
-            if (!$dashboard->issue) {
+            if (!empty($comparisonFunnels)) {
                 Step1GetSubjectFunnelPerformance::run($analysis, $subjectFunnel, $comparisonFunnels);
                 Step2GetSubjectFunnelBOFI::run($analysis, $subjectFunnel, $comparisonFunnels);
                 Step3CalculatePotentialAssets::run($analysis, $subjectFunnel, $comparisonFunnels);  
