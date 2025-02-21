@@ -45,26 +45,35 @@ class PageBuilderMagicPatterns implements ShouldQueue
 
         // Build the prompt for Magic Patterns
         $prompt = "Build section " . ($recommendation->sections_built + 1) . 
-                 " of a webpage using FontAwesome icons and placeholder images. " . 
-                 "Content Outline: " . $messages;
+                 " from the Content Outline: " . $recommendation->content_outline;
 
         try {
             // Get design from Magic Patterns
             $magicResponse = $this->magicPatterns->createDesign(
                 prompt: $prompt,
-                designSystem: 'html', // Magic Patterns might return React despite this
+                designSystem: 'html',
                 styling: 'tailwind',
-                shouldAwaitGenerations: true,
+                shouldAwaitGenerations: true, // Ensure we get completed generations
                 requestSummary: false,
                 numberOfGenerations: 1
             );
 
-            // Extract the generated code (assuming it might be React)
+            // Extract the sourceCode from the first generation
             $generatedCode = '';
-            if (isset($magicResponse['snapshots']) && !empty($magicResponse['snapshots'])) {
-                // This might need adjustment based on actual Magic Patterns response
-                $generatedCode = $magicResponse['snapshots'][0]['url']; 
-                // If the URL needs to be fetched, you'd need to add HTTP request here
+            if (isset($magicResponse['snapshots']) && 
+                !empty($magicResponse['snapshots']) && 
+                isset($magicResponse['snapshots'][0]['generations']) && 
+                !empty($magicResponse['snapshots'][0]['generations'])) {
+                
+                $generatedCode = $magicResponse['snapshots'][0]['generations'][0]['sourceCode'] ?? '';
+            } else {
+                Log::info('No generations found in Magic Patterns response');
+                throw new \Exception('No generations found in Magic Patterns response');
+            }
+
+            if (empty($generatedCode)) {
+                Log::info('No sourceCode found in Magic Patterns response');
+                throw new \Exception('No sourceCode found in Magic Patterns response');
             }
 
             // Convert React to vanilla HTML/CSS using Grok
