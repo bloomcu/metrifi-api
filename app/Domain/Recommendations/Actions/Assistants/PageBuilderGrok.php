@@ -41,12 +41,14 @@ class PageBuilderGrok implements ShouldQueue
         instructions: 
           'You are an expert website block designer and developer who uses html and tailwind css v3.
           You build beautiful blocks of a webpage that look like they came from Tailwind UIs own block library.
+          Only build one section at a time.
+          Make hero block slightly taller than the others.
+          Use background color to make important blocks stand out.
+          Use an image in the hero block, or icon, somthing visual.
           Use fontawesome icons.
           Use placeholder images from placehold.co (e.g. https://placehold.co/600x400).
-          Use Tailwind color blue.
+          Use violet for the buttons.
           Always fully round buttons.
-          Make hero blocks slightly taller than the others.
-          Only build one section at a time.
           Return the section code as a string, nothing else before or after.',
         message: 'Build section ' . $recommendation->sections_built + 1 . ' from the Content Outline: ' . $recommendation->content_outline,
       );

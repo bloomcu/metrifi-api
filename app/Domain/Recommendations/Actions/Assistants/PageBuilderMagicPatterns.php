@@ -36,7 +36,7 @@ class PageBuilderMagicPatterns implements ShouldQueue
         $this->grok = $grok;
     }
 
-    function handle(Recommendation $recommendation)
+    public function handle(Recommendation $recommendation)
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
@@ -51,25 +51,15 @@ class PageBuilderMagicPatterns implements ShouldQueue
             // Get design from Magic Patterns
             $magicResponse = $this->magicPatterns->createDesign(
                 prompt: $prompt,
-                presetId: 'html-tailwind',
+                // presetId: 'html-tailwind',
             );
 
-            // Extract the sourceCode from the first generation
-            $generatedCode = '';
-            if (isset($magicResponse['snapshots']) && 
-                !empty($magicResponse['snapshots']) && 
-                isset($magicResponse['snapshots'][0]['generations']) && 
-                !empty($magicResponse['snapshots'][0]['generations'])) {
-                
-                $generatedCode = $magicResponse['snapshots'][0]['generations'][0]['sourceCode'] ?? '';
-            } else {
-                Log::info('No generations found in Magic Patterns response');
-                throw new \Exception('No generations found in Magic Patterns response');
-            }
-
+            // Extract the component code from the response
+            $generatedCode = $magicResponse['componentCode'] ?? '';
+            
             if (empty($generatedCode)) {
-                Log::info('No sourceCode found in Magic Patterns response');
-                throw new \Exception('No sourceCode found in Magic Patterns response');
+                Log::info('No componentCode found in Magic Patterns response');
+                throw new \Exception('No componentCode found in Magic Patterns response');
             }
 
             // Convert React to vanilla HTML/CSS using Grok
@@ -79,7 +69,12 @@ class PageBuilderMagicPatterns implements ShouldQueue
             );
 
             // Extract the HTML/CSS section from the Grok response
-            $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? $matches[1] : '';
+            $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
+
+            if (empty($cleanHtmlCss)) {
+                Log::info('Failed to extract HTML from Grok response');
+                throw new \Exception('Failed to extract HTML from Grok response');
+            }
 
             // Update the recommendation with the converted section
             $built = $recommendation->sections_built + 1;
@@ -90,7 +85,7 @@ class PageBuilderMagicPatterns implements ShouldQueue
 
             // If there are more sections to build, dispatch a new instance of the job with a delay
             if ($built < $recommendation->sections_count) {
-                self::dispatch($recommendation)->delay(now()->addSeconds(3));
+                self::dispatch($recommendation);
                 return;
             }
             
