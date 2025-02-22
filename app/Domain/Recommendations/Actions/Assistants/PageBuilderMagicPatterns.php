@@ -19,8 +19,6 @@ class PageBuilderMagicPatterns implements ShouldQueue
     
     public $name = 'page_builder';
     public $timeout = 300;
-    // public $tries = 50;
-    // public $backoff = 5;
 
     protected AssistantService $assistant;
     protected MagicPatternsService $magicPatterns;
@@ -40,9 +38,6 @@ class PageBuilderMagicPatterns implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
-        // Get messages from the thread
-        $messages = $this->assistant->getMessagesAsString($recommendation->thread_id);
-
         // Build the prompt for Magic Patterns
         $prompt = "Build section " . ($recommendation->sections_built + 1) . 
                  " from the Content Outline: " . $recommendation->content_outline;
@@ -54,33 +49,52 @@ class PageBuilderMagicPatterns implements ShouldQueue
                 // presetId: 'html-tailwind',
             );
 
-            // Extract the component code from the response
-            $generatedCode = $magicResponse['componentCode'] ?? '';
+            // Extract the components from the response
+            $components = $magicResponse['components'] ?? [];
             
-            if (empty($generatedCode)) {
-                Log::info('No componentCode found in Magic Patterns response');
-                throw new \Exception('No componentCode found in Magic Patterns response');
+            if (empty($components)) {
+                Log::info('No components found in Magic Patterns response');
+                throw new \Exception('No components found in Magic Patterns response');
             }
 
-            // Convert React to vanilla HTML/CSS using Grok
-            $htmlCss = $this->grok->chat(
-                instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. Use FontAwesome icons and maintain the original styling. Return only the HTML code as a string with inline Tailwind CSS classes, nothing else before or after.',
-                message: $generatedCode
-            );
+            // Convert each React component to vanilla HTML/CSS using Grok
+            $htmlCssSections = '';
+            foreach ($components as $component) {
+                $generatedCode = $component['code'] ?? '';
+                
+                if (empty($generatedCode)) {
+                    Log::info('No code found for component: ' . ($component['name'] ?? 'unknown'));
+                    continue; // Skip this component if no code is present
+                }
 
-            // Extract the HTML/CSS section from the Grok response
-            $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
+                // Convert React to vanilla HTML/CSS using Grok
+                $htmlCss = $this->grok->chat(
+                    instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Return only the HTML code as a string with inline Tailwind CSS classes, nothing else before or after.',
+                    message: $generatedCode
+                );
 
-            if (empty($cleanHtmlCss)) {
-                Log::info('Failed to extract HTML from Grok response');
-                throw new \Exception('Failed to extract HTML from Grok response');
+                // Extract the HTML/CSS section from the Grok response
+                $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
+
+                if (empty($cleanHtmlCss)) {
+                    Log::info('Failed to extract HTML from Grok response for component: ' . ($component['name'] ?? 'unknown'));
+                    continue; // Skip this component if extraction fails
+                }
+
+                // Append the converted HTML/CSS to the sections string
+                $htmlCssSections .= $cleanHtmlCss . "\n";
+            }
+
+            if (empty($htmlCssSections)) {
+                Log::info('No valid HTML/CSS generated from components');
+                throw new \Exception('No valid HTML/CSS generated from components');
             }
 
             // Update the recommendation with the converted section
             $built = $recommendation->sections_built + 1;
             $recommendation->update([
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $cleanHtmlCss,
+                'prototype' => $recommendation->prototype . $htmlCssSections,
             ]);
 
             // If there are more sections to build, dispatch a new instance of the job with a delay

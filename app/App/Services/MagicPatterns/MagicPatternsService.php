@@ -17,18 +17,12 @@ class MagicPatternsService
 
     public function createDesign(
         string $prompt,
-        string $presetId = 'html-tailwind',
     ) {
-        // Prepare the multipart data array
         $multipartData = [
             [
                 'name' => 'prompt',
                 'contents' => $prompt,
-            ],
-            // [
-            //     'name' => 'presetId',
-            //     'contents' => $presetId,
-            // ],
+            ]
         ];
 
         // Send the request with increased timeout and retries
@@ -45,20 +39,19 @@ class MagicPatternsService
         if ($response->successful()) {
             $data = $response->json();
 
-            // Extract the component source file (e.g., App.tsx or a component file)
-            $componentFile = $this->extractComponentSourceFile($data['sourceFiles'] ?? []);
+            // Extract all component source files from /components directory
+            $componentFiles = $this->extractComponentSourceFiles($data['sourceFiles'] ?? []);
 
-            if ($componentFile) {
+            if (!empty($componentFiles)) {
                 return [
                     'id' => $data['id'] ?? null,
-                    'componentCode' => $componentFile['code'] ?? null,
-                    'componentName' => $componentFile['name'] ?? null,
+                    'components' => $componentFiles, // Return an array of components
                     'editorUrl' => $data['editorUrl'] ?? null,
                     'previewUrl' => $data['previewUrl'] ?? null,
                 ];
             }
 
-            throw new \Exception('No valid component source file found in the API response.');
+            throw new \Exception('No valid component source files found in the /components directory.');
         }
 
         // Throw an exception if the request failed
@@ -71,31 +64,30 @@ class MagicPatternsService
     }
 
     /**
-     * Extract the main component source file from the array of source files.
+     * Extract all component source files from the /components directory.
      *
      * @param array $sourceFiles
-     * @return array|null
+     * @return array
      */
-    protected function extractComponentSourceFile(array $sourceFiles): ?array
+    protected function extractComponentSourceFiles(array $sourceFiles): array
     {
+        $components = [];
+
         foreach ($sourceFiles as $file) {
-            // Look for a file that is a React component (e.g., App.tsx or files in components/)
+            // Look for files in /components directory that are JavaScript and not read-only
             if (
                 $file['type'] === 'javascript' &&
                 !$file['isReadOnly'] &&
-                (str_contains($file['name'], 'App.tsx') || str_contains($file['name'], 'components/'))
+                str_contains($file['name'], 'components/')
             ) {
-                return $file;
+                $components[] = [
+                    'id' => $file['id'] ?? null,
+                    'name' => $file['name'] ?? null,
+                    'code' => $file['code'] ?? null,
+                ];
             }
         }
 
-        // Fallback: return the first non-read-only JavaScript file if no clear component is found
-        foreach ($sourceFiles as $file) {
-            if ($file['type'] === 'javascript' && !$file['isReadOnly']) {
-                return $file;
-            }
-        }
-
-        return null;
+        return $components;
     }
 }
