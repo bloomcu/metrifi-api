@@ -17,12 +17,7 @@ class MagicPatternsService
 
     public function createDesign(
         string $prompt,
-        string $designSystem = 'html',
-        string $styling = 'tailwind',
-        ?string $imagePath = null,
-        bool $shouldAwaitGenerations = false,
-        bool $requestSummary = false,
-        int $numberOfGenerations = 1
+        string $presetId = 'html-tailwind',
     ) {
         // Prepare the multipart data array
         $multipartData = [
@@ -31,35 +26,39 @@ class MagicPatternsService
                 'contents' => $prompt,
             ],
             [
-                'name' => 'designSystem',
-                'contents' => $designSystem,
+                'name' => 'presetId',
+                'contents' => $presetId,
             ],
-            [
-                'name' => 'styling',
-                'contents' => $styling,
-            ],
-            [
-                'name' => 'shouldAwaitGenerations',
-                'contents' => $shouldAwaitGenerations ? 'true' : 'false',
-            ],
-            [
-                'name' => 'requestSummary',
-                'contents' => $requestSummary ? 'true' : 'false',
-            ],
-            [
-                'name' => 'numberOfGenerations',
-                'contents' => (string) $numberOfGenerations,
-            ],
+            // [
+            //     'name' => 'designSystem',
+            //     'contents' => $designSystem,
+            // ],
+            // [
+            //     'name' => 'styling',
+            //     'contents' => $styling,
+            // ],
+            // [
+            //     'name' => 'shouldAwaitGenerations',
+            //     'contents' => $shouldAwaitGenerations ? 'true' : 'false',
+            // ],
+            // [
+            //     'name' => 'requestSummary',
+            //     'contents' => $requestSummary ? 'true' : 'false',
+            // ],
+            // [
+            //     'name' => 'numberOfGenerations',
+            //     'contents' => (string) $numberOfGenerations,
+            // ],
         ];
 
         // Add image if provided
-        if ($imagePath && file_exists($imagePath)) {
-            $multipartData[] = [
-                'name' => 'image',
-                'contents' => fopen($imagePath, 'r'),
-                'filename' => basename($imagePath),
-            ];
-        }
+        // if ($imagePath && file_exists($imagePath)) {
+        //     $multipartData[] = [
+        //         'name' => 'image',
+        //         'contents' => fopen($imagePath, 'r'),
+        //         'filename' => basename($imagePath),
+        //     ];
+        // }
 
         // Send the request with increased timeout and retries
         $response = Http::asMultipart()

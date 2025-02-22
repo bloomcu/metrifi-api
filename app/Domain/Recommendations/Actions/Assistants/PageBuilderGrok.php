@@ -38,7 +38,16 @@ class PageBuilderGrok implements ShouldQueue
       $messages = $this->assistant->getMessagesAsString($recommendation->thread_id);
 
       $chat = $this->grok->chat(
-        instructions: 'You are Grok, an expert website section designer and developer who uses html and tailwind css. You build beautiful sections of a webpage that look production ready using fontawesome icons and placeholder images from placehold.co (e.g. https://placehold.co/600x400). You only build one section at a time. You return the section code as a string, nothing else before or after.',
+        instructions: 
+          'You are an expert website block designer and developer who uses html and tailwind css v3.
+          You build beautiful blocks of a webpage that look like they came from Tailwind UIs own block library.
+          Use fontawesome icons.
+          Use placeholder images from placehold.co (e.g. https://placehold.co/600x400).
+          Use Tailwind color blue.
+          Always fully round buttons.
+          Make hero blocks slightly taller than the others.
+          Only build one section at a time.
+          Return the section code as a string, nothing else before or after.',
         message: 'Build section ' . $recommendation->sections_built + 1 . ' from the Content Outline: ' . $recommendation->content_outline,
       );
 

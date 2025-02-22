@@ -51,11 +51,7 @@ class PageBuilderMagicPatterns implements ShouldQueue
             // Get design from Magic Patterns
             $magicResponse = $this->magicPatterns->createDesign(
                 prompt: $prompt,
-                designSystem: 'html',
-                styling: 'tailwind',
-                shouldAwaitGenerations: true, // Ensure we get completed generations
-                requestSummary: false,
-                numberOfGenerations: 1
+                presetId: 'html-tailwind',
             );
 
             // Extract the sourceCode from the first generation

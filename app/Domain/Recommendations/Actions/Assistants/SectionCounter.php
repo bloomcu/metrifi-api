@@ -94,8 +94,8 @@ class SectionCounter implements ShouldQueue
 
             // SectionCategorizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             // PageBuilderOpenAI::dispatch($recommendation)->delay(now()->addSeconds(8));
-            // PageBuilderGrok::dispatch($recommendation)->delay(now()->addSeconds(3));
-            PageBuilderMagicPatterns::dispatch($recommendation)->delay(now()->addSeconds(3));
+            PageBuilderGrok::dispatch($recommendation)->delay(now()->addSeconds(3));
+            // PageBuilderMagicPatterns::dispatch($recommendation)->delay(now()->addSeconds(3));
 
             return;
         }
