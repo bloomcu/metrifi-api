@@ -41,8 +41,6 @@ class PageBuilderOpenAI implements ShouldQueue
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
                 assistantId: 'asst_Wk0cohBVjSRxWLu2XGLd3361',
-                // maxPromptTokens: 10000,
-                // maxCompletionTokens: 10000,
             );
 
             $recommendation->runs = array_merge($recommendation->runs, [
@@ -69,12 +67,6 @@ class PageBuilderOpenAI implements ShouldQueue
         }
 
         if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // if (isset($run['usage'])) {
-            //     Log::info($this->name . ' prompt tokens used: ' . $run['usage']['prompt_tokens']);
-            //     Log::info($this->name . ' completion tokens used: ' . $run['usage']['completion_tokens']);
-            //     Log::info('Current time: ' . now());
-            // }
-
             // Dispatch a new instance of the job with a delay to check int
             self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
             return;

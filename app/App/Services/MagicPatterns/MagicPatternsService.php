@@ -37,7 +37,7 @@ class MagicPatternsService
             ->withHeaders([
                 'x-mp-api-key' => $this->apiKey,
             ])
-            ->timeout(60)
+            ->timeout(300)
             ->retry(3, 1000)
             ->post('/pattern', $multipartData);
 

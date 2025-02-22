@@ -18,9 +18,9 @@ class PageBuilderMagicPatterns implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
     public $name = 'page_builder';
-    public $timeout = 60;
-    public $tries = 50;
-    public $backoff = 5;
+    public $timeout = 300;
+    // public $tries = 50;
+    // public $backoff = 5;
 
     protected AssistantService $assistant;
     protected MagicPatternsService $magicPatterns;
