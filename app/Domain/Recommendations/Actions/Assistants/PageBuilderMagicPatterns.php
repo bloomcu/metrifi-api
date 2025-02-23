@@ -69,7 +69,7 @@ class PageBuilderMagicPatterns implements ShouldQueue
 
                 // Convert React to vanilla HTML/CSS using Grok
                 $htmlCss = $this->grok->chat(
-                    instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. If you are converting a calculator, attempt to produce the vanilla JavaScript needed for it to function. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. If the React code contains small components such as a button, use that componet inside the main component (e.g., inside the hero, feature, etc). Return only the HTML code as a string with inline Tailwind CSS classes, nothing else before or after.',
+                    instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. If you are converting an interactive component, attempt to produce the vanilla JavaScript needed for it to function. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. If the React code contains small components such as a button, use that componet inside the main component (e.g., inside the hero, feature, etc). Return only the HTML code as a string with inline Tailwind CSS classes, nothing else before or after.',
                     message: $generatedCode
                 );
 
