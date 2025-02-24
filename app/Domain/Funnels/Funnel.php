@@ -11,6 +11,7 @@ use DDD\Domain\Messages\Message;
 use DDD\Domain\Funnels\FunnelStep;
 use DDD\Domain\Funnels\Casts\SnapshotsCast;
 use DDD\Domain\Funnels\Casts\ProjectionsCast;
+use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Base\Categories\Category;
 use DDD\App\Traits\BelongsToUser;
@@ -37,6 +38,25 @@ class Funnel extends Model
         'snapshots' => SnapshotsCast::class,
         'projections' => ProjectionsCast::class,
     ];
+
+    protected static function booted()
+    {
+        static::updated(function ($funnel) {
+            // Define the fields that should trigger the job when changed
+            $watchedFields = ['conversion_value'];
+            
+            // Get the changed attributes
+            $changes = $funnel->getChanges();
+            
+            // Check if any of the watched fields have changed
+            $significantChanges = array_intersect_key($changes, array_flip($watchedFields));
+            
+            // If there are changes in the watched fields, dispatch the job
+            if (!empty($significantChanges)) {
+                FunnelSnapshotAction::dispatch($funnel, 'last28Days');
+            }
+        });
+    }
 
     /**
      * Steps associated with the funnel.
