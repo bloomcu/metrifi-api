@@ -2,13 +2,17 @@
 
 namespace DDD\Domain\Funnels;
 
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 use DDD\Domain\Funnels\Traits\IsOrderable;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Funnels\Casts\FunnelStepMetricsCast;
 use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
+use DDD\Domain\Dashboards\Dashboard;
+use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
 use DDD\App\Traits\BelongsToFunnel;
 
 class FunnelStep extends Model
@@ -38,16 +42,28 @@ class FunnelStep extends Model
         static::updated(function ($funnelStep) {
             // Define the fields that should trigger the job when changed
             $watchedFields = ['order', 'metrics'];
-            
-            // Get the changed attributes
             $changes = $funnelStep->getChanges();
-            
-            // Check if any of the watched fields have changed
             $significantChanges = array_intersect_key($changes, array_flip($watchedFields));
             
-            // If there are changes in the watched fields, dispatch the job
+            // If there are changes in the watched fields
             if (!empty($significantChanges)) {
-                FunnelSnapshotAction::dispatch($funnelStep->funnel, 'last28Days');
+              // Snapshot the funnel
+              FunnelSnapshotAction::dispatch($funnelStep->funnel, 'last28Days');
+
+              // If funnel is the subject of any dashboards, analyze it then re-calculate org assets
+              $dashboards = Dashboard::whereFocusFunnelId($funnelStep->funnel->id)->get();
+
+              if ($dashboards->isNotEmpty()) {
+                // Create array of jobs for each dashboard
+                $dashboardJobs = $dashboards->map(function ($dashboard) {
+                    return AnalyzeDashboardAction::makeJob($dashboard);
+                })->all();
+                
+                Bus::chain([
+                  ...$dashboardJobs,
+                  CalculateOrganizationTotalAssetsAction::makeJob($funnelStep->funnel->organization),
+                ])->dispatch();
+              }
             }
         });
     }

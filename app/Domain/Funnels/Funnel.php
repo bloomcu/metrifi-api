@@ -3,10 +3,12 @@
 namespace DDD\Domain\Funnels;
 
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
+use DDD\Domain\Organizations\Actions\CalculateOrganizationTotalAssetsAction;
 use DDD\Domain\Messages\Message;
 use DDD\Domain\Funnels\FunnelStep;
 use DDD\Domain\Funnels\Casts\SnapshotsCast;
@@ -14,6 +16,7 @@ use DDD\Domain\Funnels\Casts\ProjectionsCast;
 use DDD\Domain\Funnels\Actions\FunnelSnapshotAction;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Base\Categories\Category;
+use DDD\Domain\Analyses\Actions\AnalyzeDashboardAction;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToConnection;
@@ -42,19 +45,31 @@ class Funnel extends Model
     protected static function booted()
     {
         static::updated(function ($funnel) {
-            // Define the fields that should trigger the job when changed
-            $watchedFields = ['conversion_value'];
+          // Define the fields that should trigger the job when changed
+          $watchedFields = ['conversion_value'];
+          $changes = $funnel->getChanges();
+          $significantChanges = array_intersect_key($changes, array_flip($watchedFields));
+          
+          // If there are changes in the watched fields, analyze dashboards
+          if (!empty($significantChanges)) {
+            // Snapshot the funnel
+            FunnelSnapshotAction::dispatch($funnel, 'last28Days');
+
+            // If funnel is the subject of any dashboards, analyze it then re-calculate org assets
+            $dashboards = Dashboard::whereFocusFunnelId($funnel->id)->get();
             
-            // Get the changed attributes
-            $changes = $funnel->getChanges();
-            
-            // Check if any of the watched fields have changed
-            $significantChanges = array_intersect_key($changes, array_flip($watchedFields));
-            
-            // If there are changes in the watched fields, dispatch the job
-            if (!empty($significantChanges)) {
-                FunnelSnapshotAction::dispatch($funnel, 'last28Days');
+            if ($dashboards->isNotEmpty()) {
+              // Create array of jobs for each dashboard
+              $dashboardJobs = $dashboards->map(function ($dashboard) {
+                  return AnalyzeDashboardAction::makeJob($dashboard);
+              })->all();
+              
+              Bus::chain([
+                ...$dashboardJobs,
+                CalculateOrganizationTotalAssetsAction::makeJob($funnel->organization),
+              ])->dispatch();
             }
+          }
         });
     }
 
