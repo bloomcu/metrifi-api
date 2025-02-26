@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\PageBuilder;
+use DDD\Domain\Recommendations\Actions\Assistants\OpenAI;
 use DDD\App\Services\OpenAI\AssistantService;
 
 class ComponentPicker implements ShouldQueue
@@ -83,7 +83,7 @@ class ComponentPicker implements ShouldQueue
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
-            PageBuilder::dispatch($recommendation)->delay(now()->addSeconds(8));
+            PageBuilderOpenAI::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
 

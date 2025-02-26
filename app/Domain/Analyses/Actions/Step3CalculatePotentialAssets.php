@@ -18,12 +18,14 @@ class Step3CalculatePotentialAssets
             $potential = 0;
         }
 
-        // Get profit per user by first getting assets per user
-        $assetsPerUser = ($assets / 100) / $analysis->subject_funnel_users;
-        $returnOnAssets = $analysis->dashboard->organization->return_on_assets;
-        $profitPerUser = $assetsPerUser * ($returnOnAssets / 100);
-
-        // $profitPerUser = $analysis->dashboard->organization->return_on_assets;
+        // Calculate profit per user safely
+        $assetsPerUser = 0;
+        $profitPerUser = 0;
+        if ($analysis->subject_funnel_users > 0) {
+            $assetsPerUser = ($assets / 100) / $analysis->subject_funnel_users;
+            $returnOnAssets = $analysis->dashboard->organization->return_on_assets;
+            $profitPerUser = $assetsPerUser * ($returnOnAssets / 100);
+        }
 
         // Build reference
         $reference = $analysis->reference .= $this->generateReference([

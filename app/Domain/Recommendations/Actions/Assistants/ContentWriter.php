@@ -83,7 +83,13 @@ class ContentWriter implements ShouldQueue
         }
 
         if (in_array($run['status'], ['completed', 'incomplete'])) {
-            $recommendation->update(['status' => $this->name . '_completed']);
+            $message = $this->assistant->getFinalMessage(threadId: $recommendation->thread_id);
+
+            $recommendation->update([
+              'status' => $this->name . '_completed',
+              'content_outline' => $message,
+            ]);
+
             SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }

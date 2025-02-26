@@ -50,6 +50,14 @@ return [
         'organization' => env('OPENAI_ORGANIZATION'),
     ],
 
+    'grok' => [
+        'api_key' => env('GROK_API_KEY'),
+    ],
+
+    'magicpatterns' => [
+        'api_key' => env('MAGICPATTERNS_API_KEY'),
+    ],
+
     'thumbio' => [
         'token' => env('THUMBIO_TOKEN'),
     ],
