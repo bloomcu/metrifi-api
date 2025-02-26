@@ -5,6 +5,7 @@ namespace DDD\Http\Recommendations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Http\Request;
 use DDD\Domain\Recommendations\Resources\RecommendationResource;
+use DDD\Domain\Recommendations\Requests\UpdateRecommendationRequest;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
@@ -56,12 +57,12 @@ class RecommendationController extends Controller
         return new RecommendationResource($recommendation);
     }
 
-    // public function update(Organization $organization, Dashboard $dashboard, Analysis $analysis, AnalysisUpdateRequest $request)
-    // {
-    //     $analysis->update($request->validated());
+    public function update(Organization $organization, Dashboard $dashboard, Recommendation $recommendation, UpdateRecommendationRequest $request)
+    {
+        $recommendation->update($request->validated());
 
-    //     return new AnalysisResource($analysis);
-    // }
+        return new RecommendationResource($recommendation);
+    }
 
     // public function destroy(Organization $organization, Dashboard $dashboard, Analysis $analysis)
     // {

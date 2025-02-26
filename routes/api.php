@@ -218,6 +218,7 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
+            Route::put('/{recommendation}', [RecommendationController::class, 'update']);
         });
 
         // Recommendation files
