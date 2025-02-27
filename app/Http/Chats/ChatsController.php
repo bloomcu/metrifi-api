@@ -2,6 +2,7 @@
 
 namespace DDD\Http\Chats;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\App\Services\Grok\GrokService;
@@ -31,7 +32,7 @@ class ChatsController extends Controller
 
       // Base instructions for Grok
       $instructions = "You are a coding expert. " . 
-      "I am requesting changes to an HTML prototype. I may include attached elements in reference to my changes. " . 
+      "I am requesting changes to an HTML prototype. I may include attached elements I want you to update in the prototype html. You must re-write the whole prototype html with your changes.";
       // "Please provide your response in JSON format with two keys:\n" . 
       // "1. 'message' (a string with your natural language response)\n" . 
       // "2. 'data' (the structured data as JSON with the structure { code: the entire updated prototype code. })\n\n" . 
@@ -44,21 +45,21 @@ class ChatsController extends Controller
       $responseFormat = $request->input('response_format');
 
       // Start with users message
-      $fullMessage = "User request:\n" . $userMessage . "Then, return the full updated prototype.";
+      $fullMessage = "User request:\n" . $userMessage;
+
+      // Add the attached elements
+      if (!empty($attachedElements)) {
+        $fullMessage .= "\n\nAttached Elements:\n";
+        $fullMessage .= implode("\n", $attachedElements);
+      }
 
       // Include the prototype HTML
       $fullMessage .= "\n\nPrototype HTML:\n" . $prototypeHtml;
 
-      if (!empty($attachedElements)) {
-          $fullMessage .= "\n\nAttached Elements:\n";
-          foreach ($attachedElements as $index => $html) {
-              $fullMessage .= sprintf(
-                  "%d. %s\n",
-                  $index + 1,
-                  $html
-              );
-          }
-      }
+      // log the instructions
+      // Log::info("Instructions: \n" . $instructions . "\n\n");
+      // Log::info("Full Message:  \n" . $fullMessage . "\n\n");
+      // Log::info("Response format: \n" . $responseFormat . "\n\n");
 
       // Send the formatted message to Grok
       $response = $this->grokService->chat($instructions, $fullMessage, $responseFormat);

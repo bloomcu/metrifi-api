@@ -3,6 +3,7 @@
 namespace DDD\App\Services\Grok;
 
 use OpenAI;
+use Illuminate\Support\Facades\Log;
 
 class GrokService
 {
@@ -13,6 +14,7 @@ class GrokService
         $this->client = OpenAI::factory()
             ->withApiKey(config('services.grok.api_key'))
             ->withBaseUri('https://api.x.ai/v1')
+            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => 300]))
             ->make();
     }
 
@@ -29,6 +31,9 @@ class GrokService
             $systemInstructions .= "\n\nPlease provide your response in JSON format with two keys: 'message' (a string with your natural language response) and 'data' (the structured data as $responseFormat). Do not wrap the response in Markdown code blocks (e.g., ```json). Return only the raw JSON.";
         }
 
+        // Log::info("System instructions: \n" . $systemInstructions . "\n\n");
+        // Log::info("Message:  \n" . $message . "\n\n");
+
         $completion = $this->client->chat()->create([
             'model' => 'grok-beta',
             'messages' => [
@@ -44,6 +49,8 @@ class GrokService
         ]);
 
         $rawResponse = $completion->choices[0]->message->content;
+
+        // Log::info("Raw response: \n" . $rawResponse . "\n\n");
 
         // Clean the response if a format is requested
         return $responseFormat ? $this->cleanMarkdown($rawResponse) : $rawResponse;
