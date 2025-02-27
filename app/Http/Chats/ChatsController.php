@@ -32,7 +32,9 @@ class ChatsController extends Controller
 
       // Base instructions for Grok
       $instructions = "You are a coding expert. " . 
-      "I am requesting changes to an HTML prototype. I may include attached elements I want you to update in the prototype html. You must re-write the whole prototype html with your changes.";
+      "I am requesting changes to an HTML prototype." . 
+      // "I may include attached elements I want you to update in the prototype html." . 
+      "You must return the whole prototype html with your changes.";
       // "Please provide your response in JSON format with two keys:\n" . 
       // "1. 'message' (a string with your natural language response)\n" . 
       // "2. 'data' (the structured data as JSON with the structure { code: the entire updated prototype code. })\n\n" . 
@@ -49,7 +51,7 @@ class ChatsController extends Controller
 
       // Add the attached elements
       if (!empty($attachedElements)) {
-        $fullMessage .= "\n\nAttached Elements:\n";
+        $fullMessage .= "\n\n Elements to be changed in the prototype html:\n";
         $fullMessage .= implode("\n", $attachedElements);
       }
 
