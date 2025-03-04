@@ -54,7 +54,13 @@ class PageBuilderMagicPatterns implements ShouldQueue
             
             if (empty($components)) {
                 Log::info('No components found in Magic Patterns response');
-                throw new \Exception('No components found in Magic Patterns response');
+                // Create a fallback HTML element with the error
+                $components = [
+                    [
+                        'name' => 'error_fallback',
+                        'code' => '<section class="error">Error: No components found in Magic Patterns response</section>'
+                    ]
+                ];
             }
 
             // Convert each React component to vanilla HTML/CSS using Grok
@@ -67,21 +73,24 @@ class PageBuilderMagicPatterns implements ShouldQueue
                     continue; // Skip this component if no code is present
                 }
 
-                // Convert React to vanilla HTML/CSS using Grok
-                $htmlCss = $this->grok->chat(
-                    instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. If you are converting an interactive component, attempt to produce the vanilla JavaScript needed for it to function. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. If the React code contains small components such as a button, use that componet inside the main component (e.g., inside the hero, feature, etc). Always wrap component in a <div> tag. Return only the HTML code as a string with inline Tailwind CSS classes, nothing else before or after.',
-                    message: $generatedCode
-                );
+                try {
+                    // Convert React to vanilla HTML/CSS using Grok
+                    $htmlCss = $this->grok->chat(
+                        instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. If you are converting an interactive component, attempt to produce the vanilla JavaScript needed for it to function. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. If the React code contains small components such as a button, only use that component inside the main component (e.g., inside the hero, feature, etc). Always wrap component in a <section> tag with a unique id attribute using an 8 digit random number. Return only the component HTML code as a string, nothing else before or after.',
+                        message: $generatedCode
+                    );
 
-                // Extract the HTML/CSS section from the Grok response
-                $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
+                    // Extract the HTML/CSS section from the Grok response
+                    $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
 
-                // Wrap the html/css in a section tag with a unique id
-                $cleanHtmlCss = '<section id="section-' . mt_rand(10000000, 99999999) . '">' . $cleanHtmlCss . '</section>';
+                    if (empty($cleanHtmlCss)) {
+                        Log::info('Failed to extract HTML from Grok response for component: ' . ($component['name'] ?? 'unknown'));
+                        $cleanHtmlCss = '<section class="error">Error: Failed to convert component ' . ($component['name'] ?? 'unknown') . '</section>';
+                    }
 
-                if (empty($cleanHtmlCss)) {
-                    Log::info('Failed to extract HTML from Grok response for component: ' . ($component['name'] ?? 'unknown'));
-                    continue; // Skip this component if extraction fails
+                } catch (\Exception $e) {
+                    Log::error('Grok conversion failed for component ' . ($component['name'] ?? 'unknown') . ': ' . $e->getMessage());
+                    $cleanHtmlCss = '<section class="error">Error: Grok conversion failed - ' . $e->getMessage() . '</section>';
                 }
 
                 // Append the converted HTML/CSS to the sections string
@@ -90,7 +99,7 @@ class PageBuilderMagicPatterns implements ShouldQueue
 
             if (empty($htmlCssSections)) {
                 Log::info('No valid HTML/CSS generated from components');
-                throw new \Exception('No valid HTML/CSS generated from components');
+                $htmlCssSections = '<section id="section-' . mt_rand(10000000, 99999999) . '" class="error">Error: No valid HTML/CSS generated</section>';
             }
 
             // Update the recommendation with the converted section
@@ -113,8 +122,22 @@ class PageBuilderMagicPatterns implements ShouldQueue
 
         } catch (\Exception $e) {
             Log::error('Page generation failed: ' . $e->getMessage());
-            $recommendation->update(['status' => 'failed']);
-            throw $e;
+            
+            // Capture MagicPatterns error and create an HTML fallback
+            $errorHtml = '<section id="section-' . mt_rand(10000000, 99999999) . '" class="error">MagicPatterns Error: ' . $e->getMessage() . '</section>';
+            $built = $recommendation->sections_built + 1;
+            
+            $recommendation->update([
+                'sections_built' => $built,
+                'prototype' => $recommendation->prototype . $errorHtml,
+                'status' => $built < $recommendation->sections_count ? $this->name . '_in_progress' : 'done',
+            ]);
+
+            // Continue with the next section if applicable
+            if ($built < $recommendation->sections_count) {
+                self::dispatch($recommendation);
+                return;
+            }
         }
 
         return;
