@@ -23,6 +23,7 @@ use DDD\Http\Dashboards\DashboardReplicateController;
 use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
+use DDD\Http\Chats\ChatsController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
@@ -50,22 +51,6 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [AdminOrganizationController::class, 'index']);
             Route::post('/', [AdminOrganizationController::class, 'store']);
         });
-    });
-
-    // Organizations
-    Route::prefix('organizations')->group(function () {
-        Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
-        Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
-        Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
-
-        // Analyze organization dashboards
-        Route::post('{organization:slug}/analyze', [OrganizationAnalysisController::class, 'analyzeOrganizationDashboards']);
-
-        // Subscription
-        Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
-
-        // Weekly analysis email
-        Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
     });
 
     // Benchmarks
@@ -111,6 +96,22 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
     });
 
+    // Organizations
+    Route::prefix('organizations')->group(function () {
+      Route::get('/{organization:slug}', [OrganizationController::class, 'show']);
+      Route::put('/{organization:slug}', [OrganizationController::class, 'update']);
+      Route::delete('/{organization:slug}', [OrganizationController::class, 'destroy']);
+
+      // Analyze organization dashboards
+      Route::post('{organization:slug}/analyze', [OrganizationAnalysisController::class, 'analyzeOrganizationDashboards']);
+
+      // Subscription
+      Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
+
+      // Weekly analysis email
+      Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
+    });
+
     Route::prefix('{organization:slug}')->group(function() {
         // Stripe
         Route::prefix('stripe')->group(function() {
@@ -135,6 +136,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{file}', [FileController::class, 'show']);
             Route::post('/{file}', [FileController::class, 'update']);
             Route::delete('/{file}', [FileController::class, 'destroy']);
+        });
+
+        // Chat
+        Route::prefix('chats')->group(function() {
+          Route::post('/', [ChatsController::class, 'store']);
         });
 
         // Connections
@@ -218,6 +224,7 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
+            Route::put('/{recommendation}', [RecommendationController::class, 'update']);
         });
 
         // Recommendation files

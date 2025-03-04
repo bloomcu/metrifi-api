@@ -35,7 +35,7 @@ class PageBuilderGrok implements ShouldQueue
       $recommendation->update(['status' => $this->name . '_in_progress']);
 
       // Get messages from the thread
-      $messages = $this->assistant->getMessagesAsString($recommendation->thread_id);
+      // $messages = $this->assistant->getMessagesAsString($recommendation->thread_id);
 
       $chat = $this->grok->chat(
         instructions: 
