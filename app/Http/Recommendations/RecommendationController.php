@@ -2,21 +2,13 @@
 
 namespace DDD\Http\Recommendations;
 
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Http\Request;
 use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\UpdateRecommendationRequest;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\UIAnalyzer;
 use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
-use DDD\Domain\Recommendations\Actions\Assistants\PageBuilderOpenAI;
-use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
-use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Dashboards\Dashboard;
-use DDD\App\Services\Screenshot\ThumbioService;
-use DDD\App\Services\Screenshot\ScreenshotInterface;
 use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
@@ -35,6 +27,12 @@ class RecommendationController extends Controller
         StoreRecommendationRequest $request, 
         AssistantService $assistant,
     ){
+        // For testing: Get recomendation by id and rebuild it
+        // Note: You have to reset the sections_built and prototype columns in db manually
+        // $recommendation = Recommendation::find(81);
+        // DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
+        // return;
+
         $thread = $assistant->createThread();
 
         $recommendation = $dashboard->recommendations()->create([
