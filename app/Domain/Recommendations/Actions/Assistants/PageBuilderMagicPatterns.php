@@ -46,70 +46,60 @@ class PageBuilderMagicPatterns implements ShouldQueue
             // Get design from Magic Patterns
             $magicResponse = $this->magicPatterns->createDesign(
                 prompt: $prompt,
-                // presetId: 'html-tailwind',
             );
+
+            Log::info('Magic Patterns response: ' . json_encode($magicResponse));
 
             // Extract the components from the response
             $components = $magicResponse['components'] ?? [];
             
             if (empty($components)) {
                 Log::info('No components found in Magic Patterns response');
-                // Create a fallback HTML element with the error
-                $components = [
-                    [
-                        'name' => 'error_fallback',
-                        'code' => '<section class="error">Error: No components found in Magic Patterns response</section>'
-                    ]
-                ];
-            }
-
-            // Convert each React component to vanilla HTML/CSS using Grok
-            $htmlCssSections = '';
-            foreach ($components as $component) {
-                $generatedCode = $component['code'] ?? '';
-                
-                if (empty($generatedCode)) {
-                    Log::info('No code found for component: ' . ($component['name'] ?? 'unknown'));
-                    continue; // Skip this component if no code is present
-                }
-
-                try {
-                    // Convert React to vanilla HTML/CSS using Grok
-                    $htmlCss = $this->grok->chat(
-                        instructions: 'You are an expert web developer. Convert the following React code to vanilla HTML and Tailwind CSS. If you are converting an interactive component, attempt to produce the vanilla JavaScript needed for it to function. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. If the React code contains small components such as a button, only use that component inside the main component (e.g., inside the hero, feature, etc). Return only the component HTML code as a string, nothing else before or after. This is most important, always wrap component in a <section> tag with a unique id attribute using timestamp–the id MUST be unique.',
-                        message: $generatedCode
-                    );
-
-                    // Extract the HTML/CSS section from the Grok response
-                    $cleanHtmlCss = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
-
-                    if (empty($cleanHtmlCss)) {
-                        Log::info('Failed to extract HTML from Grok response for component: ' . ($component['name'] ?? 'unknown'));
-                        $cleanHtmlCss = '<section class="error">Error: Failed to convert component ' . ($component['name'] ?? 'unknown') . '</section>';
+                $htmlCssSections = '<section id="section-' . time() . '" class="error">Error: No components found in Magic Patterns response</section>';
+            } else {
+                // Combine all component code into a single string
+                $combinedCode = '';
+                foreach ($components as $component) {
+                    $generatedCode = $component['code'] ?? '';
+                    if (!empty($generatedCode)) {
+                        $combinedCode .= "\n\n// Component: " . ($component['name'] ?? 'unnamed') . "\n" . $generatedCode;
                     }
-
-                } catch (\Exception $e) {
-                    Log::error('Grok conversion failed for component ' . ($component['name'] ?? 'unknown') . ': ' . $e->getMessage());
-                    $cleanHtmlCss = '<section class="error">Error: Grok conversion failed - ' . $e->getMessage() . '</section>';
                 }
 
-                // Append the converted HTML/CSS to the sections string
-                $htmlCssSections .= $cleanHtmlCss . "\n";
-            }
+                if (empty($combinedCode)) {
+                    Log::info('No valid code found in components');
+                    $htmlCssSections = '<section id="section-' . time() . '" class="error">Error: No valid code found in components</section>';
+                } else {
+                    try {
+                        // Convert all components at once to vanilla HTML/CSS using Grok
+                        $htmlCss = $this->grok->chat(
+                            instructions: 'You are an expert web developer. Convert the following React code (which may contain multiple components) to a single cohesive vanilla HTML section with Tailwind CSS. Combine all components into one logical section, maintaining their relationships (e.g., if one component is imported into another). If there are interactive components, include the necessary vanilla JavaScript. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. Return only the component HTML code as a string, nothing else before or after. Wrap the result in a <section> tag with a unique id attribute using timestamp.',
+                            message: $combinedCode
+                        );
 
-            if (empty($htmlCssSections)) {
-                Log::info('No valid HTML/CSS generated from components');
-                $htmlCssSections = '<section id="section-' . mt_rand(10000000, 99999999) . '" class="error">Error: No valid HTML/CSS generated</section>';
+                        // Extract the HTML/CSS section from the Grok response
+                        $htmlCssSections = preg_match('/```html(.*?)```/s', $htmlCss, $matches) ? trim($matches[1]) : '';
+
+                        if (empty($htmlCssSections)) {
+                            Log::info('Failed to extract HTML from Grok response');
+                            $htmlCssSections = '<section id="section-' . time() . '" class="error">Error: Failed to convert components</section>';
+                        }
+
+                    } catch (\Exception $e) {
+                        Log::error('Grok conversion failed: ' . $e->getMessage());
+                        $htmlCssSections = '<section id="section-' . time() . '" class="error">Error: Grok conversion failed - ' . $e->getMessage() . '</section>';
+                    }
+                }
             }
 
             // Update the recommendation with the converted section
             $built = $recommendation->sections_built + 1;
             $recommendation->update([
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $htmlCssSections,
+                'prototype' => $recommendation->prototype . $htmlCssSections . "\n",
             ]);
 
-            // If there are more sections to build, dispatch a new instance of the job with a delay
+            // If there are more sections to build, dispatch a new instance of the job
             if ($built < $recommendation->sections_count) {
                 self::dispatch($recommendation);
                 return;
@@ -123,13 +113,13 @@ class PageBuilderMagicPatterns implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('Page generation failed: ' . $e->getMessage());
             
-            // Capture MagicPatterns error and create an HTML fallback
-            $errorHtml = '<section id="section-' . mt_rand(10000000, 99999999) . '" class="error">MagicPatterns Error: ' . $e->getMessage() . '</section>';
+            // Capture error and create an HTML fallback
+            $errorHtml = '<section id="section-' . time() . '" class="error">MagicPatterns Error: ' . $e->getMessage() . '</section>';
             $built = $recommendation->sections_built + 1;
             
             $recommendation->update([
                 'sections_built' => $built,
-                'prototype' => $recommendation->prototype . $errorHtml,
+                'prototype' => $recommendation->prototype . $errorHtml . "\n",
                 'status' => $built < $recommendation->sections_count ? $this->name . '_in_progress' : 'done',
             ]);
 
