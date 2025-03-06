@@ -29,8 +29,8 @@ class RecommendationController extends Controller
     ){
         // For testing: Get recomendation by id and rebuild it
         // Note: You have to reset the sections_built and prototype columns in db manually
-        // $recommendation = Recommendation::find(81);
-        // DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
+        // $recommendation = Recommendation::find(82);
+        // \DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
         // return;
 
         $thread = $assistant->createThread();

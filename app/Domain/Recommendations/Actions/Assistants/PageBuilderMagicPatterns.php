@@ -73,7 +73,33 @@ class PageBuilderMagicPatterns implements ShouldQueue
                     try {
                         // Convert all components at once to vanilla HTML/CSS using Grok
                         $htmlCss = $this->grok->chat(
-                            instructions: 'You are an expert web developer. Convert the following React code (which may contain multiple components) to a single cohesive vanilla HTML section with Tailwind CSS. Combine all components into one logical section, maintaining their relationships (e.g., if one component is imported into another). If there are interactive components, include the necessary vanilla JavaScript. Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. Use FontAwesome where icons exist. Return only the component HTML code as a string, nothing else before or after. Wrap the result in a <section> tag with a unique id attribute using timestamp.',
+                            instructions: '
+                              You are an expert web developer. 
+                              Convert the following React code (which may contain multiple components) to a single cohesive vanilla HTML section with Tailwind CSS. 
+                              Combine all components into one logical section, maintaining their relationships (e.g., if one component is imported into another). 
+                              If there are interactive components, include the necessary vanilla JavaScript. 
+                              Use placeholder images from placehold.co (e.g. https://placehold.co/600x400) where images exist. 
+                              Use FontAwesome where icons exist. 
+                              Return only the component HTML code as a string, nothing else before or after. 
+                              Wrap the result in a <section> tag. 
+                              Add an id attribute to the section tag with a unique id attribute using timestamp. 
+                              Add a custom attribute called "block-category" with a value from the following options: 
+                              - Hero: A large section at the top of the page, often with a call to action. 
+                              - Feature List: A list of features, benefits, or value propositions. 
+                              - Calculator: A financial calculator or estimator. 
+                              - How It Works: Overview of how something works or process overview. 
+                              - FAQs: Frequently asked questions or top questions. 
+                              - Testimonials: Customer testimonials or reviews. 
+                              - Blog Posts: A list of blog posts or articles. 
+                              - Resources: A list of resources or helpful links. 
+                              - Call to Action: Like a hero but smaller, often at the bottom of the page. 
+                              - Content Section: A general content section, detailed content section or detailed product information. 
+                              - Statistics: A collection of stats (e.g, statistics) or numbers. 
+                              - Comparisons: A comparison of features, products or pricing.
+                              - Team: A list of team members or staff.
+                              - Logo Cloud: A collection of logos or brand marks.
+                              - Table: A table of data or information such as rates, prices, fees. 
+                            ',
                             message: $combinedCode
                         );
 
