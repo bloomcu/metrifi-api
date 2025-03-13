@@ -30,6 +30,8 @@ use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
+use DDD\Http\Pages\PageController;
+use DDD\Http\Pages\PageBlockController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -230,6 +232,22 @@ Route::middleware('auth:sanctum')->group(function() {
         // Recommendation files
         Route::prefix('/recommendations')->group(function() {
             Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
+        });
+
+        // Pages
+        Route::prefix('pages')->group(function() {
+            Route::post('/', [PageController::class, 'store']);
+            Route::get('/{page}', [PageController::class, 'show']);
+            Route::put('/{page}', [PageController::class, 'update']);
+            Route::delete('/{page}', [PageController::class, 'destroy']);
+
+            // Page blocks
+            Route::prefix('{page}/blocks')->group(function() {
+                Route::post('/', [PageBlockController::class, 'store']);
+                Route::get('/{block}', [PageBlockController::class, 'show']);
+                Route::put('/{block}', [PageBlockController::class, 'update']);
+                Route::delete('/{block}', [PageBlockController::class, 'destroy']);
+            });
         });
     }); 
 });

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('thread_id')->nullable();
             $table->string('status')->nullable();
             $table->string('title');
-            $table->longText('content')->nullable();
-            $table->longText('prototype')->nullable();
+            $table->longText('content')->nullable(); // TODO: Remove
+            $table->longText('prototype')->nullable(); // TODO: Remove
             $table->string('period')->nullable();
             $table->longText('reference')->nullable();
             $table->timestamps();

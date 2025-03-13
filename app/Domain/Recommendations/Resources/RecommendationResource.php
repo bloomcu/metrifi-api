@@ -29,6 +29,13 @@ class RecommendationResource extends JsonResource
             'status' => $this->status ?? 'queued',
             'title' => $this->title,
             'content' => $this->content,
+            'pages' => $this->pages->map(function ($page) {
+                return [
+                    'id' => $page->id,
+                    'title' => $page->title,
+                    'url' => $page->url,
+                ];
+            }),
             'prototype' => $this->prototype,
             'period' => $this->period,
             'reference' => $this->reference,
