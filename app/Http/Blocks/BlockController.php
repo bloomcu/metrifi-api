@@ -13,11 +13,12 @@ class BlockController extends Controller
   public function store(Organization $organization, Request $request)
   {
     $validated = $request->validate([
-    'page_id' => 'nullable|exists:pages,id',
+      'page_id' => 'nullable|exists:pages,id',
       'order' => 'nullable|string',
       'title' => 'nullable|string',
       'type' => 'nullable|string',
       'variant' => 'nullable|string',
+      'wordpress_category' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
 
@@ -38,6 +39,7 @@ class BlockController extends Controller
       'title' => 'nullable|string',
       'type' => 'nullable|string',
       'variant' => 'nullable|string',
+      'wordpress_category' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
 
