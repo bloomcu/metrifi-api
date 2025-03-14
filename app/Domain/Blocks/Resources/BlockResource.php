@@ -20,6 +20,7 @@ class BlockResource extends JsonResource
             'outline' => $this->outline,
             'type' => $this->type,
             'variant' => $this->variant,
+            'wordpress_category' => $this->wordpress_category,
             'html' => $this->html,
         ];
     }
