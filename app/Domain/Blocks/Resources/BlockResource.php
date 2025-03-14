@@ -4,7 +4,6 @@ namespace DDD\Domain\Blocks\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
-use DDD\Domain\Users\Resources\UserResource;
 
 class BlockResource extends JsonResource
 {
@@ -18,6 +17,7 @@ class BlockResource extends JsonResource
             'user' => ['name' => $this->user->name],
             'order' => $this->order,
             'title' => $this->title,
+            'outline' => $this->outline,
             'type' => $this->type,
             'variant' => $this->variant,
             'html' => $this->html,

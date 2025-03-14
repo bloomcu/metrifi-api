@@ -22,13 +22,14 @@ class GrokService
         string $instructions,
         string $message,
         ?string $responseFormat = null
-    ) {
+    ){
         // Default system instructions
         $systemInstructions = $instructions;
 
         // If a response format is specified, request both a message and structured data
         if ($responseFormat) {
-            $systemInstructions .= "\n\nPlease provide your response in JSON format with two keys: 'message' (a string with your natural language response) and 'data' (the structured data as $responseFormat). Do not wrap the response in Markdown code blocks (e.g., ```json). Return only the raw JSON.";
+            // $systemInstructions .= "\n\nPlease provide your response in JSON format with two keys: 'message' (a string with your natural language response) and 'data' (the structured data as $responseFormat). Do not wrap the response in Markdown code blocks (e.g., ```json). Return only the raw JSON.";
+            $instructions .= "\n\nCRITICAL: Return your response as JSON with this structure $responseFormat. Do not wrap the response in Markdown (e.g., ```json). Return only the raw JSON.";
         }
 
         // Log::info("System instructions: \n" . $systemInstructions . "\n\n");

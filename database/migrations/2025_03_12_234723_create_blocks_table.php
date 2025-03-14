@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('type')->nullable();
             $table->string('variant')->nullable();
+            $table->longText('outline')->nullable();
             $table->longText('html')->nullable();
             $table->timestamps();
 

@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\ContentWriter;
+use DDD\Domain\Recommendations\Actions\Assistants\WriteContentOutline;
 use DDD\App\Services\OpenAI\AssistantService;
 
 class Anonymizer implements ShouldQueue
@@ -89,7 +89,7 @@ class Anonymizer implements ShouldQueue
                 'content' => $content,
             ]);
     
-            ContentWriter::dispatch($recommendation)->delay(now()->addSeconds(8));
+            WriteContentOutline::dispatch($recommendation)->delay(now()->addSeconds(8));
 
             return;
         }

@@ -58,4 +58,14 @@ class Recommendation extends Model
     {
         return $this->hasMany(Page::class)->orderBy('created_at');
     }
+
+    /**
+     * The latest page associated with this recommendation.
+     * 
+     * @return belongsTo
+     */
+    public function latestPage()
+    {
+        return $this->hasOne(Page::class)->latest();
+    }
 }

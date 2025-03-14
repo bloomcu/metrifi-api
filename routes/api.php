@@ -31,7 +31,7 @@ use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
 use DDD\Http\Pages\PageController;
-use DDD\Http\Pages\PageBlockController;
+use DDD\Http\Blocks\BlockController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -240,14 +240,14 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{page}', [PageController::class, 'show']);
             Route::put('/{page}', [PageController::class, 'update']);
             Route::delete('/{page}', [PageController::class, 'destroy']);
+        });
 
-            // Page blocks
-            Route::prefix('{page}/blocks')->group(function() {
-                Route::post('/', [PageBlockController::class, 'store']);
-                Route::get('/{block}', [PageBlockController::class, 'show']);
-                Route::put('/{block}', [PageBlockController::class, 'update']);
-                Route::delete('/{block}', [PageBlockController::class, 'destroy']);
-            });
+        // Blocks
+        Route::prefix('blocks')->group(function() {
+            Route::post('/', [BlockController::class, 'store']);
+            Route::get('/{block}', [BlockController::class, 'show']);
+            Route::put('/{block}', [BlockController::class, 'update']);
+            Route::delete('/{block}', [BlockController::class, 'destroy']);
         });
     }); 
 });
