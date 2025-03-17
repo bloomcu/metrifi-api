@@ -24,37 +24,38 @@ class ConnectionController extends Controller
     {
         // Handle WordPress Website connections
         if ($request->service === 'WordPress Website') {
-            // Validate WordPress connection
-            $validator = Validator::make($request->all(), [
-                'service' => 'required|string|in:WordPress Website',
-                'name' => 'required|string|max:255',
-                'token' => 'required|array',
-                'token.wordpress_url' => 'required|string|url',
-                'token.username' => 'required|string',
-                'token.app_password' => 'required|string',
-            ]);
-            
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-            
             return $this->storeWordPressConnection($organization, $request);
         }
 
-        $connection = $organization->connections()->create([
-            'user_id' => auth()->user()->id,
-            'service' => $request->service,
-            'account_name' => $request->account_name,
-            'name' => $request->name,
-            'uid' => $request->uid,
-            'token' => $request->token,
-        ]);
-
-        return new ConnectionResource($connection);
+        // Handle Google Analytics connections
+        if ($request->service === 'Google Analytics - Property') {
+            return $this->storeGoogleAnalyticsConnection($organization, $request);
+        }
     }
 
+    /**
+     * Store a WordPress connection.
+     *
+     * @param Organization $organization
+     * @param Request $request
+     * @return ConnectionResource
+     */
     protected function storeWordPressConnection(Organization $organization, Request $request)
     {
+        // Validate WordPress connection
+        $validator = Validator::make($request->all(), [
+            'service' => 'required|string|in:WordPress Website',
+            'name' => 'required|string|max:255',
+            'token' => 'required|array',
+            'token.wordpress_url' => 'required|string|url',
+            'token.username' => 'required|string',
+            'token.app_password' => 'required|string',
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $connection = $organization->connections()->create([
             'user_id' => auth()->user()->id,
             'service' => 'WordPress Website',
@@ -66,6 +67,40 @@ class ConnectionController extends Controller
                 'username' => $request->token['username'],
                 'app_password' => $request->token['app_password'],
             ],
+        ]);
+
+        return new ConnectionResource($connection);
+    }
+
+    /**
+     * Store a Google Analytics connection.
+     *
+     * @param Organization $organization
+     * @param Request $request
+     * @return ConnectionResource
+     */
+    protected function storeGoogleAnalyticsConnection(Organization $organization, Request $request)
+    {
+        // Validate Google Analytics connection
+        $validator = Validator::make($request->all(), [
+            'service' => 'required|string',
+            'account_name' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'uid' => 'required|string',
+            'token' => 'required|array',
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        
+        $connection = $organization->connections()->create([
+            'user_id' => auth()->user()->id,
+            'service' => $request->service,
+            'account_name' => $request->account_name,
+            'name' => $request->name,
+            'uid' => $request->uid,
+            'token' => $request->token,
         ]);
 
         return new ConnectionResource($connection);
