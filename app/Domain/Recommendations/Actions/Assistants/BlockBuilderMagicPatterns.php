@@ -35,8 +35,8 @@ class BlockBuilderMagicPatterns implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
         
-        // Get retry count from job properties or initialize to 0
-        $retryCount = $this->job->payload()['retry_count'] ?? 0;
+        // Get retry count from recommendation metadata or initialize to 0
+        $retryCount = $recommendation->metadata['retry_count'] ?? 0;
         $maxRetries = 2;
 
         try {
@@ -75,7 +75,6 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             try {
                 // Convert all components at once to vanilla HTML/CSS using gpt
                 $gptResponse = $this->gpt->chat(
-                    // model: 'chatgpt-4o-latest',
                     model: 'gpt-4o-2024-11-20',
                     instructions: '
                     You are an expert web developer.
@@ -202,16 +201,37 @@ class BlockBuilderMagicPatterns implements ShouldQueue
 
                 Log::info('GPT response: ' . $gptResponse);
 
-                // $response will be a json string, we need to decode it into actual json
+                // Parse the JSON response
                 $json = json_decode($gptResponse, true);
+
+                // Validate the JSON response
+                if (!$json) {
+                    Log::error('Failed to parse GPT response as JSON: ' . $gptResponse);
+                    throw new \Exception('Failed to parse GPT response as JSON');
+                }
+
+                if (!isset($json['html']) || !isset($json['category'])) {
+                    Log::error('Invalid JSON structure from GPT: ' . $gptResponse);
+                    throw new \Exception('Invalid JSON structure from GPT response: missing required fields');
+                }
+
+                if (empty($json['html'])) {
+                    Log::error('Empty HTML content in GPT response: ' . $gptResponse);
+                    throw new \Exception('Empty HTML content in GPT response');
+                }
 
                 $block->update([
                     'type' => $json['category'], // TODO: Add column 'category' to block table
                     'html' => $json['html'],
                 ]);
 
+                // Reset retry count on success
+                $metadata = $recommendation->metadata ?? [];
+                $metadata['retry_count'] = 0;
+                
                 $recommendation->update([
                     'status' => 'done',
+                    'metadata' => $metadata
                 ]);
                 
             } catch (\Exception $e) {
@@ -228,25 +248,49 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 $nextRetryCount = $retryCount + 1;
                 Log::info("Dispatching new job for retry attempt {$nextRetryCount} of {$maxRetries}");
                 
-                // Dispatch a new job with the same parameters
-                self::dispatch($recommendation, $block)->delay(now()->addSeconds(5));
+                // Update metadata with incremented retry count
+                $metadata = $recommendation->metadata ?? [];
+                $metadata['retry_count'] = $nextRetryCount;
+                $metadata['last_error'] = $errorMessage;
+                $metadata['last_retry_at'] = now()->toIso8601String();
                 
-                // Update status to indicate retry
+                // Update recommendation with new retry count
                 $recommendation->update([
                     'status' => $this->name . '_retrying',
+                    'metadata' => $metadata
                 ]);
+                
+                // Dispatch a new job with the same parameters
+                // Use exponential backoff for retries (5s, 10s, 20s, etc.)
+                $delay = now()->addSeconds(5 * pow(2, $nextRetryCount - 1));
+                self::dispatch($recommendation, $block)->delay($delay);
+                
+                return;
             } else {
                 Log::error("Block generation failed after {$retryCount} retries: {$errorMessage}");
                 
                 // Create an HTML fallback after all retries have failed
-                $html = '<section id="section-' . time() . '" class="error">Error after ' . $retryCount . ' retries: ' . $errorMessage . '</section>';
+                $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
+                    <h3 class="font-bold">Error generating block</h3>
+                    <p>We encountered an issue while generating this block after ' . ($retryCount + 1) . ' attempts.</p>
+                    <p class="text-sm mt-2">Error details: ' . htmlspecialchars($errorMessage) . '</p>
+                </section>';
                 
                 $block->update([
+                    'type' => 'error',
                     'html' => $html,
                 ]);
                 
+                // Store error information in metadata
+                $metadata = $recommendation->metadata ?? [];
+                $metadata['retry_count'] = 0;
+                $metadata['last_error'] = $errorMessage;
+                $metadata['failed_at'] = now()->toIso8601String();
+                $metadata['max_retries_reached'] = true;
+                
                 $recommendation->update([
                     'status' => 'failed',
+                    'metadata' => $metadata
                 ]);
             }
         }
