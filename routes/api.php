@@ -6,6 +6,7 @@ use DDD\Http\Stripe\StripeController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Services\WordPress\WordPressPageController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
@@ -248,6 +249,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{block}', [BlockController::class, 'show']);
             Route::put('/{block}', [BlockController::class, 'update']);
             Route::delete('/{block}', [BlockController::class, 'destroy']);
+        });
+
+        // WordPress
+        Route::prefix('wordpress')->group(function() {
+            Route::post('/pages', [WordPressPageController::class, 'store']);
         });
     }); 
 });
