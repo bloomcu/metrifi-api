@@ -50,7 +50,7 @@ class WordPressPageController extends Controller
             // Prepare the request data
             $postData = [
                 'title' => $formattedTitle,
-                'status' => 'publish',
+                'status' => 'draft',
                 'acf' => [
                     'content_blocks' => $blocks
                 ]
