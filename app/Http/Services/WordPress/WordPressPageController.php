@@ -96,7 +96,7 @@ class WordPressPageController extends Controller
                 } elseif ($statusCode === 404) {
                     $errorMessage = 'WordPress API endpoint not found. Please check the WordPress URL.';
                 } elseif ($statusCode >= 500) {
-                    $errorMessage = "WordPress server error ($statusCode): The server encountered an issue. Please try again later.";
+                    $errorMessage = "WordPress server error ($statusCode): The server encountered an issue. This could be due to incorrect credentials. Please verify your WordPress credentials and try again.";
                 }
             }
 
