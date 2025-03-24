@@ -267,7 +267,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 
                 return;
             } else {
-                Log::error("Block generation failed after {$retryCount} retries: {$errorMessage}");
+                Log::error("Block generation failed after 3 attempts: {$errorMessage}");
                 
                 // Create an HTML fallback after all retries have failed
                 $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
