@@ -22,6 +22,15 @@ class ConnectionController extends Controller
 
     public function store(Organization $organization, Request $request)
     {
+        // Validate service is present
+        $validator = Validator::make($request->all(), [
+            'service' => 'required|string',
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         // Handle WordPress Website connections
         if ($request->service === 'WordPress Website') {
             return $this->storeWordPressConnection($organization, $request);
@@ -31,6 +40,9 @@ class ConnectionController extends Controller
         if ($request->service === 'Google Analytics - Property') {
             return $this->storeGoogleAnalyticsConnection($organization, $request);
         }
+        
+        // If service is not supported
+        return response()->json(['errors' => ['service' => ['Unsupported service type']]], 422);
     }
 
     /**
@@ -88,6 +100,8 @@ class ConnectionController extends Controller
             'name' => 'required|string|max:255',
             'uid' => 'required|string',
             'token' => 'required|array',
+            'token.access_token' => 'required|string',
+            'token.refresh_token' => 'required|string',
         ]);
         
         if ($validator->fails()) {
