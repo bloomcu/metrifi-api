@@ -9,6 +9,7 @@ use Dyrynda\Database\Support\CascadeSoftDeletes;
 use DDD\Domain\Funnels\Funnel;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
+use Illuminate\Support\Facades\Crypt;
 
 class Connection extends Model
 {
@@ -17,27 +18,12 @@ class Connection extends Model
         CascadeSoftDeletes,
         BelongsToOrganization,
         BelongsToUser;
-
+        
     protected $guarded = [
         'id',
     ];
 
-    protected $casts = [
-        'token' => 'json',
-    ];
-
     protected $cascadeDeletes = ['funnels'];
-
-    // public static function boot()
-    // {
-    //     parent::boot();
-
-    //     self::deleting(function (Connection $connection) {
-    //         foreach ($connection->funnels as $funnel) {
-    //             $funnel->cascadeDelete();
-    //         }
-    //     });
-    // }
 
     /**
      * Funnels associated with the connection.
@@ -47,5 +33,25 @@ class Connection extends Model
     public function funnels()
     {
         return $this->hasMany(Funnel::class);
+    }
+
+    /**
+     * Encrypt token json
+     *
+     * @param array $value
+     */    
+    public function setTokenAttribute($value)
+    {
+        $this->attributes['token'] = Crypt::encrypt(json_encode($value));
+    }
+
+    /**
+     * Decrypt token json
+     * 
+     * @return array
+     */
+    public function getTokenAttribute($value)
+    {
+        return json_decode(Crypt::decrypt($value), true);
     }
 }

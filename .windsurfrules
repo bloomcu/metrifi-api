@@ -1,0 +1,6 @@
+- All models can be found in app/Domain/{Domain}/
+- All controllers can be found in app/Http/{Domain}/{Controller}
+- All resources can be found in app/Http/{Domain}/Resources/{Resource}
+- This is a laravel api so never use web routes.
+- Never explain code or changes made, just do it unless asked to explain.
+- Never run php artisan serve.

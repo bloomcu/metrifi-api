@@ -39,8 +39,8 @@ class UserController extends Controller
     public function destroy(Organization $organization, User $user)
     {
         // Check if user role is admin
-        if ($user->role !== RoleEnum::Admin) {
-            return response()->json(['error' => 'Not authorized.'],403);
+        if ($user->role == RoleEnum::Admin) {
+            return response()->json(['error' => 'Not authorized to remove admins.'], 403);
         }
 
         $user->delete();
