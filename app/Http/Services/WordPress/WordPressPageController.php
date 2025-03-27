@@ -36,7 +36,7 @@ class WordPressPageController extends Controller
             $pageTitle = $request->input('title');
             
             // Format the title with current date
-            $formattedTitle = 'MetriFi - ' . $pageTitle . Carbon::now()->format('Y-m-d H:i:s');
+            $formattedTitle = 'MetriFi - ' . $pageTitle . ' - ' . Carbon::now()->format('Y-m-d H:i:s');
 
             // Get blocks from request and parse them
             $blocks = $request->input('blocks', []);
