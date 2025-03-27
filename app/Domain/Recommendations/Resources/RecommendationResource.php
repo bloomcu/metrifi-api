@@ -2,10 +2,11 @@
 
 namespace DDD\Domain\Recommendations\Resources;
 
-use DDD\Domain\Files\File;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DDD\Http\Files\Resources\FileResource;
 use DDD\Domain\Users\Resources\UserResource;
+use DDD\Domain\Pages\Resources\PageResource;
+use DDD\Domain\Files\File;
 
 class RecommendationResource extends JsonResource
 {
@@ -29,6 +30,14 @@ class RecommendationResource extends JsonResource
             'status' => $this->status ?? 'queued',
             'title' => $this->title,
             'content' => $this->content,
+            'pages' => $this->pages->map(function ($page) {
+                return [
+                    'id' => $page->id,
+                    'title' => $page->title,
+                    'url' => $page->url,
+                ];
+            }),
+            'latest_page' => new PageResource($this->latestPage),
             'prototype' => $this->prototype,
             'period' => $this->period,
             'reference' => $this->reference,

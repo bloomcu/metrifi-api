@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use DDD\Domain\Users\User;
 use DDD\Domain\Recommendations\Recommendation;
+use DDD\Domain\Pages\Page;
 use DDD\Domain\Organizations\Casts\OnboardingCast;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Files\File;
 use DDD\Domain\Dashboards\Dashboard;
 use DDD\Domain\Connections\Connection;
+use DDD\Domain\Blocks\Block;
 use DDD\Domain\Base\Teams\Team;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use DDD\Domain\Base\Invitations\Invitation;
@@ -98,6 +100,16 @@ class Organization extends Model {
     public function recommendations()
     {
         return $this->hasMany(Recommendation::class);
+    }
+
+    public function pages()
+    {
+        return $this->hasMany(Page::class);
+    }
+
+    public function blocks()
+    {
+        return $this->hasMany(Block::class);
     }
 
     /**

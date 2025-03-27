@@ -27,10 +27,26 @@ class RecommendationController extends Controller
         StoreRecommendationRequest $request, 
         AssistantService $assistant,
     ){
-        // For testing: Get recomendation by id and rebuild it
+        // For testing: Create page and blocks from content outline
+        // Note: You have to delete the recommendation's latest page blocks in db manually
+        // $recommendation = Recommendation::find(82);
+        // $page = $recommendation->latestPage;
+        // $page->blocks()->delete(); // Start fresh
+        // \DDD\Domain\Recommendations\Actions\Assistants\CreateBlocksFromContentOutline::dispatch($recommendation);
+        // return;
+
+        // For testing: Rebuild blocks with Magic Patterns
         // Note: You have to reset the sections_built and prototype columns in db manually
-        // $recommendation = Recommendation::find(81);
-        // DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
+        // $recommendation = Recommendation::find(82);
+        // \DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
+        // return;
+
+        // For testing: Build blocks with Magic Patterns
+        // Note: You have to reset the sections_built and prototype columns in db manually
+        // $recommendation = Recommendation::find(82);
+        // $page = $recommendation->latestPage;
+        // $block = $page->blocks()->first();
+        // \DDD\Domain\Recommendations\Actions\Assistants\BlockBuilderMagicPatterns::dispatch($recommendation, $block);
         // return;
 
         $thread = $assistant->createThread();

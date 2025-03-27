@@ -9,11 +9,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\SectionCategorizer;
-use DDD\Domain\Recommendations\Actions\Assistants\ComponentPicker;
+use DDD\Domain\Recommendations\Actions\Assistants\CreateBlocksFromContentOutline;
 use DDD\App\Services\OpenAI\AssistantService;
 
-class ContentWriter implements ShouldQueue
+class WriteContentOutline implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
@@ -90,7 +89,8 @@ class ContentWriter implements ShouldQueue
               'content_outline' => $message,
             ]);
 
-            SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(8));
+            // SectionCounter::dispatch($recommendation)->delay(now()->addSeconds(8));
+            CreateBlocksFromContentOutline::dispatch($recommendation);
             return;
         }
 

@@ -6,6 +6,7 @@ use DDD\Http\Stripe\StripeController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
+use DDD\Http\Services\WordPress\WordPressPageController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
@@ -30,6 +31,8 @@ use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
+use DDD\Http\Pages\PageController;
+use DDD\Http\Blocks\BlockController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -230,6 +233,27 @@ Route::middleware('auth:sanctum')->group(function() {
         // Recommendation files
         Route::prefix('/recommendations')->group(function() {
             Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
+        });
+
+        // Pages
+        Route::prefix('pages')->group(function() {
+            Route::post('/', [PageController::class, 'store']);
+            Route::get('/{page}', [PageController::class, 'show']);
+            Route::put('/{page}', [PageController::class, 'update']);
+            Route::delete('/{page}', [PageController::class, 'destroy']);
+        });
+
+        // Blocks
+        Route::prefix('blocks')->group(function() {
+            Route::post('/', [BlockController::class, 'store']);
+            Route::get('/{block}', [BlockController::class, 'show']);
+            Route::put('/{block}', [BlockController::class, 'update']);
+            Route::delete('/{block}', [BlockController::class, 'destroy']);
+        });
+
+        // WordPress
+        Route::prefix('wordpress')->group(function() {
+            Route::post('/pages', [WordPressPageController::class, 'store']);
         });
     }); 
 });

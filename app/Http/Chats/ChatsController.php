@@ -5,16 +5,16 @@ namespace DDD\Http\Chats;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
-use DDD\App\Services\Grok\GrokService;
+use DDD\App\Services\OpenAi\GPTService;
 use DDD\App\Controllers\Controller;
 
 class ChatsController extends Controller
 {
-    protected $grokService;
+    protected $gptService;
 
-    public function __construct(GrokService $grokService)
+    public function __construct(GPTService $gptService)
     {
-        $this->grokService = $grokService;
+        $this->gptService = $gptService;
     }
     
     public function store(Organization $organization, Request $request)
@@ -64,14 +64,14 @@ class ChatsController extends Controller
       // Log::info("Response format: \n" . $responseFormat . "\n\n");
 
       // Send the formatted message to Grok
-      $response = $this->grokService->chat($instructions, $fullMessage, $responseFormat);
+      $response = $this->gptService->chat($instructions, $fullMessage, $responseFormat);
 
       // Attempt to decode the response as JSON if a format was requested
       $structuredResponse = $responseFormat ? json_decode($response, true) : $response;
 
       // If decoding fails, return the raw response as a fallback
       if ($responseFormat && json_last_error() !== JSON_ERROR_NONE) {
-          $structuredResponse = ['error' => 'Invalid response format from Grok', 'raw_response' => $response];
+          $structuredResponse = ['error' => 'Invalid response format ', 'raw_response' => $response];
       }
 
       // Return the structured response directly

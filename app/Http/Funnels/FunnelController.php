@@ -58,7 +58,7 @@ class FunnelController extends Controller
     {
         $funnel = $organization->funnels()->create([
             'user_id' => $request->user()->id,
-            'connection_id' => $organization->connections->first()->id,
+            'connection_id' => $organization->connections->where('service', 'Google Analytics - Property')->first()->id,
             'name' => $request->name,
             'zoom' => 0,
             'conversion_value' => $request->conversion_value,

@@ -8,6 +8,7 @@ use Google\Service\CloudFilestore\Snapshot;
 use DDD\Domain\Admin\Commands\SnapshotAllFunnelsCommand;
 use DDD\Domain\Admin\Commands\AnalyzeAllDashboardsCommand;
 use DDD\App\Console\Commands\SyncRecommendationOrgs;
+use DDD\App\Console\Commands\EncryptConnectionTokens;
 
 class Kernel extends ConsoleKernel
 {
@@ -20,6 +21,7 @@ class Kernel extends ConsoleKernel
         SyncRecommendationOrgs::class,
         AnalyzeAllDashboardsCommand::class,
         SnapshotAllFunnelsCommand::class,
+        EncryptConnectionTokens::class,
     ];
 
     /**
