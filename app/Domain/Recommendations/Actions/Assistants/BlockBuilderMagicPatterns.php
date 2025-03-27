@@ -48,13 +48,13 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 prompt: $prompt,
             );
 
-            Log::info('Magic Patterns response: ' . json_encode($magicResponse));
+            // Log::info('Magic Patterns response: ' . json_encode($magicResponse));
 
             // Extract the components from the response
             $components = $magicResponse['components'] ?? [];
             
             if (empty($components)) {
-                Log::info('No components found in Magic Patterns response');
+                // Log::info('No components found in Magic Patterns response');
                 throw new \Exception('No components found in Magic Patterns response');
             }
             
@@ -68,7 +68,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             }
 
             if (empty($combinedCode)) {
-                Log::info('No valid code found in components');
+                Log::info('BlockBuilderMagicPatterns: No valid code found in components');
                 throw new \Exception('No valid code found in components');
             }
             
@@ -199,24 +199,24 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                     responseFormat: '{html: string, category: string}'
                 );
 
-                Log::info('GPT response: ' . $gptResponse);
+                // Log::info('GPT response: ' . $gptResponse);
 
                 // Parse the JSON response
                 $json = json_decode($gptResponse, true);
 
                 // Validate the JSON response
                 if (!$json) {
-                    Log::error('Failed to parse GPT response as JSON: ' . $gptResponse);
+                    Log::error('BlockBuilderMagicPatterns: Failed to parse GPT response as JSON: ' . $gptResponse);
                     throw new \Exception('Failed to parse GPT response as JSON');
                 }
 
                 if (!isset($json['html']) || !isset($json['category'])) {
-                    Log::error('Invalid JSON structure from GPT: ' . $gptResponse);
+                    Log::error('BlockBuilderMagicPatterns: Invalid JSON structure from GPT: ' . $gptResponse);
                     throw new \Exception('Invalid JSON structure from GPT response: missing required fields');
                 }
 
                 if (empty($json['html'])) {
-                    Log::error('Empty HTML content in GPT response: ' . $gptResponse);
+                    Log::error('BlockBuilderMagicPatterns: Empty HTML content in GPT response: ' . $gptResponse);
                     throw new \Exception('Empty HTML content in GPT response');
                 }
 
@@ -235,18 +235,18 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 ]);
                 
             } catch (\Exception $e) {
-                Log::error('GPT conversion failed: ' . $e->getMessage());
+                Log::error('BlockBuilderMagicPatterns: GPT conversion failed: ' . $e->getMessage());
                 throw new \Exception('GPT conversion failed: ' . $e->getMessage());
             }
             
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
-            Log::warning("Block generation attempt failed: {$errorMessage}. Retry count: {$retryCount}");
+            // Log::warning("BlockBuilderMagicPatterns: Block generation attempt failed: {$errorMessage}. Retry count: {$retryCount}");
             
             if ($retryCount < $maxRetries) {
                 // Increment retry count for next attempt
                 $nextRetryCount = $retryCount + 1;
-                Log::info("Dispatching new job for retry attempt {$nextRetryCount} of {$maxRetries}");
+                // Log::info("BlockBuilderMagicPatterns: Dispatching new job for retry attempt {$nextRetryCount} of {$maxRetries}");
                 
                 // Update metadata with incremented retry count
                 $metadata = $recommendation->metadata ?? [];
@@ -267,7 +267,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 
                 return;
             } else {
-                Log::error("Block generation failed after 3 attempts: {$errorMessage}");
+                Log::error("BlockBuilderMagicPatterns: Block generation failed after 3 attempts: {$errorMessage}");
                 
                 // Create an HTML fallback after all retries have failed
                 $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">

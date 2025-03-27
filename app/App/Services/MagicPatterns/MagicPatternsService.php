@@ -3,6 +3,7 @@
 namespace DDD\App\Services\MagicPatterns;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MagicPatternsService
 {
@@ -51,16 +52,15 @@ class MagicPatternsService
                 ];
             }
 
-            throw new \Exception('No valid component source files found in the /components directory.');
+            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory.';
+            Log::error($noValidComponentError);
+            throw new \Exception($noValidComponentError);
         }
 
         // Throw an exception if the request failed
-        throw new \Exception(
-            'Magic Patterns API request failed: ' .
-            $response->status() .
-            ' - ' .
-            $response->body()
-        );
+        $apiRequestFailedError = 'Magic Patterns Service: Magic Patterns API request failed: ' . $response->status() . ' - ' . $response->body();
+        Log::error($apiRequestFailedError);
+        throw new \Exception($apiRequestFailedError);
     }
 
     /**
