@@ -40,7 +40,7 @@ class MagicPatternsService
         if ($response->successful()) {
             $data = $response->json();
 
-            Log::info('Magic Patterns service response: ' . json_encode($data));
+            // Log::info('Magic Patterns service response: ' . json_encode($data));
 
             // Extract all component source files from /components directory
             $componentFiles = $this->extractComponentSourceFiles($data['sourceFiles'] ?? []);
