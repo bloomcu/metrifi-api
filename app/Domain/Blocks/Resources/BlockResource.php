@@ -17,10 +17,12 @@ class BlockResource extends JsonResource
             'organization' => ['slug' => $this->organization->slug],
             'user' => ['name' => $this->user->name],
             'order' => $this->order,
+            'status' => $this->status,
+            'error' => $this->error,
             'title' => $this->title,
             'outline' => $this->outline,
             'type' => $this->type,
-            'variant' => $this->variant,
+            'layout' => $this->layout,
             'wordpress_category' => $this->wordpress_category,
             'html' => $this->html,
         ];
