@@ -223,6 +223,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 $block->update([
                     'type' => $json['category'], // TODO: Add column 'category' to block table
                     'html' => $json['html'],
+                    'status' => 'done'
                 ]);
 
                 // Reset retry count on success

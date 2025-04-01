@@ -33,6 +33,7 @@ use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
 use DDD\Http\Pages\PageController;
 use DDD\Http\Blocks\BlockController;
+use DDD\Http\Blocks\BlockRegenerationController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -249,6 +250,9 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{block}', [BlockController::class, 'show']);
             Route::put('/{block}', [BlockController::class, 'update']);
             Route::delete('/{block}', [BlockController::class, 'destroy']);
+
+            // Regenerate block html
+            Route::put('/{block}/regenerate', [BlockRegenerationController::class, 'store']);
         });
 
         // WordPress
