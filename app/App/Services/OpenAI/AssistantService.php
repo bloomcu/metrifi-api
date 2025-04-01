@@ -82,7 +82,7 @@ class AssistantService
             }
 
             if ($run['status'] === 'failed') {
-                throw new \Exception("Run failed");
+                throw new \Exception("OpenAI Assistant run failed");
             }
 
             sleep(4);
@@ -90,7 +90,7 @@ class AssistantService
             $attempts++;
         }
 
-        throw new \Exception("Polling exceeded the maximum number of attempts.");
+        throw new \Exception("OpenAI Assistant polling exceeded the maximum number of attempts.");
         
         // $pollingInterval = 1; // Set delay in seconds between polls
         // $maxPollingAttempts = 20; // Limit number of attempts
