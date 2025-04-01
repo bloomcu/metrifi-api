@@ -21,6 +21,11 @@ class BlockRegenerationController extends Controller
             return response()->json(['error' => 'Block does not belong to a page'], Response::HTTP_BAD_REQUEST);
         }
 
+        // Check if the block has an outline
+        if (!$block->outline) {
+            return response()->json(['error' => 'Block does not have an outline'], Response::HTTP_BAD_REQUEST);
+        }
+
         // Check if page belongs to a recommendation
         $recommendation = $block->page->recommendation;
         if (!$recommendation) {
