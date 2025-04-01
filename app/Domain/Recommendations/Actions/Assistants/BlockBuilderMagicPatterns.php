@@ -55,7 +55,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             
             if (empty($components)) {
                 // Log::info('No components found in Magic Patterns response');
-                throw new \Exception('No components found in Magic Patterns response');
+                throw new \Exception('Magic Patterns: No components found in Magic Patterns response');
             }
             
             // Combine all component code into a single string
@@ -68,8 +68,8 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             }
 
             if (empty($combinedCode)) {
-                Log::info('BlockBuilderMagicPatterns: No valid code found in components');
-                throw new \Exception('No valid code found in components');
+                Log::info('Magic Patterns: No valid code found in components');
+                throw new \Exception('Magic Patterns: No valid code found in components');
             }
             
             try {
@@ -206,18 +206,18 @@ class BlockBuilderMagicPatterns implements ShouldQueue
 
                 // Validate the JSON response
                 if (!$json) {
-                    Log::error('BlockBuilderMagicPatterns: Failed to parse GPT response as JSON: ' . $gptResponse);
-                    throw new \Exception('Failed to parse GPT response as JSON');
+                    Log::error('Magic Patterns: Failed to parse GPT response as JSON: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Failed to parse GPT response as JSON.' . $gptResponse);
                 }
 
                 if (!isset($json['html']) || !isset($json['category'])) {
-                    Log::error('BlockBuilderMagicPatterns: Invalid JSON structure from GPT: ' . $gptResponse);
-                    throw new \Exception('Invalid JSON structure from GPT response: missing required fields');
+                    Log::error('Magic Patterns: Invalid JSON structure from GPT: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Invalid JSON structure from GPT.' . $gptResponse);
                 }
 
                 if (empty($json['html'])) {
-                    Log::error('BlockBuilderMagicPatterns: Empty HTML content in GPT response: ' . $gptResponse);
-                    throw new \Exception('Empty HTML content in GPT response');
+                    Log::error('Magic Patterns: Empty HTML content in GPT response: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Empty HTML content in GPT response.' . $gptResponse);
                 }
 
                 $block->update([
@@ -235,8 +235,8 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 ]);
                 
             } catch (\Exception $e) {
-                Log::error('BlockBuilderMagicPatterns: GPT conversion failed: ' . $e->getMessage());
-                throw new \Exception('GPT conversion failed: ' . $e->getMessage());
+                Log::error('Magic Patterns: GPT conversion failed: ' . $e->getMessage());
+                throw new \Exception('Magic Patterns: GPT conversion failed: ' . $e->getMessage());
             }
             
         } catch (\Exception $e) {
@@ -267,8 +267,9 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 
                 return;
             } else {
-                Log::error("BlockBuilderMagicPatterns: Block generation failed after 3 attempts: {$errorMessage}");
-                
+                Log::error("Magic Patterns: Block generation failed after 3 attempts: {$errorMessage}");
+                throw new \Exception("Magic Patterns: Block generation failed after 3 attempts: {$errorMessage}");
+
                 // Create an HTML fallback after all retries have failed
                 $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
                     <h3 class="font-bold">Error generating block</h3>
