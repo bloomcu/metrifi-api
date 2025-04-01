@@ -21,7 +21,7 @@ return [
     'release' => env('SENTRY_RELEASE'),
 
     // When left empty or `null` the Laravel environment will be used (usually discovered from `APP_ENV` in your `.env`)
-    'environment' => env('SENTRY_ENVIRONMENT'),
+    'environment' => env('SENTRY_ENVIRONMENT', 'APP_ENV'),
 
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#sample-rate
     'sample_rate' => env('SENTRY_SAMPLE_RATE') === null ? 1.0 : (float) env('SENTRY_SAMPLE_RATE'),
