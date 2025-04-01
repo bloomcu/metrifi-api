@@ -53,11 +53,6 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             // Extract the components from the response
             $components = $magicResponse['components'] ?? [];
             
-            if (empty($components)) {
-                // Log::info('No components found in Magic Patterns response');
-                throw new \Exception('Magic Patterns: No components found in Magic Patterns response');
-            }
-            
             // Combine all component code into a single string
             $combinedCode = '';
             foreach ($components as $component) {
@@ -65,11 +60,6 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 if (!empty($generatedCode)) {
                     $combinedCode .= "\n\n// Component: " . ($component['name'] ?? 'unnamed') . "\n" . $generatedCode;
                 }
-            }
-
-            if (empty($combinedCode)) {
-                Log::info('Magic Patterns: No valid code found in components');
-                throw new \Exception('Magic Patterns: No valid code found in components');
             }
             
             try {
