@@ -4,10 +4,9 @@ namespace DDD\App\Console;
 
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Scheduling\Schedule;
-use Google\Service\CloudFilestore\Snapshot;
 use DDD\Domain\Admin\Commands\SnapshotAllFunnelsCommand;
+use DDD\Domain\Admin\Commands\SendAllOrganizationWeeklyAnalysisEmailCommand;
 use DDD\Domain\Admin\Commands\AnalyzeAllDashboardsCommand;
-use DDD\App\Console\Commands\SyncRecommendationOrgs;
 use DDD\App\Console\Commands\EncryptConnectionTokens;
 
 class Kernel extends ConsoleKernel
@@ -18,22 +17,24 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        SyncRecommendationOrgs::class,
         AnalyzeAllDashboardsCommand::class,
+        SendAllOrganizationWeeklyAnalysisEmailCommand::class,
         SnapshotAllFunnelsCommand::class,
         EncryptConnectionTokens::class,
     ];
 
     /**
      * Define the application's command schedule.
+     * 00:00 is midnight
      */
     protected function schedule(Schedule $schedule): void
     {
         // cd /home/forge/staging-api.metrifi && php artisan schedule:run
         // php /home/forge/staging-api.metrifi/artisan schedule:run
 
-        $schedule->command('admin:snapshot-all-funnels')->dailyAt('04:00')->timezone('America/Denver'); // 00:00 is midnight
-        $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 00:00 is midnight
+        $schedule->command('admin:snapshot-all-funnels')->dailyAt('04:00')->timezone('America/Denver'); // 4:00 am
+        $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 4:30 am
+        // $schedule->command('admin:send-all-organization-weekly-analysis-email')->mondays()->at('09:00')->timezone('America/Denver'); // 9:00 am on Monday
     }
 
     /**
