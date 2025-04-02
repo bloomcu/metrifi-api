@@ -18,6 +18,7 @@ class AuthRegisterWithInvitationController extends Controller
             'name' => $request->name,
             'email' => $invitation->email,
             'role' => 'editor', // TODO: Remove
+            'settings' => ['send_weekly_website_analysis' => false],
             'organization_id' => $invitation->organization->id,
             'password' => Hash::make($request->password),
         ]);
