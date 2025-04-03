@@ -45,16 +45,16 @@ class MagicPatternsService
             // Extract all component source files from /components directory
             $componentFiles = $this->extractComponentSourceFiles($data['sourceFiles'] ?? []);
 
-            if (!empty($componentFiles)) {
-                return [
-                    'id' => $data['id'] ?? null,
-                    'components' => $componentFiles, // Return an array of components
-                    'editorUrl' => $data['editorUrl'] ?? null,
-                    'previewUrl' => $data['previewUrl'] ?? null,
-                ];
-            }
+            // if (!empty($componentFiles)) {
+            //     return [
+            //         'id' => $data['id'] ?? null,
+            //         'components' => $componentFiles, // Return an array of components
+            //         'editorUrl' => $data['editorUrl'] ?? null,
+            //         'previewUrl' => $data['previewUrl'] ?? null,
+            //     ];
+            // }
 
-            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory.';
+            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx.';
             Log::error($noValidComponentError);
             throw new \Exception($noValidComponentError);
         }
