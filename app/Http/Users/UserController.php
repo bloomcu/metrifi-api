@@ -38,8 +38,13 @@ class UserController extends Controller
     
     public function destroy(Organization $organization, User $user)
     {
-        // Check if user role is admin
-        if ($user->role == RoleEnum::Admin) {
+        // Check if authenticated user is the user being deleted
+        if ($user->id === auth()->id()) {
+            return response()->json(['error' => 'Not authorized to delete yourself.'], 403);
+        }
+
+        // Must be an admin to remove an admin
+        if ($user->role == RoleEnum::Admin && auth()->user()->role !== RoleEnum::Admin) {
             return response()->json(['error' => 'Not authorized to remove admins.'], 403);
         }
 
