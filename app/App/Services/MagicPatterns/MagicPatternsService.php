@@ -45,24 +45,28 @@ class MagicPatternsService
             // Extract all component source files from /components directory
             $componentFiles = $this->extractComponentSourceFiles($data['sourceFiles'] ?? []);
 
-            // if (!empty($componentFiles)) {
-            //     return [
-            //         'id' => $data['id'] ?? null,
-            //         'components' => $componentFiles, // Return an array of components
-            //         'editorUrl' => $data['editorUrl'] ?? null,
-            //         'previewUrl' => $data['previewUrl'] ?? null,
-            //     ];
-            // }
+            if (!empty($componentFiles)) {
+                return [
+                    'id' => $data['id'] ?? null,
+                    'components' => $componentFiles, // Return an array of components
+                    'editorUrl' => $data['editorUrl'] ?? null,
+                    'previewUrl' => $data['previewUrl'] ?? null,
+                ];
+            }
 
-            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx.';
+            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx. Time: ' . time();
             Log::error($noValidComponentError);
             throw new \Exception($noValidComponentError);
+
+            return;
         }
 
         // Throw an exception if the request failed
         $apiRequestFailedError = 'Magic Patterns Service: Magic Patterns API request failed: ' . $response->status() . ' - ' . $response->body();
         Log::error($apiRequestFailedError);
         throw new \Exception($apiRequestFailedError);
+
+        return;
     }
 
     /**
