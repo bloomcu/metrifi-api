@@ -26,6 +26,7 @@ class AuthRegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'role' => 'editor', // TODO: Remove
+            'settings' => ['send_weekly_website_analysis' => false],
             'organization_id' => $organization->id,
             'password' => Hash::make($request->password),
         ]);

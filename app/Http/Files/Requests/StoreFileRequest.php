@@ -24,7 +24,7 @@ class StoreFileRequest extends FormRequest
     {
         return [
             // 'file' => 'required|mimes:jpg,jpeg,png,gif,webp,svg,pdf,mp4,mov,webm,mpeg,html,css,js|max:30000', // Max 30mb
-            'file' => 'required|mimes:jpg,jpeg,png,gif,webp|max:30000', // Max 30mb
+            'file' => 'required|mimes:jpg,jpeg,png,gif,webp|max:100000', // Max 100mb
             'folder_id' => 'nullable|integer',
         ];
     }

@@ -27,8 +27,7 @@ class InvitationEmail extends Mailable
      */
     public function build(): static
     {
-        // return $this->view('emails.invitation');
-        return $this->subject('You\'ve been invited to join the BloomCU team')
+        return $this->subject('You\'ve been invited to join MetriFi')
             ->view('emails.invitation');
     }
 }

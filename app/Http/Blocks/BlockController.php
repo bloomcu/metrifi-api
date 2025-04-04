@@ -15,9 +15,11 @@ class BlockController extends Controller
     $validated = $request->validate([
       'page_id' => 'nullable|exists:pages,id',
       'order' => 'nullable|string',
+      'status' => 'nullable|string',
+      'error' => 'nullable|string',
       'title' => 'nullable|string',
       'type' => 'nullable|string',
-      'variant' => 'nullable|string',
+      'layout' => 'nullable|string',
       'wordpress_category' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
@@ -36,9 +38,11 @@ class BlockController extends Controller
   {        
     $validated = $request->validate([
       'order' => 'nullable|string',
+      'status' => 'nullable|string',
+      'error' => 'nullable|string',
       'title' => 'nullable|string',
       'type' => 'nullable|string',
-      'variant' => 'nullable|string',
+      'layout' => 'nullable|string',
       'wordpress_category' => 'nullable|string',
       'html' => 'nullable|string',
     ]);

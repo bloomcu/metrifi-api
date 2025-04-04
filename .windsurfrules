@@ -1,6 +1,20 @@
+# Windsurf Editor Rules
+
+## General Context
+- This is a Laravel 10 project.
+
+## General Rules
+- Always challenge me on my instructions if I am suggesting a pattern that does not map to the Laravel, Inertia, Vue way.
+- Never explain code or changes made, just do it.
+
+## Laravel Rules
 - All models can be found in app/Domain/{Domain}/
 - All controllers can be found in app/Http/{Domain}/{Controller}
 - All resources can be found in app/Http/{Domain}/Resources/{Resource}
-- This is a laravel api so never use web routes.
-- Never explain code or changes made, just do it unless asked to explain.
+- Only use resourceful methods in controllers: index, show, store, update, destroy.
+- Only use api routes in routes/api.php, never web routes.
+- Always use implicit route model binding in controllers when possible.
+- Always ask me if I want to write Pest tests for new features.
+- Always look at existing related tests as reference if you are having trouble writing a new test.
+- Always run Pest tests after completing new features or breaking changes.
 - Never run php artisan serve.

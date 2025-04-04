@@ -3,6 +3,7 @@
 namespace DDD\App\Services\MagicPatterns;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MagicPatternsService
 {
@@ -39,6 +40,8 @@ class MagicPatternsService
         if ($response->successful()) {
             $data = $response->json();
 
+            // Log::info('Magic Patterns service response: ' . json_encode($data));
+
             // Extract all component source files from /components directory
             $componentFiles = $this->extractComponentSourceFiles($data['sourceFiles'] ?? []);
 
@@ -51,16 +54,19 @@ class MagicPatternsService
                 ];
             }
 
-            throw new \Exception('No valid component source files found in the /components directory.');
+            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx. Time: ' . rand(1, 1000000000) ;
+            Log::error($noValidComponentError);
+            throw new \Exception($noValidComponentError);
+
+            return;
         }
 
         // Throw an exception if the request failed
-        throw new \Exception(
-            'Magic Patterns API request failed: ' .
-            $response->status() .
-            ' - ' .
-            $response->body()
-        );
+        $apiRequestFailedError = 'Magic Patterns Service: Magic Patterns API request failed: ' . $response->status() . ' - ' . $response->body();
+        Log::error($apiRequestFailedError);
+        throw new \Exception($apiRequestFailedError);
+
+        return;
     }
 
     /**
@@ -73,8 +79,8 @@ class MagicPatternsService
     {
         $components = [];
 
+        // Pluck out files in /components
         foreach ($sourceFiles as $file) {
-            // Look for files in /components directory that are JavaScript and not read-only
             if (
                 $file['type'] === 'javascript' &&
                 !$file['isReadOnly'] &&
@@ -86,6 +92,30 @@ class MagicPatternsService
                     'code' => $file['code'] ?? null,
                 ];
             }
+        }
+
+        // If no components are found, pluck out the App.tsx file
+        if (empty($components)) {
+            foreach ($sourceFiles as $file) {
+                if (
+                    $file['type'] === 'javascript' &&
+                    !$file['isReadOnly'] &&
+                    str_contains($file['name'], 'App.tsx')
+                ) {
+                    $components[] = [
+                        'id' => $file['id'] ?? null,
+                        'name' => $file['name'] ?? null,
+                        'code' => $file['code'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        // If no components are found, throw an exception
+        if (empty($components)) {
+            $noValidComponentError = 'Magic Patterns: No usable code found in Magic Patterns response components or app.tsx';
+            Log::error($noValidComponentError);
+            throw new \Exception($noValidComponentError);
         }
 
         return $components;

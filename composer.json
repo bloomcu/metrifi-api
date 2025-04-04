@@ -27,6 +27,7 @@
         "openai-php/client": "^0.10.1",
         "openai-php/laravel": "^0.10.1",
         "pusher/pusher-php-server": "^7.2",
+        "sentry/sentry-laravel": "^4.13",
         "spatie/laravel-query-builder": "^5.1",
         "staudenmeir/laravel-adjacency-list": "^1.13",
         "stripe/stripe-php": "^10.21",

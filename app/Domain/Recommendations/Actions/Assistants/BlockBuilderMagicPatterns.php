@@ -34,10 +34,6 @@ class BlockBuilderMagicPatterns implements ShouldQueue
     public function handle(Recommendation $recommendation, Block $block)
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
-        
-        // Get retry count from recommendation metadata or initialize to 0
-        $retryCount = $recommendation->metadata['retry_count'] ?? 0;
-        $maxRetries = 2;
 
         try {
             // Build the prompt for Magic Patterns
@@ -48,15 +44,30 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 prompt: $prompt,
             );
 
-            Log::info('Magic Patterns response: ' . json_encode($magicResponse));
+            // catch magic patterns exception
+            if ($magicResponse === null) {
+                // Create an HTML fallback after all retries have failed
+                $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
+                    <h3 class="font-bold">Error designing block</h3>
+                    <p>Magic Patterns encountered an issue while designing this block.</p>
+                </section>';
+                
+                $block->update([
+                    'error' => 'Issue encountered while designing this block',
+                    'type' => 'error',
+                    'html' => $html,
+                    'status' => 'done'
+                ]);
+                
+                $recommendation->update([
+                    'status' => 'done',
+                ]);
+
+                return;
+            }
 
             // Extract the components from the response
             $components = $magicResponse['components'] ?? [];
-            
-            if (empty($components)) {
-                Log::info('No components found in Magic Patterns response');
-                throw new \Exception('No components found in Magic Patterns response');
-            }
             
             // Combine all component code into a single string
             $combinedCode = '';
@@ -65,11 +76,6 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 if (!empty($generatedCode)) {
                     $combinedCode .= "\n\n// Component: " . ($component['name'] ?? 'unnamed') . "\n" . $generatedCode;
                 }
-            }
-
-            if (empty($combinedCode)) {
-                Log::info('No valid code found in components');
-                throw new \Exception('No valid code found in components');
             }
             
             try {
@@ -199,30 +205,34 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                     responseFormat: '{html: string, category: string}'
                 );
 
-                Log::info('GPT response: ' . $gptResponse);
+                // Log::info('GPT response: ' . $gptResponse);
 
                 // Parse the JSON response
                 $json = json_decode($gptResponse, true);
 
                 // Validate the JSON response
                 if (!$json) {
-                    Log::error('Failed to parse GPT response as JSON: ' . $gptResponse);
-                    throw new \Exception('Failed to parse GPT response as JSON');
+                    Log::error('Magic Patterns: Failed to parse GPT response as JSON: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Failed to parse GPT response as JSON.' . $gptResponse);
+                    return;
                 }
 
                 if (!isset($json['html']) || !isset($json['category'])) {
-                    Log::error('Invalid JSON structure from GPT: ' . $gptResponse);
-                    throw new \Exception('Invalid JSON structure from GPT response: missing required fields');
+                    Log::error('Magic Patterns: Invalid JSON structure from GPT: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Invalid JSON structure from GPT.' . $gptResponse);
+                    return;
                 }
 
                 if (empty($json['html'])) {
-                    Log::error('Empty HTML content in GPT response: ' . $gptResponse);
-                    throw new \Exception('Empty HTML content in GPT response');
+                    Log::error('Magic Patterns: Empty HTML content in GPT response: ' . $gptResponse);
+                    throw new \Exception('Magic Patterns: Empty HTML content in GPT response.' . $gptResponse);
+                    return;
                 }
 
                 $block->update([
                     'type' => $json['category'], // TODO: Add column 'category' to block table
                     'html' => $json['html'],
+                    'status' => 'done'
                 ]);
 
                 // Reset retry count on success
@@ -235,64 +245,50 @@ class BlockBuilderMagicPatterns implements ShouldQueue
                 ]);
                 
             } catch (\Exception $e) {
-                Log::error('GPT conversion failed: ' . $e->getMessage());
-                throw new \Exception('GPT conversion failed: ' . $e->getMessage());
-            }
-            
-        } catch (\Exception $e) {
-            $errorMessage = $e->getMessage();
-            Log::warning("Block generation attempt failed: {$errorMessage}. Retry count: {$retryCount}");
-            
-            if ($retryCount < $maxRetries) {
-                // Increment retry count for next attempt
-                $nextRetryCount = $retryCount + 1;
-                Log::info("Dispatching new job for retry attempt {$nextRetryCount} of {$maxRetries}");
-                
-                // Update metadata with incremented retry count
-                $metadata = $recommendation->metadata ?? [];
-                $metadata['retry_count'] = $nextRetryCount;
-                $metadata['last_error'] = $errorMessage;
-                $metadata['last_retry_at'] = now()->toIso8601String();
-                
-                // Update recommendation with new retry count
-                $recommendation->update([
-                    'status' => $this->name . '_retrying',
-                    'metadata' => $metadata
-                ]);
-                
-                // Dispatch a new job with the same parameters
-                // Use exponential backoff for retries (5s, 10s, 20s, etc.)
-                $delay = now()->addSeconds(5 * pow(2, $nextRetryCount - 1));
-                self::dispatch($recommendation, $block)->delay($delay);
-                
-                return;
-            } else {
-                Log::error("Block generation failed after 3 attempts: {$errorMessage}");
-                
                 // Create an HTML fallback after all retries have failed
                 $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
-                    <h3 class="font-bold">Error generating block</h3>
-                    <p>We encountered an issue while generating this block after ' . ($retryCount + 1) . ' attempts.</p>
-                    <p class="text-sm mt-2">Error details: ' . htmlspecialchars($errorMessage) . '</p>
+                    <h3 class="font-bold">Error designing block</h3>
+                    <p>Magic Patterns encountered an issue while designing this block.</p>
                 </section>';
                 
                 $block->update([
+                    'error' => 'Issue encountered while designing this block',
                     'type' => 'error',
                     'html' => $html,
+                    'status' => 'done'
                 ]);
-                
-                // Store error information in metadata
-                $metadata = $recommendation->metadata ?? [];
-                $metadata['retry_count'] = 0;
-                $metadata['last_error'] = $errorMessage;
-                $metadata['failed_at'] = now()->toIso8601String();
-                $metadata['max_retries_reached'] = true;
                 
                 $recommendation->update([
-                    'status' => 'failed',
-                    'metadata' => $metadata
+                    'status' => 'done',
                 ]);
+
+                Log::error('Magic Patterns: GPT conversion failed: ' . $e->getMessage());
+                throw new \Exception('Magic Patterns: GPT conversion failed: ' . $e->getMessage());
             }
+            
+        } catch (\Exception $e) {
+            // Create an HTML fallback after all retries have failed
+            $html = '<section id="section-' . time() . '" class="error p-4 bg-red-50 text-red-700 rounded-lg">
+                <h3 class="font-bold">Error designing block</h3>
+                <p>Magic Patterns encountered an issue while designing this block.</p>
+            </section>';
+            
+            $block->update([
+                'error' => 'Issue encountered while designing this block',
+                'type' => 'error',
+                'html' => $html,
+                'status' => 'done'
+            ]);
+            
+            $recommendation->update([
+                'status' => 'done',
+            ]);
+
+            // When magic patterns fails, this is the only exception that is thrown
+            Log::error("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . rand(1, 1000000000));
+            throw new \Exception("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . rand(1, 1000000000));
+
+            return;
         }
 
         return;
