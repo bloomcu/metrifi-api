@@ -54,7 +54,7 @@ class MagicPatternsService
                 ];
             }
 
-            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx. Time: ' . time();
+            $noValidComponentError = 'Magic Patterns Service: No valid component source files found in the /components directory or App.tsx. Time: ' . rand(1, 1000000000) ;
             Log::error($noValidComponentError);
             throw new \Exception($noValidComponentError);
 

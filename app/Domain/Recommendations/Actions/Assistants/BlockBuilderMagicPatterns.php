@@ -285,8 +285,8 @@ class BlockBuilderMagicPatterns implements ShouldQueue
             ]);
 
             // When magic patterns fails, this is the only exception that is thrown
-            Log::error("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . time());
-            throw new \Exception("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . time());
+            Log::error("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . rand(1, 1000000000));
+            throw new \Exception("Magic Patterns: Block generation failed: " . $e->getMessage() . ' Time: ' . rand(1, 1000000000));
 
             return;
         }
