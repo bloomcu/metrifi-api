@@ -35,6 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('admin:snapshot-all-funnels')->dailyAt('04:00')->timezone('America/Denver'); // 4:00 am
         $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 4:30 am
         // $schedule->command('admin:send-all-organization-weekly-analysis-email')->mondays()->at('09:00')->timezone('America/Denver'); // 9:00 am on Monday
+        $schedule->command('admin:send-all-organization-weekly-analysis-email')->everyFiveMinutes(); // Every 5 minutes
     }
 
     /**
