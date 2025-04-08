@@ -126,7 +126,7 @@ $organizationPotentialRounded = round($organization->assets['median']['potential
 <!--[if !mso]>--><td class="t37" style="background-color:#EDE9FE;overflow:hidden;width:234px;border-radius:40px 40px 40px 40px;">
 <!--<![endif]-->
 <table class="t36" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t35" style="text-align:center;line-height:48px;mso-line-height-rule:exactly;mso-text-raise:9px;padding:0 30px 0 30px;"> <a class="t34" href="https://metrifi.com/talk-about-opportunity" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:48px;font-weight:500;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;direction:ltr;color:#884DFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:9px;"
-target="_blank"> Explain this to me </a>
+target="_blank">Let's talk about it</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr></table>
