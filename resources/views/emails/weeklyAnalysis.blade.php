@@ -137,7 +137,7 @@ $organizationPotentialRounded = round($organization->assets['median']['potential
 <![endif]-->
 <!--[if !mso]>--><td class="t46" style="width:381px;">
 <!--<![endif]-->
-<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Biggest losers</h1>
+<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">What to fix</h1>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t48" style="mso-line-height-rule:exactly;mso-line-height-alt:7px;line-height:7px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
@@ -147,8 +147,7 @@ $organizationPotentialRounded = round($organization->assets['median']['potential
 <![endif]-->
 <!--[if !mso]>--><td class="t52" style="width:444px;">
 <!--<![endif]-->
-<table class="t51" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t50"><p class="t49" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#5C5C5C;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;"> Your funnels with the highest
-potential assets. </p>
+<table class="t51" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t50"><p class="t49" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#5C5C5C;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">Where you're losing the most money</p>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t54" style="mso-line-height-rule:exactly;mso-line-height-alt:32px;line-height:32px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
@@ -251,8 +250,18 @@ target="_blank"> View dashboard </a>
 <![endif]-->
 <!--[if !mso]>--><td class="t112" style="width:444px;">
 <!--<![endif]-->
-<table class="t111" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t110"><p class="t108" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:17px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#5C5C5C;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Talk with us about how you can
-improve your website.</p>
+<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Let's fix it</h1>
+</td></tr></table>
+</td></tr></table>
+</td></tr><tr><td><div class="t48" style="mso-line-height-rule:exactly;mso-line-height-alt:7px;line-height:7px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
+</td></tr><tr><td align="left">
+<table class="t53" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr>
+<!--[if mso]><td width="444" class="t52" style="width:444px;">
+<![endif]-->
+<!--[if !mso]>--><td class="t52" style="width:444px;">
+<!--<![endif]-->
+<table class="t51" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t50"><p class="t49" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#5C5C5C;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">Talk with us about how you can
+    improve your website</p>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t114" style="mso-line-height-rule:exactly;mso-line-height-alt:21px;line-height:21px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
