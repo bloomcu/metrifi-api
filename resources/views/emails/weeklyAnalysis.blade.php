@@ -104,7 +104,7 @@ class="t16" style="margin:0;Margin:0;mso-line-height-rule:exactly;">Weekly</span
 <!--[if !mso]>--><td class="t25" style="width:444px;">
 <!--<![endif]-->
 <table class="t24" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t23"><h1 class="t22" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#884DFF;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;"> @php
-$organizationPotentialRounded = round($organization->assets['median']['potential']); $organizationPotentialAnnualized = bcmul($organizationPotentialRounded, 13.04, 2); @endphp Your website is currently missing out on {{ '$' . number_format($organizationPotentialAnnualized) }} per year </h1>
+$organizationPotentialRounded = round($organization->assets['median']['potential']); $organizationPotentialAnnualized = bcmul($organizationPotentialRounded, 13.04, 2); @endphp Your website is currently losing out on {{ '$' . number_format($organizationPotentialAnnualized) }} per year </h1>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t27" style="mso-line-height-rule:exactly;mso-line-height-alt:12px;line-height:12px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
@@ -118,16 +118,8 @@ $organizationPotentialRounded = round($organization->assets['median']['potential
 }} </p>
 </td></tr></table>
 </td></tr></table>
-</td></tr><tr><td><div class="t33" style="mso-line-height-rule:exactly;mso-line-height-alt:24px;line-height:24px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
-</td></tr><tr><td align="left">
-<table class="t38" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr>
-<!--[if mso]><td width="234" class="t37" style="background-color:#EDE9FE;overflow:hidden;width:234px;border-radius:40px 40px 40px 40px;">
-<![endif]-->
-<!--[if !mso]>--><td class="t37" style="background-color:#EDE9FE;overflow:hidden;width:234px;border-radius:40px 40px 40px 40px;">
-<!--<![endif]-->
-<table class="t36" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t35" style="text-align:center;line-height:48px;mso-line-height-rule:exactly;mso-text-raise:9px;padding:0 30px 0 30px;"> <a class="t34" href="https://metrifi.com/talk-about-opportunity" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:48px;font-weight:500;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;direction:ltr;color:#884DFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:9px;"
-target="_blank">Let's talk about it</a>
-</td></tr></table>
+</td></tr>
+
 </td></tr></table>
 </td></tr></table>
 </td></tr></table>
@@ -145,7 +137,7 @@ target="_blank">Let's talk about it</a>
 <![endif]-->
 <!--[if !mso]>--><td class="t46" style="width:381px;">
 <!--<![endif]-->
-<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Top opportunities</h1>
+<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Biggest losers</h1>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t48" style="mso-line-height-rule:exactly;mso-line-height-alt:7px;line-height:7px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
