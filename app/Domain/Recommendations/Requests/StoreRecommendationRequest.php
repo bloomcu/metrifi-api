@@ -31,7 +31,7 @@ class StoreRecommendationRequest extends FormRequest
             'period' => 'nullable|string',
             'step_index' => 'nullable|integer',
             'prompt' => 'nullable|string',
-            // 'file_ids' => 'nullable|array',
+            'dashboard_id' => 'nullable|exists:dashboards,id',
             'metadata' => 'nullable|array',
         ];
     }

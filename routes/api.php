@@ -224,11 +224,22 @@ Route::middleware('auth:sanctum')->group(function() {
         });
 
         // Recommendations
-        Route::prefix('/dashboards/{dashboard}/recommendations')->group(function() {
+        // Route::prefix('/dashboards/{dashboard}/recommendations')->group(function() {
+        //     Route::get('/', [RecommendationController::class, 'index']);
+        //     Route::post('/', [RecommendationController::class, 'store']);
+        //     Route::get('/{recommendation}', [RecommendationController::class, 'show']);
+        //     Route::put('/{recommendation}', [RecommendationController::class, 'update']);
+        // });
+
+        // Recommendations
+        Route::prefix('/recommendations')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
             Route::get('/{recommendation}', [RecommendationController::class, 'show']);
             Route::put('/{recommendation}', [RecommendationController::class, 'update']);
+
+            // Recommendation files
+            Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
         });
 
         // Recommendation files
