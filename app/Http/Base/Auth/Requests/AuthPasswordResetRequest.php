@@ -11,6 +11,19 @@ use Exception;
 class AuthPasswordResetRequest extends FormRequest
 {
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Fix email with plus symbols (converted to spaces in transmission)
+        if ($this->has('email')) {
+            $this->merge([
+                'email' => str_replace(' ', '+', $this->email),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array

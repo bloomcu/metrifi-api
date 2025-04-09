@@ -33,7 +33,11 @@ class WeeklyAnalysisEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Weekly website analysis for ' . $this->organization->domain)
+        $organizationPotentialRounded = round($this->organization->assets['median']['potential']); 
+        $organizationPotentialAnnualized = bcmul($organizationPotentialRounded, 13.04, 2); 
+        $figure = number_format($organizationPotentialAnnualized);
+
+        return $this->subject('Intel: ' . $this->organization->domain . ' missing $' . $figure . ' per year')
             ->view('emails.weeklyAnalysis');
     }
 }

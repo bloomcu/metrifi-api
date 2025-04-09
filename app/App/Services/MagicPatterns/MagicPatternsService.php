@@ -18,6 +18,9 @@ class MagicPatternsService
 
     public function createDesign(
         string $prompt,
+        int $timeout = 300,
+        int $retryTimes = 15,
+        int $retryMilliseconds = 2000
     ) {
         $multipartData = [
             [
@@ -32,8 +35,8 @@ class MagicPatternsService
             ->withHeaders([
                 'x-mp-api-key' => $this->apiKey,
             ])
-            ->timeout(300)
-            ->retry(15, 2000)
+            ->timeout($timeout)
+            ->retry($retryTimes, $retryMilliseconds)
             ->post('/pattern', $multipartData);
 
         // Check if the request was successful
