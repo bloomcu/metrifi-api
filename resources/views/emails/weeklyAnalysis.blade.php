@@ -246,12 +246,9 @@ target="_blank"> View dashboard </a>
 </td></tr><tr><td><div class="t107" style="mso-line-height-rule:exactly;mso-line-height-alt:17px;line-height:17px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
 </td></tr><tr><td align="left">
 <table class="t113" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr>
-<!--[if mso]><td width="444" class="t112" style="width:444px;">
-<![endif]-->
-<!--[if !mso]>--><td class="t112" style="width:444px;">
-<!--<![endif]-->
-<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Let's fix it</h1>
-</td></tr></table>
+<!--[if mso]><td width="444" class="t112" style="width:444px;"><![endif]-->
+<!--[if !mso]>--><td class="t112" style="width:444px;"><!--<![endif]-->
+<table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><h1 class="t43" style="margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:41px;font-weight:700;font-style:normal;font-size:30px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">Let&apos;s fix it</h1></td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t48" style="mso-line-height-rule:exactly;mso-line-height-alt:7px;line-height:7px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
 </td></tr><tr><td align="left">
@@ -272,7 +269,7 @@ target="_blank"> View dashboard </a>
 <!--[if !mso]>--><td class="t118" style="background-color:#884DFF;overflow:hidden;width:197px;border-radius:40px 40px 40px 40px;">
 <!--<![endif]-->
 <table class="t117" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t116" style="text-align:center;line-height:48px;mso-line-height-rule:exactly;mso-text-raise:9px;padding:0 30px 0 30px;"> <a class="t115" href="https://sbiv9ihb7b3.typeform.com/to/uym0T0KZ" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:48px;font-weight:500;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;direction:ltr;color:#FFFFFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:9px;"
-target="_blank"> Let&#39;s talk </a>
+target="_blank"> Let&apos;s talk </a>
 </td></tr></table>
 </td></tr></table>
 </td></tr><tr><td><div class="t121" style="mso-line-height-rule:exactly;mso-line-height-alt:27px;line-height:27px;font-size:1px;display:block;">&nbsp;&nbsp;</div>
