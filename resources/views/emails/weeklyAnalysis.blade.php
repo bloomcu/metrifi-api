@@ -271,7 +271,7 @@ target="_blank"> View dashboard </a>
 <![endif]-->
 <!--[if !mso]>--><td class="t118" style="background-color:#884DFF;overflow:hidden;width:197px;border-radius:40px 40px 40px 40px;">
 <!--<![endif]-->
-<table class="t117" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t116" style="text-align:center;line-height:48px;mso-line-height-rule:exactly;mso-text-raise:9px;padding:0 30px 0 30px;"> <a class="t115" href="https://metrifi.com/talk-about-opportunity" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:48px;font-weight:500;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;direction:ltr;color:#FFFFFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:9px;"
+<table class="t117" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t116" style="text-align:center;line-height:48px;mso-line-height-rule:exactly;mso-text-raise:9px;padding:0 30px 0 30px;"> <a class="t115" href="https://sbiv9ihb7b3.typeform.com/to/uym0T0KZ" style="display:block;margin:0;Margin:0;font-family:Inter,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:48px;font-weight:500;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;direction:ltr;color:#FFFFFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:9px;"
 target="_blank"> Let&#39;s talk </a>
 </td></tr></table>
 </td></tr></table>
