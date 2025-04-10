@@ -37,7 +37,7 @@ class WeeklyAnalysisEmail extends Mailable
         $organizationPotentialAnnualized = bcmul($organizationPotentialRounded, 13.04, 2); 
         $figure = number_format($organizationPotentialAnnualized);
 
-        return $this->subject('Website update: You\'re losing out on $' . $figure . ' per year')
+        return $this->subject('Intel: ' . $this->organization->domain . ' missing $' . $figure . ' per year')
             ->view('emails.weeklyAnalysis');
     }
 }
