@@ -2,21 +2,27 @@
 
 namespace DDD\Http\Recommendations;
 
+use Illuminate\Http\Request;
 use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\UpdateRecommendationRequest;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
 use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Dashboards\Dashboard;
 use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
 class RecommendationController extends Controller
 {
-    public function index(Organization $organization)
+    public function index(Organization $organization, Request $request)
     {
-        $recommendations = Recommendation::where('organization_id', $organization->id)->latest()->get();
+        $recommendations = Recommendation::where('organization_id', $organization->id);
+            
+        if ($request->has('dashboard_id')) {
+            $recommendations->where('dashboard_id', $request->dashboard_id);
+        }
+        
+        $recommendations = $recommendations->latest()->get();
 
         return RecommendationResource::collection($recommendations);
     }
