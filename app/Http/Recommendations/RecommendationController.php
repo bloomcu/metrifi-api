@@ -2,86 +2,69 @@
 
 namespace DDD\Http\Recommendations;
 
+use Illuminate\Http\Request;
 use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\UpdateRecommendationRequest;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
 use DDD\Domain\Organizations\Organization;
-use DDD\Domain\Dashboards\Dashboard;
 use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
 class RecommendationController extends Controller
 {
-    public function index(Organization $organization, Dashboard $dashboard)
+    public function index(Organization $organization, Request $request)
     {
-        $recommendations = $dashboard->recommendations()->latest()->get();
+        $recommendations = Recommendation::where('organization_id', $organization->id);
+            
+        if ($request->has('dashboard_id')) {
+            $recommendations->where('dashboard_id', $request->dashboard_id);
+        }
+        
+        $recommendations = $recommendations->latest()->get();
 
         return RecommendationResource::collection($recommendations);
     }
 
     public function store(
-        Organization $organization, 
-        Dashboard $dashboard, 
+        Organization $organization,
         StoreRecommendationRequest $request, 
         AssistantService $assistant,
     ){
-        // For testing: Create page and blocks from content outline
-        // Note: You have to delete the recommendation's latest page blocks in db manually
-        // $recommendation = Recommendation::find(82);
-        // $page = $recommendation->latestPage;
-        // $page->blocks()->delete(); // Start fresh
-        // \DDD\Domain\Recommendations\Actions\Assistants\CreateBlocksFromContentOutline::dispatch($recommendation);
-        // return;
-
-        // For testing: Rebuild blocks with Magic Patterns
-        // Note: You have to reset the sections_built and prototype columns in db manually
-        // $recommendation = Recommendation::find(82);
-        // \DDD\Domain\Recommendations\Actions\Assistants\PageBuilderMagicPatterns::dispatch($recommendation);
-        // return;
-
-        // For testing: Build blocks with Magic Patterns
-        // Note: You have to reset the sections_built and prototype columns in db manually
-        // $recommendation = Recommendation::find(82);
-        // $page = $recommendation->latestPage;
-        // $block = $page->blocks()->first();
-        // \DDD\Domain\Recommendations\Actions\Assistants\BlockBuilderMagicPatterns::dispatch($recommendation, $block);
-        // return;
-
         $thread = $assistant->createThread();
 
-        $recommendation = $dashboard->recommendations()->create([
+        $data = [
             'organization_id' => $organization->id,
-            'title' => $request->metadata['focus']['name'],
+            'user_id' => auth()->id(),
+            'title' => $request->metadata['focus']['name'] ?? $request->title,
             'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
             'secret_shopper_prompt' => $request->secret_shopper_prompt,
             'metadata' => $request->metadata,
-        ]);
+        ];
+
+        if ($request->dashboard_id) {
+            $data['dashboard_id'] = $request->dashboard_id;
+        }
+
+        $recommendation = Recommendation::create($data);
 
         ScreenshotGrabber::dispatch($recommendation);
 
         return new RecommendationResource($recommendation);
     }
 
-    public function show(Organization $organization, Dashboard $dashboard, AssistantService $assistant, Recommendation $recommendation)
+    public function show(Organization $organization, Recommendation $recommendation)
     {
         return new RecommendationResource($recommendation);
     }
 
-    public function update(Organization $organization, Dashboard $dashboard, Recommendation $recommendation, UpdateRecommendationRequest $request)
+    public function update(Organization $organization, Recommendation $recommendation, UpdateRecommendationRequest $request)
     {
         $recommendation->update($request->validated());
 
         return new RecommendationResource($recommendation);
     }
-
-    // public function destroy(Organization $organization, Dashboard $dashboard, Analysis $analysis)
-    // {
-    //     $analysis->delete();
-
-    //     return new AnalysisResource($analysis);
-    // }
 }
