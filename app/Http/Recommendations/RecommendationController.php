@@ -32,6 +32,7 @@ class RecommendationController extends Controller
         $data = [
             'organization_id' => $organization->id,
             'user_id' => auth()->id(),
+            'status' => $request->status,
             'title' => $request->metadata['focus']['name'] ?? $request->title,
             // 'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
