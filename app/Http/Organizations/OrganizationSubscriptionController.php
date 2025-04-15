@@ -62,10 +62,26 @@ class OrganizationSubscriptionController extends Controller
             ]);
 
         } else {
-            // Dynamically get start and renewal date based on the organization creation day
-            $dayOfMonth = $organization->created_at->format ('j');
-            $startedAt = Carbon::createFromDate (now()->year, now()->month, $dayOfMonth);
-            $renewsAt = intval (now()->format ('j')) < intval ($dayOfMonth) ? Carbon::createFromDate (now()->year, now()->month, $dayOfMonth) : Carbon::createFromDate (now()->year, now()->month, $dayOfMonth)->addMonths(1);
+            // Organization is on the free plan
+            
+            // Use the organization's creation date as the starting point
+            $creationDate = $organization->created_at;
+            
+            // Calculate the current billing cycle
+            $now = now();
+            $yearsSinceCreation = $now->diffInYears($creationDate);
+            
+            // Set start date to the anniversary of creation in the current billing year
+            $startedAt = $creationDate->copy()->addYears($yearsSinceCreation);
+            
+            // If we've passed this year's anniversary, use that as the start date
+            // Otherwise use last year's anniversary
+            if ($startedAt->gt($now)) {
+                $startedAt = $creationDate->copy()->addYears($yearsSinceCreation - 1);
+            }
+            
+            // Renewal date is always 12 months after the start date
+            $renewsAt = $startedAt->copy()->addMonths(12);
 
             // Get usage
             $recommendationsUsed = $organization->recommendations()
