@@ -36,6 +36,13 @@ class ScreenshotGrabber implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
+        // Skip screenshot grabbing if no focus URL is available
+        if (!$recommendation->metadata || !isset($recommendation->metadata['focus']['url'])) {
+            $recommendation->update(['status' => $this->name . '_completed']);
+            ComparisonAnalyzer::dispatch($recommendation);
+            return;
+        }
+
         try {
             // Get focus screenshot
             $focusScreenshot = $this->screenshotter->getScreenshot(

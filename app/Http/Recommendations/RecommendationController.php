@@ -27,18 +27,13 @@ class RecommendationController extends Controller
         return RecommendationResource::collection($recommendations);
     }
 
-    public function store(
-        Organization $organization,
-        StoreRecommendationRequest $request, 
-        AssistantService $assistant,
-    ){
-        $thread = $assistant->createThread();
-
+    public function store(Organization $organization, StoreRecommendationRequest $request)
+    {
         $data = [
             'organization_id' => $organization->id,
             'user_id' => auth()->id(),
             'title' => $request->metadata['focus']['name'] ?? $request->title,
-            'thread_id' => $thread['id'],
+            // 'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
             'secret_shopper_prompt' => $request->secret_shopper_prompt,
@@ -50,8 +45,6 @@ class RecommendationController extends Controller
         }
 
         $recommendation = Recommendation::create($data);
-
-        ScreenshotGrabber::dispatch($recommendation);
 
         return new RecommendationResource($recommendation);
     }

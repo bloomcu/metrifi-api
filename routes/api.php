@@ -3,12 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use DDD\Http\Users\UserController;
 use DDD\Http\Stripe\StripeController;
+use DDD\Http\Services\WordPress\WordPressPageController;
 use DDD\Http\Services\Google\GoogleAuthController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
-use DDD\Http\Services\WordPress\WordPressPageController;
+use DDD\Http\Recommendations\RecommendationGenerateController;
 use DDD\Http\Recommendations\RecommendationFileController;
 use DDD\Http\Recommendations\RecommendationController;
+use DDD\Http\Pages\PageController;
 use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
 use DDD\Http\Organizations\OrganizationSubscriptionController;
 use DDD\Http\Organizations\OrganizationController;
@@ -25,15 +27,14 @@ use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Chats\ChatsController;
+use DDD\Http\Blocks\BlockRegenerationController;
+use DDD\Http\Blocks\BlockController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
 use DDD\Http\Admin\AdminOrganizationController;
 use DDD\Http\Admin\AdminFunnelController;
 use DDD\Http\Admin\AdminDashboardController;
-use DDD\Http\Pages\PageController;
-use DDD\Http\Blocks\BlockController;
-use DDD\Http\Blocks\BlockRegenerationController;
 
 Route::middleware('auth:sanctum')->group(function() {
     // Admin
@@ -240,11 +241,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
             // Recommendation files
             Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
-        });
 
-        // Recommendation files
-        Route::prefix('/recommendations')->group(function() {
-            Route::post('/{recommendation}/files', [RecommendationFileController::class, 'attach']);
+            // Recommendation generate
+            Route::put('/{recommendation}/generate', [RecommendationGenerateController::class, 'update']);
         });
 
         // Pages

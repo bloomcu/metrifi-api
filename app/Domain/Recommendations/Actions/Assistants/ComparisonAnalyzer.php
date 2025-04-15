@@ -35,7 +35,7 @@ class ComparisonAnalyzer implements ShouldQueue
     function handle(Recommendation $recommendation)
     {
         // If there is not comparisons, skip to the next step
-        if (!$recommendation->metadata['comparisons']) {
+        if (!$recommendation->metadata || !$recommendation->metadata['comparisons']) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
