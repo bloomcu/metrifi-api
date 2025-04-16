@@ -9,6 +9,7 @@ use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsDataController;
 use DDD\Http\Services\GoogleAnalytics\GoogleAnalyticsAdminController;
 use DDD\Http\Recommendations\RecommendationGenerateController;
 use DDD\Http\Recommendations\RecommendationFileController;
+use DDD\Http\Recommendations\RecommendationReplicateController;
 use DDD\Http\Recommendations\RecommendationController;
 use DDD\Http\Pages\PageController;
 use DDD\Http\Organizations\OrganizationWeeklyAnalysisEmailController;
@@ -225,14 +226,6 @@ Route::middleware('auth:sanctum')->group(function() {
         });
 
         // Recommendations
-        // Route::prefix('/dashboards/{dashboard}/recommendations')->group(function() {
-        //     Route::get('/', [RecommendationController::class, 'index']);
-        //     Route::post('/', [RecommendationController::class, 'store']);
-        //     Route::get('/{recommendation}', [RecommendationController::class, 'show']);
-        //     Route::put('/{recommendation}', [RecommendationController::class, 'update']);
-        // });
-
-        // Recommendations
         Route::prefix('/recommendations')->group(function() {
             Route::get('/', [RecommendationController::class, 'index']);
             Route::post('/', [RecommendationController::class, 'store']);
@@ -244,6 +237,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
             // Recommendation generate
             Route::put('/{recommendation}/generate', [RecommendationGenerateController::class, 'update']);
+            
+            // Recommendation replicate
+            Route::post('/{recommendation}/replicate', [RecommendationReplicateController::class, 'store']);
         });
 
         // Pages

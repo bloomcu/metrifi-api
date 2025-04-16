@@ -34,7 +34,6 @@ class RecommendationController extends Controller
             'user_id' => auth()->id(),
             'status' => $request->status,
             'title' => $request->metadata['focus']['name'] ?? $request->title,
-            // 'thread_id' => $thread['id'],
             'step_index' => $request->step_index,
             'prompt' => $request->prompt,
             'secret_shopper_prompt' => $request->secret_shopper_prompt,
