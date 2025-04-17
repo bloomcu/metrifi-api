@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DDD\Domain\Pages\Page;
 use DDD\Domain\Blocks\Traits\BlockIsOrderable;
+use DDD\Domain\Blocks\Traits\HasVersions;
 use DDD\App\Traits\BelongsToUser;
 use DDD\App\Traits\BelongsToOrganization;
 
@@ -14,11 +15,17 @@ class Block extends Model
     use HasFactory,
         BelongsToOrganization,
         BelongsToUser,
-        BlockIsOrderable;
+        BlockIsOrderable,
+        HasVersions;
 
     protected $guarded = [
         'id',
     ];
+
+    /**
+     * Attributes that should trigger versioning when changed.
+     */
+    protected $versionableAttributes = ['html'];
 
     /**
      * Page this block belongs to.
