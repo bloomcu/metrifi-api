@@ -29,6 +29,7 @@ use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Chats\ChatsController;
 use DDD\Http\Blocks\BlockRegenerationController;
+use DDD\Http\Blocks\BlockVersionController;
 use DDD\Http\Blocks\BlockController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
@@ -259,6 +260,12 @@ Route::middleware('auth:sanctum')->group(function() {
 
             // Regenerate block html
             Route::put('/{block}/regenerate', [BlockRegenerationController::class, 'store']);
+            
+            // Block versions
+            Route::get('/{block}/versions', [BlockVersionController::class, 'index']);
+            Route::post('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
+            Route::post('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
+            Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'change']);
         });
 
         // WordPress
