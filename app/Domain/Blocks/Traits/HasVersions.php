@@ -41,8 +41,11 @@ trait HasVersions
                 'organization_id' => $this->organization_id,
                 'user_id' => $this->user_id,
                 'data' => $data,
-                'version_number' => $this->versions()->count() + 1,
+                'version_number' => $this->current_version,
             ]);
+            
+            // Update the current version number
+            $this->current_version = $this->current_version + 1;
         }
     }
 
@@ -81,7 +84,7 @@ trait HasVersions
      */
     public function advanceToNext()
     {
-        $currentVersionNumber = $this->versions()->where('version_number', '>', 1)->min('version_number') ?? 1;
+        $currentVersionNumber = $this->current_version;
      
         $nextVersion = $this->versions()->where('version_number', '<', $currentVersionNumber)->orderBy('version_number', 'desc')->first();
         
@@ -111,6 +114,9 @@ trait HasVersions
                 }
             }
             
+            // Update the current version
+            $this->current_version = $version->version_number;
+            
             // Save without triggering another version
             $this->saveQuietly();
         });
@@ -133,11 +139,14 @@ trait HasVersions
      */
     public function getCurrentVersionNumber()
     {
-        // Explain how this works
-        // 1. Get the minimum version number that is greater than 1
-        // 2. If no version number is found, return 1
-        // 3. Return the minimum version number
-        
-        return $this->versions()->where('version_number', '>', 1)->min('version_number') ?? 1;
+        return $this->current_version ?? 1;
+    }
+
+    /**
+     * Get the current version number.
+     */
+    public function getTotalVersionsCount()
+    {
+        return $this->versions()->count() + 1;
     }
 }

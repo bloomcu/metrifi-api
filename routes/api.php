@@ -262,10 +262,11 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::put('/{block}/regenerate', [BlockRegenerationController::class, 'store']);
             
             // Block versions
-            Route::get('/{block}/versions', [BlockVersionController::class, 'index']);
-            Route::put('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
-            Route::put('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
-            Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'change']);
+            // Route::get('/{block}/versions', [BlockVersionController::class, 'index']);
+            // Route::put('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
+            // Route::put('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
+            // Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'change']);
+            Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'revert']);
         });
 
         // WordPress

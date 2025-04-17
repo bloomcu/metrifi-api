@@ -25,10 +25,18 @@ class BlockResource extends JsonResource
             'layout' => $this->layout,
             'wordpress_category' => $this->wordpress_category,
             'html' => $this->html,
-            'version' => [
-                'current' => $this->getCurrentVersionNumber(),
-                'total' => $this->versions()->count(),
-            ],
+            'current_version' => $this->current_version,
+            'versions' => $this->versions->map(function ($version) {
+                return [
+                    'id' => $version->id,
+                    'version_number' => $version->version_number,
+                    'created_at' => $version->created_at,
+                ];
+            }),
+            // 'version' => [
+            //     'current' => $this->getCurrentVersionNumber(),
+            //     'total' => $this->getTotalVersionsCount(),
+            // ],
         ];
     }
 }
