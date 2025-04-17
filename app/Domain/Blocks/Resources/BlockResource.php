@@ -33,10 +33,6 @@ class BlockResource extends JsonResource
                     'created_at' => $version->created_at,
                 ];
             }),
-            // 'version' => [
-            //     'current' => $this->getCurrentVersionNumber(),
-            //     'total' => $this->getTotalVersionsCount(),
-            // ],
         ];
     }
 }

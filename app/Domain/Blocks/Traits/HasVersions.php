@@ -23,6 +23,14 @@ trait HasVersions
     }
 
     /**
+     * Get all versions of this block.
+     */
+    public function versions()
+    {
+        return $this->hasMany(BlockVersion::class)->orderBy('version_number', 'desc');
+    }
+
+    /**
      * Create a version if versionable attributes have changed.
      */
     protected function createVersionFromChanges()
@@ -47,52 +55,6 @@ trait HasVersions
             // Update the current version number
             $this->current_version = $this->current_version + 1;
         }
-    }
-
-    /**
-     * Get all versions of this block.
-     */
-    public function versions()
-    {
-        return $this->hasMany(BlockVersion::class)->orderBy('version_number', 'desc');
-    }
-
-    /**
-     * Get the previous version of this block.
-     */
-    public function previousVersion()
-    {
-        return $this->versions()->first();
-    }
-
-    /**
-     * Revert to the previous version.
-     */
-    public function revertToPrevious()
-    {
-        $previousVersion = $this->previousVersion();
-        
-        if (!$previousVersion) {
-            return false;
-        }
-        
-        return $this->revertToVersion($previousVersion);
-    }
-
-    /**
-     * Advance to the next version.
-     */
-    public function advanceToNext()
-    {
-        $currentVersionNumber = $this->current_version;
-     
-        $nextVersion = $this->versions()->where('version_number', '<', $currentVersionNumber)->orderBy('version_number', 'desc')->first();
-        
-        if (!$nextVersion) {
-            return false;
-        }
-        
-        return $this->revertToVersion($nextVersion);
     }
 
     /**
@@ -132,21 +94,5 @@ trait HasVersions
         return static::withoutEvents(function () use ($options) {
             return $this->save($options);
         });
-    }
-    
-    /**
-     * Get the current version number.
-     */
-    public function getCurrentVersionNumber()
-    {
-        return $this->current_version ?? 1;
-    }
-
-    /**
-     * Get the current version number.
-     */
-    public function getTotalVersionsCount()
-    {
-        return $this->versions()->count() + 1;
     }
 }
