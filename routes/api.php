@@ -263,8 +263,8 @@ Route::middleware('auth:sanctum')->group(function() {
             
             // Block versions
             Route::get('/{block}/versions', [BlockVersionController::class, 'index']);
-            Route::post('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
-            Route::post('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
+            Route::put('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
+            Route::put('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
             Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'change']);
         });
 

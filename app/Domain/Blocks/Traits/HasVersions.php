@@ -127,4 +127,17 @@ trait HasVersions
             return $this->save($options);
         });
     }
+    
+    /**
+     * Get the current version number.
+     */
+    public function getCurrentVersionNumber()
+    {
+        // Explain how this works
+        // 1. Get the minimum version number that is greater than 1
+        // 2. If no version number is found, return 1
+        // 3. Return the minimum version number
+        
+        return $this->versions()->where('version_number', '>', 1)->min('version_number') ?? 1;
+    }
 }

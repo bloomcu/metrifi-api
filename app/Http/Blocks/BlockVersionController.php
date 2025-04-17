@@ -2,20 +2,19 @@
 
 namespace DDD\Http\Blocks;
 
-use DDD\Domain\Blocks\Block;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use DDD\Http\Blocks\Resources\BlockVersionResource;
-use DDD\Domain\Blocks\BlockVersion;
-use Illuminate\Support\Facades\Gate;
+use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Blocks\Resources\BlockResource;
+use DDD\Domain\Blocks\BlockVersion;
+use DDD\Domain\Blocks\Block;
 
 class BlockVersionController extends Controller
 {
     /**
      * Display a listing of the block versions.
      */
-    public function index(Block $block)
+    public function index(Organization $organization, Block $block)
     {   
         $versions = $block->versions()->paginate();
         
@@ -25,7 +24,7 @@ class BlockVersionController extends Controller
     /**
      * Revert to the previous version.
      */
-    public function revert(Block $block)
+    public function revert(Organization $organization, Block $block)
     {   
         $success = $block->revertToPrevious();
         
@@ -39,7 +38,7 @@ class BlockVersionController extends Controller
     /**
      * Advance to the next version.
      */
-    public function advance(Block $block)
+    public function advance(Organization $organization, Block $block)
     {   
         $success = $block->advanceToNext();
         
@@ -53,7 +52,7 @@ class BlockVersionController extends Controller
     /**
      * Revert to a specific version.
      */
-    public function change(Block $block, BlockVersion $version)
+    public function change(Organization $organization, Block $block, BlockVersion $version)
     {   
         // Ensure the version belongs to this block
         if ($version->block_id !== $block->id) {
