@@ -17,9 +17,33 @@ trait HasVersions
      */
     public static function bootHasVersions()
     {
+        // Create initial version when a block is created
+        static::created(function ($model) {
+            $model->createInitialVersion();
+        });
+        
+        // Create a new version when a block is updated
         static::updating(function ($model) {
             $model->createVersionFromChanges();
         });
+    }
+    
+    /**
+     * Create the initial version for a new block.
+     */
+    protected function createInitialVersion()
+    {
+        $this->versions()->create([
+            'block_id' => $this->id,
+            'organization_id' => $this->organization_id,
+            'user_id' => $this->user_id,
+            'data' => $this->getAttributes(),
+            'version_number' => 1,
+        ]);
+        
+        // Set current version to 1
+        $this->current_version = 1;
+        $this->saveQuietly();
     }
 
     /**
@@ -41,19 +65,26 @@ trait HasVersions
         $versionableChanges = array_intersect_key($changes, array_flip($this->versionableAttributes));
         
         if (count($versionableChanges) > 0) {
-            // Serialize the current state of the model
-            $data = $this->getOriginal();
+            // Find the highest version number and increment by 1
+            $maxVersionNumber = $this->versions()->max('version_number') ?? 0;
+            $newVersionNumber = $maxVersionNumber + 1;
+            
+            // We need to apply the changes to the attributes before creating the version
+            $attributes = $this->getAttributes();
+            foreach ($changes as $key => $value) {
+                $attributes[$key] = $value;
+            }
             
             $this->versions()->create([
                 'block_id' => $this->id,
                 'organization_id' => $this->organization_id,
                 'user_id' => $this->user_id,
-                'data' => $data,
-                'version_number' => $this->current_version,
+                'data' => $attributes,
+                'version_number' => $newVersionNumber,
             ]);
             
             // Update the current version number
-            $this->current_version = $this->current_version + 1;
+            $this->current_version = $newVersionNumber;
         }
     }
 
@@ -62,10 +93,12 @@ trait HasVersions
      */
     public function revertToVersion(BlockVersion $version)
     {
+        // Ensure the version belongs to this block
+        if ($version->block_id !== $this->id) {
+            return false;
+        }
+        
         DB::transaction(function () use ($version) {
-            // Create a version of the current state before reverting
-            $this->createVersionFromChanges();
-            
             // Update the block with the version's data
             $versionData = $version->data->toArray();
             
@@ -76,7 +109,7 @@ trait HasVersions
                 }
             }
             
-            // Update the current version
+            // Update the current version to the target version number
             $this->current_version = $version->version_number;
             
             // Save without triggering another version
