@@ -33,17 +33,19 @@ trait HasVersions
      */
     protected function createInitialVersion()
     {
-        $this->versions()->create([
-            'block_id' => $this->id,
-            'organization_id' => $this->organization_id,
-            'user_id' => $this->user_id,
-            'data' => $this->getAttributes(),
-            'version_number' => 1,
-        ]);
-        
-        // Set current version to 1
-        $this->current_version = 1;
-        $this->saveQuietly();
+        if ($this->hasVersionableChanges()) {
+            $this->versions()->create([
+                'block_id' => $this->id,
+                'organization_id' => $this->organization_id,
+                'user_id' => $this->user_id,
+                'data' => $this->getAttributes(),
+                'version_number' => 1,
+            ]);
+            
+            // Set current version to 1
+            $this->current_version = 1;
+            $this->saveQuietly();
+        }
     }
 
     /**
@@ -55,16 +57,26 @@ trait HasVersions
     }
 
     /**
+     * Check if any versionable attributes have changed.
+     */
+    protected function hasVersionableChanges(?array $changes = null)
+    {
+        $changes = $changes ?? $this->getDirty();
+        
+        // Check if any versionable attributes have changed
+        $versionableChanges = array_intersect_key($changes, array_flip($this->versionableAttributes));
+        
+        return count($versionableChanges) > 0;
+    }
+
+    /**
      * Create a version if versionable attributes have changed.
      */
     protected function createVersionFromChanges()
     {
         $changes = $this->getDirty();
         
-        // Check if any versionable attributes have changed
-        $versionableChanges = array_intersect_key($changes, array_flip($this->versionableAttributes));
-        
-        if (count($versionableChanges) > 0) {
+        if ($this->hasVersionableChanges($changes)) {
             // Find the highest version number and increment by 1
             $maxVersionNumber = $this->versions()->max('version_number') ?? 0;
             $newVersionNumber = $maxVersionNumber + 1;
