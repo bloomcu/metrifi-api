@@ -5,7 +5,7 @@ namespace DDD\Domain\Blocks\Traits;
 use DDD\Domain\Blocks\BlockVersion;
 use Illuminate\Support\Facades\DB;
 
-trait HasVersions
+trait BlockHasVersions
 {
     /**
      * The attributes that should trigger versioning when changed.
@@ -15,7 +15,7 @@ trait HasVersions
     /**
      * Boot the trait.
      */
-    public static function bootHasVersions()
+    public static function bootBlockHasVersions()
     {
         // Create initial version when a block is created
         static::created(function ($model) {
