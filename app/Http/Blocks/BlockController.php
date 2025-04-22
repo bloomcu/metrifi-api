@@ -14,7 +14,7 @@ class BlockController extends Controller
   {
     $validated = $request->validate([
       'page_id' => 'nullable|exists:pages,id',
-      'order' => 'nullable|string',
+      'order' => 'nullable|integer',
       'status' => 'nullable|string',
       'error' => 'nullable|string',
       'title' => 'nullable|string',
@@ -37,13 +37,14 @@ class BlockController extends Controller
   public function update(Organization $organization, Block $block, Request $request)
   {        
     $validated = $request->validate([
-      'order' => 'nullable|string',
+      'order' => 'nullable|integer',
       'status' => 'nullable|string',
       'error' => 'nullable|string',
       'title' => 'nullable|string',
       'type' => 'nullable|string',
       'layout' => 'nullable|string',
       'wordpress_category' => 'nullable|string',
+      'outline' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
 

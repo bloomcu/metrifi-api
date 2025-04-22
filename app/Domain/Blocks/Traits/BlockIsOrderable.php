@@ -10,12 +10,15 @@ use InvalidArgumentException;
 
 trait BlockIsOrderable
 {
-    protected static function bootPageIsOrderable(): void
+    protected static function bootBlockIsOrderable(): void
     {
         static::creating(function (Model $model) {
             if (!request()->order) {
                 $model->setHighestOrderNumber();
+                return;
             }
+
+            $model->reorder(request()->order);
         });
 
         static::updating(function (Model $model) {

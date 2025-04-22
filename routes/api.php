@@ -30,6 +30,7 @@ use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Chats\ChatsController;
 use DDD\Http\Blocks\BlockRegenerationController;
 use DDD\Http\Blocks\BlockVersionController;
+use DDD\Http\Blocks\BlockOrderController;
 use DDD\Http\Blocks\BlockController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
@@ -257,6 +258,9 @@ Route::middleware('auth:sanctum')->group(function() {
             Route::get('/{block}', [BlockController::class, 'show']);
             Route::put('/{block}', [BlockController::class, 'update']);
             Route::delete('/{block}', [BlockController::class, 'destroy']);
+
+            // Reorder block
+            Route::put('/{block}/reorder', [BlockOrderController::class, 'reorder']);
 
             // Regenerate block html
             Route::put('/{block}/regenerate', [BlockRegenerationController::class, 'store']);
