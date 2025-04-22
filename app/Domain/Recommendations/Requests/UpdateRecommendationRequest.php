@@ -30,6 +30,7 @@ class UpdateRecommendationRequest extends FormRequest
             'content' => 'nullable|string',
             'content_outline' => 'nullable|string',
             'prototype' => 'nullable|string',
+            'prompt' => 'nullable|string',
         ];
     }
 
