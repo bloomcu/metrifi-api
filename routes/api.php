@@ -32,6 +32,7 @@ use DDD\Http\Blocks\BlockRegenerationController;
 use DDD\Http\Blocks\BlockVersionController;
 use DDD\Http\Blocks\BlockOrderController;
 use DDD\Http\Blocks\BlockController;
+use DDD\Http\Blocks\ReplicateBlockController;
 use DDD\Http\Benchmarks\BenchmarkController;
 use DDD\Http\Benchmarks\BenchmarkCalculateController;
 use DDD\Http\Analyses\AnalysisController;
@@ -265,11 +266,10 @@ Route::middleware('auth:sanctum')->group(function() {
             // Regenerate block html
             Route::put('/{block}/regenerate', [BlockRegenerationController::class, 'store']);
             
+            // Replicate block
+            Route::post('/{block}/replicate', [ReplicateBlockController::class, 'replicate']);
+            
             // Block versions
-            // Route::get('/{block}/versions', [BlockVersionController::class, 'index']);
-            // Route::put('/{block}/versions/revert', [BlockVersionController::class, 'revert']);
-            // Route::put('/{block}/versions/advance', [BlockVersionController::class, 'advance']);
-            // Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'change']);
             Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'revert']);
         });
 
