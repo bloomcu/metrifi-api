@@ -14,10 +14,7 @@ class ReplicateBlockController extends Controller
     {
         $clonedBlock = $block->replicate();
         $clonedBlock->save();
-        // $clonedBlock->order = $block->order + 1;
-        $clonedBlock->update([
-            'order' => $block->order + 1
-        ]);
+        $clonedBlock->reorder($block->order + 1);
 
         return new BlockResource($clonedBlock);
     }
