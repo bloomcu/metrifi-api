@@ -45,7 +45,7 @@ class BlockRegenerationController extends Controller
         BlockBuilderMagicPatterns::dispatch($recommendation, $block);
 
         // Return the block with updated status
-        $block->update(['status' => 'regenerating']);
+        $block->update(['status' => 'generating']);
         
         return new BlockResource($block);
     }

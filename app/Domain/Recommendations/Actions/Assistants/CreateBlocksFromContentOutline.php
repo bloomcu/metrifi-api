@@ -59,6 +59,7 @@ class CreateBlocksFromContentOutline implements ShouldQueue
             'organization_id' => $recommendation->organization_id,
             'user_id' => $recommendation->user_id,
             'order' => (int)$index + 1,
+            'status' => 'generating',
             'outline' => $section['outline'],
         ]);
       }

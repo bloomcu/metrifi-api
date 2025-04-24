@@ -60,4 +60,11 @@ class RecommendationController extends Controller
 
         return new RecommendationResource($recommendation);
     }
+    
+    public function destroy(Organization $organization, Recommendation $recommendation)
+    {
+        $recommendation->delete();
+        
+        return new RecommendationResource($recommendation);
+    }
 }

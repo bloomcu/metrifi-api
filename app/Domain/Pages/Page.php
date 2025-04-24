@@ -20,6 +20,18 @@ class Page extends Model
     ];
 
     /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::deleting(function ($page) {
+            $page->blocks()->delete();
+        });
+    }
+
+    /**
      * Recommendation this model belongs to.
      * 
      * @return belongsTo

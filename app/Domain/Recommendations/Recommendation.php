@@ -30,6 +30,21 @@ class Recommendation extends Model
     ];
 
     /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::deleting(function ($recommendation) {
+            // Delete pages and their related blocks will be deleted by the Page model's boot method
+            $recommendation->pages->each(function ($page) {
+                $page->delete();
+            });
+        });
+    }
+
+    /**
      * Dashboard this recommendation belongs to.
      * 
      * @return belongsTo
