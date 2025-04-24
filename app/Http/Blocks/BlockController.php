@@ -2,6 +2,7 @@
 
 namespace DDD\Http\Blocks;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Blocks\Resources\BlockResource;
@@ -23,6 +24,9 @@ class BlockController extends Controller
       'wordpress_category' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
+
+    // Log validate
+    // Log::info('Validated block data: ' . json_encode($validated));
 
     $block = $organization->blocks()->create($validated);
 
