@@ -44,7 +44,7 @@ class FunnelSnapshotAction
         // Update the snapshot for the given period
         $snapshots[$period]['assets'] = $funnel->report['assets'];
         $snapshots[$period]['conversion_rate'] = $funnel->report['overallConversionRate'];
-        $snapshots[$period]['users'] = (int) $funnel->report['steps'][0]['users'];
+        $snapshots[$period]['users'] = isset($funnel->report['steps'][0]) ? (int) $funnel->report['steps'][0]['users'] : 0;
 
         // Save
         unset($funnel->report);
