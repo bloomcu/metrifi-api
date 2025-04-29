@@ -16,6 +16,7 @@ class RecommendationGenerateController extends Controller
         $thread = $assistant->createThread();
 
         $recommendation->update([
+            'status' => 'queued',
             'thread_id' => $thread['id'],
         ]);
 
