@@ -16,13 +16,7 @@ class RecommendationController extends Controller
 {
     public function index(Organization $organization, Request $request)
     {
-        $recommendations = Recommendation::where('organization_id', $organization->id);
-            
-        if ($request->has('dashboard_id')) {
-            $recommendations->where('dashboard_id', $request->dashboard_id);
-        }
-        
-        $recommendations = $recommendations->latest()->get();
+        $recommendations = $organization->recommendations()->latest()->get();
 
         return RecommendationResource::collection($recommendations);
     }

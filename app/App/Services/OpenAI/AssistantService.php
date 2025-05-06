@@ -43,8 +43,8 @@ class AssistantService
     public function createRun(
         string $threadId, 
         string $assistantId, 
-        int $maxPromptTokens = null,
-        int $maxCompletionTokens = null,
+        ?int $maxPromptTokens = null,
+        ?int $maxCompletionTokens = null,
     ) {
         $response = OpenAI::threads()->runs()->create(
             threadId: $threadId,
@@ -91,43 +91,7 @@ class AssistantService
         }
 
         throw new \Exception("OpenAI Assistant polling exceeded the maximum number of attempts.");
-        
-        // $pollingInterval = 1; // Set delay in seconds between polls
-        // $maxPollingAttempts = 20; // Limit number of attempts
-        // $attempts = 0;
-
-        // do {
-        //     $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
-
-        //     if ($run->status === 'completed') break;
-
-        //     sleep($pollingInterval);
-
-        //     $attempts++;
-        // } while ($run->status !== 'completed' && $attempts < $maxPollingAttempts);
-
-        // return $run->toArray();
     }
-
-    // public function pollRunForFinalMessage(string $threadId, string $runId) {
-    //     $pollingInterval = 1; // Set delay in seconds between polls
-    //     $maxPollingAttempts = 20; // Limit number of attempts
-    //     $attempts = 0;
-
-    //     do {
-    //         $run = OpenAI::threads()->runs()->retrieve($threadId, $runId);
-
-    //         if ($run->status === 'completed') break;
-
-    //         sleep($pollingInterval);
-
-    //         $attempts++;
-    //     } while ($run->status !== 'completed' && $attempts < $maxPollingAttempts);
-
-    //     $messages = $this->getMessages(threadId: $threadId);
-
-    //     return $messages['data'][0]['content'][0]['text']['value'];
-    // }
 
     public function getMessages(string $threadId) {
         $response = OpenAI::threads()->messages()->list($threadId);
@@ -138,32 +102,28 @@ class AssistantService
     public function getFinalMessage(string $threadId) {
         $messages = $this->getMessages(threadId: $threadId);
 
+        if (empty($messages['data']) || !isset($messages['data'][0]['content'][0]['text']['value'])) {
+            return '';
+        }
+
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
     // Get all messages as a single string
     public function getMessagesAsString(string $threadId) {
         $messages = $this->getMessages(threadId: $threadId);
-
         $messageString = '';
 
-        foreach ($messages['data'] as $message) {
-            $messageString .= $message['content'][0]['text']['value'] . ' ';
+        if (!empty($messages['data'])) {
+            foreach ($messages['data'] as $message) {
+                if (isset($message['content'][0]['text']['value'])) {
+                    $messageString .= $message['content'][0]['text']['value'] . ' ';
+                }
+            }
         }
 
         return $messageString;
     }
-
-    // public function getAssistantResponse(string $assistantId, string $message) {
-    //     $run = $this->createAndRunThread($assistantId, $message);
-
-    //     $message = $this->pollForFinalMessage(
-    //         threadId: $run['thread_id'], 
-    //         runId: $run['id']
-    //     );
-
-    //     return $message;
-    // }
 
     public function createAndRunThread(string $assistantId, string $message, array $fileIds = []) {
         $messages = [
@@ -214,6 +174,10 @@ class AssistantService
 
         $messages = $this->getMessages(threadId: $threadId);
 
+        if (empty($messages['data']) || !isset($messages['data'][0]['content'][0]['text']['value'])) {
+            return '';
+        }
+
         return $messages['data'][0]['content'][0]['text']['value'];
     }
 
@@ -224,7 +188,6 @@ class AssistantService
         $imageContent = $response->getBody()->getContents();
 
         // Save the image temporarily
-        // $tempImagePath = storage_path('app/screenshot.png');
         $tempImagePath = storage_path('app/' . $name . '_' . uniqid() . '.' . $extension);
         file_put_contents($tempImagePath, $imageContent);
 
@@ -245,11 +208,4 @@ class AssistantService
             throw $e; // Rethrow the exception if you want it to propagate
         }
     }
-
-    // public function getSingleMessage(string $threadId, string $messageId) {
-    //     $response = OpenAI::threads()->messages()->retrieve($threadId, $messageId);
-
-    //     return $response->toArray();
-    //     return $response['data']['messages'][0]['content'];
-    // }
 }

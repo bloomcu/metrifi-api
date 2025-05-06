@@ -14,7 +14,7 @@ trait BlockIsOrderable
     protected static function bootBlockIsOrderable(): void
     {
         static::creating(function (Model $model) {
-            Log::info('Creating block with order: ' . request()->order);
+            // Log::info('Creating block with order: ' . request()->order);
 
             if (!request()->order) {
                 $model->setHighestOrderNumber();

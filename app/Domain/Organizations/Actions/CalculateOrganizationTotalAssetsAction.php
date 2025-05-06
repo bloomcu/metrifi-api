@@ -32,11 +32,11 @@ class CalculateOrganizationTotalAssetsAction
                 continue;
             }
 
-            $assets['median']['assets'] += $dashboard->medianAnalysis->subject_funnel_assets / 100;
-            $assets['median']['potential'] += $dashboard->medianAnalysis->subject_funnel_potential_assets / 100;
+            $assets['median']['assets'] += $dashboard->medianAnalysis?->subject_funnel_assets / 100 ?? 0;
+            $assets['median']['potential'] += $dashboard->medianAnalysis?->subject_funnel_potential_assets / 100 ?? 0;
 
-            $assets['max']['assets'] += $dashboard->maxAnalysis->subject_funnel_assets / 100;
-            $assets['max']['potential'] += $dashboard->maxAnalysis->subject_funnel_potential_assets / 100;
+            $assets['max']['assets'] += $dashboard->maxAnalysis?->subject_funnel_assets / 100 ?? 0;
+            $assets['max']['potential'] += $dashboard->maxAnalysis?->subject_funnel_potential_assets / 100 ?? 0;
         }
 
         // Add up total potentials
