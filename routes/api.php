@@ -103,6 +103,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
         // Form users
         Route::post('form-user-submissions/{connection}', [GoogleAnalyticsDataController::class, 'formUserSubmissions']);
+
+        // LLM users
+        Route::post('llm-users/{connection}', [GoogleAnalyticsDataController::class, 'llmUsers']);
     });
 
     // Organizations

@@ -107,4 +107,18 @@ class GoogleAnalyticsDataController extends Controller
             'data' => $report
         ], 200);
     }
+
+    public function llmUsers(Connection $connection, Request $request)
+    {   
+        $report = GoogleAnalyticsData::llmUsers(
+            connection: $connection, 
+            startDate: $request->startDate,
+            endDate: $request->endDate,
+            contains: $request->contains,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
 }

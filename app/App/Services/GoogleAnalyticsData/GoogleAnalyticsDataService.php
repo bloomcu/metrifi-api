@@ -709,6 +709,51 @@ class GoogleAnalyticsDataService
             'metricAggregations' => ['TOTAL'],
         ]);
     }
+
+    /**
+     * Get a list of LLM sources and the number of users referred by them
+     *
+     * @param Connection $connection
+     * @param [type] $startDate
+     * @param [type] $endDate
+     * @param string $contains
+     * @return void
+     */
+    public function llmUsers(Connection $connection, $startDate, $endDate, $contains = '')
+    {
+        // Build filer expression(s)
+        $filters[] = [
+            'filter' => [
+                'fieldName' => 'sessionSource',
+                'stringFilter' => [
+                    'matchType' => 'PARTIAL_REGEXP',
+                    'caseSensitive' => false,
+                    // 'value' => '(openai|copilot|chatgpt|gemini|gpt-[0-9]+|neeva|writesonic|nimble|outrider|perplexity|bard|edgeservices|astastic|copy\.ai|bnngpt)'
+                    'value' => '\.openai|copilot|chatgpt|gemini|gpt-[0-9]+|neeva|writesonic|nimble|perplexity|bard|edgeservices|bnngpt|google.*gemini|google.*bard'
+                ]
+            ]
+        ];            
+
+        // Run the report
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                ['name' => 'sessionSource'],
+            ],
+            'metrics' => [
+                ['name' => 'activeUsers']
+            ],
+            'dimensionFilter' => [
+                'orGroup' => [
+                    'expressions' => $filters
+                ]
+            ],
+            'limit' => '500',
+            'metricAggregations' => ['TOTAL'],
+        ]);
+    }
     
 
     /**
