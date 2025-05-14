@@ -29,7 +29,6 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            exact: $request->exact,
             contains: $request->contains,
         );
 
@@ -58,7 +57,6 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            exact: $request->exact,
             contains: $request->contains,
         );
 
