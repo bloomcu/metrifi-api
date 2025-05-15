@@ -21,9 +21,6 @@ class FileController extends Controller
     {
         $file = QueryBuilder::for(File::class)
             ->where('organization_id', $organization->id)
-            // ->allowedFilters([
-            //     AllowedFilter::exact('folder_id')
-            // ])
             ->latest()
             ->get();
 

@@ -29,7 +29,6 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            exact: $request->exact,
             contains: $request->contains,
         );
 
@@ -58,7 +57,6 @@ class GoogleAnalyticsDataController extends Controller
             connection: $connection, 
             startDate: $request->startDate,
             endDate: $request->endDate,
-            exact: $request->exact,
             contains: $request->contains,
         );
 
@@ -101,6 +99,20 @@ class GoogleAnalyticsDataController extends Controller
         $report = GoogleAnalyticsData::formUserSubmissions(
             connection: $connection, 
             startDate: $request->startDate, 
+            endDate: $request->endDate,
+            contains: $request->contains,
+        );
+
+        return response()->json([
+            'data' => $report
+        ], 200);
+    }
+
+    public function llmUsers(Connection $connection, Request $request)
+    {   
+        $report = GoogleAnalyticsData::llmUsers(
+            connection: $connection, 
+            startDate: $request->startDate,
             endDate: $request->endDate,
             contains: $request->contains,
         );

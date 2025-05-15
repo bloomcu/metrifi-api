@@ -295,7 +295,6 @@ class GoogleAnalyticsDataService
             $funnel['report'] = $this->report;
 
             return $funnel;
-
         } catch (ApiException $ex) {
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
@@ -307,27 +306,13 @@ class GoogleAnalyticsDataService
      * @param Connection $connection
      * @param [type] $startDate
      * @param [type] $endDate
-     * @param array $exact
      * @param string $contains
      * @return void
      */
-    public function pageUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
+    public function pageUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
         // Build filer expression(s)
-        if ($exact && count($exact)) {
-            foreach ($exact as $pagePath) {
-                $filters[] = [
-                    'filter' => [
-                        'fieldName' => 'pagePath',
-                        'stringFilter' => [
-                            'matchType' => 'EXACT',
-                            'caseSensitive' => true,
-                            'value' => $pagePath
-                        ]
-                    ]
-                ];
-            }
-        } elseif ($contains) {
+        if ($contains) {
             $filters[] = [
                 'filter' => [
                     'fieldName' => 'pagePath',
@@ -441,27 +426,13 @@ class GoogleAnalyticsDataService
      * @param Connection $connection
      * @param string $startDate
      * @param string $endDate
-     * @param array $exact
      * @param string $contains
      * @return array
      */
-    public function pageTitleUsers(Connection $connection, $startDate, $endDate, $exact = [], $contains = '')
+    public function pageTitleUsers(Connection $connection, $startDate, $endDate, $contains = '')
     {
         // Build filter expression(s)
-        if ($exact && count($exact)) {
-            foreach ($exact as $pageTitle) {
-                $filters[] = [
-                    'filter' => [
-                        'fieldName' => 'pageTitle',
-                        'stringFilter' => [
-                            'matchType' => 'EXACT',
-                            'caseSensitive' => true,
-                            'value' => $pageTitle
-                        ]
-                    ]
-                ];
-            }
-        } elseif ($contains) {
+        if ($contains) {
             $filters[] = [
                 'filter' => [
                     'fieldName' => 'pageTitle',
@@ -738,6 +709,51 @@ class GoogleAnalyticsDataService
             'metricAggregations' => ['TOTAL'],
         ]);
     }
+
+    /**
+     * Get a list of LLM sources and the number of users referred by them
+     *
+     * @param Connection $connection
+     * @param [type] $startDate
+     * @param [type] $endDate
+     * @param string $contains
+     * @return void
+     */
+    public function llmUsers(Connection $connection, $startDate, $endDate, $contains = '')
+    {
+        // Build filer expression(s)
+        $filters[] = [
+            'filter' => [
+                'fieldName' => 'sessionSource',
+                'stringFilter' => [
+                    'matchType' => 'PARTIAL_REGEXP',
+                    'caseSensitive' => false,
+                    // 'value' => '(openai|copilot|chatgpt|gemini|gpt-[0-9]+|neeva|writesonic|nimble|outrider|perplexity|bard|edgeservices|astastic|copy\.ai|bnngpt)'
+                    'value' => '\.openai|copilot|chatgpt|gemini|gpt-[0-9]+|neeva|writesonic|nimble|perplexity|bard|edgeservices|bnngpt|google.*gemini|google.*bard'
+                ]
+            ]
+        ];            
+
+        // Run the report
+        return $this->runReport($connection, [
+            'dateRanges' => [
+                ['startDate' => $startDate, 'endDate' => $endDate]
+            ],
+            'dimensions' => [
+                ['name' => 'sessionSource'],
+            ],
+            'metrics' => [
+                ['name' => 'activeUsers']
+            ],
+            'dimensionFilter' => [
+                'orGroup' => [
+                    'expressions' => $filters
+                ]
+            ],
+            'limit' => '500',
+            'metricAggregations' => ['TOTAL'],
+        ]);
+    }
     
 
     /**
@@ -789,9 +805,6 @@ class GoogleAnalyticsDataService
                 if ($index !== false && $index >= 0) {
                     array_splice($this->report['steps'], $index, 1);
                 }
-
-                // Remove the step from the report
-                // array_splice($this->report['steps'], $index, 1);
             }
         }
     }
@@ -816,9 +829,6 @@ class GoogleAnalyticsDataService
             }
 
             $formatted = $conversionRate * 100; // Get a percentage
-            // $formatted = round($formatted, 2); // Round to 2 decimal places
-            // $formatted = number_format($formatted, 2); // Format with commas
-            // $formatted = substr($formatted, 0, 4); // Truncate to 4 characters
 
             $this->report['steps'][$index]['conversionRate'] = $formatted;
         }
@@ -826,15 +836,12 @@ class GoogleAnalyticsDataService
 
     private function calculateOverallConversionRate() 
     {
-        // if (!$this->report['steps']) { return; }
-
         $first = $this->report['steps'][0]['users'];
         $last = end($this->report['steps'])['users'];
 
         if ($first > 0) {
             $ocr = ($last / $first) * 100;
             $this->report['overallConversionRate'] = round($ocr, 5);
-            // $this->report['overallConversionRate'] = $ocr;
         }
     }
 
