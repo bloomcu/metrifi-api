@@ -14,7 +14,7 @@ class GoogleAnalyticsDataService
 
     /**
      * Run a funnel report
-     * 
+     *
      * Not available in PHP SDK yet. Must use v1alpha version of the Google Analytics Data API.
      * Docs: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels
      * Example: https://developers.google.com/analytics/devguides/reporting/data/v1/funnels#funnel_report_example
@@ -31,7 +31,7 @@ class GoogleAnalyticsDataService
         /**
          * Generate a GA funnelReport request from our app's funnel steps.
          * TODO: Refactor this using Factory and Builder patterns.
-         * 
+         *
          */
         // Initialize an array to hold the structured funnel steps for the API request.
         $funnelSteps = [];
@@ -39,7 +39,7 @@ class GoogleAnalyticsDataService
         // Iterate through each raw funnel step to structure it for the API request.
         foreach ($funnel->steps as $step) {
             $funnelFilterExpressionList = [];
-            
+
             // If the step has no metrics, skip it.
             if ($step->metrics->isEmpty()) {
                 $index = $this->getStepIndex($funnel->steps, $step->id);
@@ -54,7 +54,7 @@ class GoogleAnalyticsDataService
                     // Match exact page path
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
-                            // The page path (web) or screen class (app) on which the event was logged. 
+                            // The page path (web) or screen class (app) on which the event was logged.
                             // Synonymous with pagePath in GA4 reports.
                             'fieldName' => 'unifiedPagePathScreen',
                             'stringFilter' => [
@@ -63,22 +63,22 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } 
+                }
 
                 elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
                     // Match exact page path plus query string
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
-                            // The page path and query string (web) or screen class (app) on which the event was logged. 
+                            // The page path and query string (web) or screen class (app) on which the event was logged.
                             // Synonymous with pagePathPlusQueryString in GA4 reports.
-                            'fieldName' => 'unifiedPageScreen', 
+                            'fieldName' => 'unifiedPageScreen',
                             'stringFilter' => [
                                 'value' => $metric['pagePathPlusQueryString'],
                                 'matchType' => 'EXACT',
                             ]
                         ]
                     ];
-                } 
+                }
 
                 if ($metric['metric'] === 'pageTitleUsers') {
                     // Match exact page path
@@ -92,7 +92,7 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } 
+                }
 
                 elseif ($metric['metric'] === 'outboundLinkUsers') {
                     $funnelFilterExpressionList[] = [
@@ -119,7 +119,7 @@ class GoogleAnalyticsDataService
                             ]
                         ]
                     ];
-                } 
+                }
                 elseif ($metric['metric'] === 'formUserSubmissions') {
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
@@ -232,7 +232,7 @@ class GoogleAnalyticsDataService
         try {
             $accessToken = $this->setupAccessToken($funnel->connection);
             $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $funnel->connection->uid . ':runFunnelReport?access_token=' . $accessToken;
-            $gaFunnelReport = Http::timeout(300)->post($endpoint, $funnelReportRequest)->json();
+            $gaFunnelReport = Http::timeout(600)->post($endpoint, $funnelReportRequest)->json();
 
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {
@@ -281,16 +281,16 @@ class GoogleAnalyticsDataService
 
             // Calculate assets of the funnel
             $this->calculateFunnelAssets($funnel);
-            
+
             // Remove disabled steps from report
             $this->removeDisabledSteps($funnel, $disabledSteps);
 
             // Calculate conversion rate of each step in report
             $this->calculateConversionRates();
-            
+
             // Calculate the overall conversion rate.
             $this->calculateOverallConversionRate();
-            
+
             // Add report to funnel
             $funnel['report'] = $this->report;
 
@@ -299,7 +299,7 @@ class GoogleAnalyticsDataService
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
     }
-    
+
     /**
      * Get a list of pages and the number of users who visited them
      *
@@ -516,7 +516,7 @@ class GoogleAnalyticsDataService
                 ]
             ];
         }
-        
+
         return $this->runReport($connection, [
             'dateRanges' => [
                 ['startDate' => $startDate, 'endDate' => $endDate]
@@ -568,7 +568,7 @@ class GoogleAnalyticsDataService
 
             // Metric value represents the event count
             $metricValues = isset($row['metricValues']) ? $row['metricValues'] : [];
-            
+
             if (count($dimensionValues) == 2) {
                 // The third item in "dimensionValues" represents the page path
                 if (isset($dimensionValues[1]['value']) && $dimensionValues[1]['value'] === $sourcePagePath) {
@@ -589,14 +589,14 @@ class GoogleAnalyticsDataService
 
         return $report;
     }
-    
+
     /**
      * Get a list of all pages with user form submissions by form id
      *
      * Enhanced measurement events and parameters: https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=13367566&sjid=3386798091051746172-NC
      * Tracking form submissions: https://ezsegment.com/automatic-form-interaction-tracking-in-ga4/
-     * 
-     * 
+     *
+     *
      * @param Connection $connection
      * @param [string] $startDate
      * @param [string] $endDate
@@ -618,7 +618,7 @@ class GoogleAnalyticsDataService
                     ]
                 ],
                 [
-                    'notExpression' => [ 
+                    'notExpression' => [
                         'orGroup' => [
                             'expressions' => [
                                 [
@@ -656,7 +656,7 @@ class GoogleAnalyticsDataService
                     ]
                 ],
                 [
-                    'notExpression' => [ 
+                    'notExpression' => [
                         'orGroup' => [
                             'expressions' => [
                                 [
@@ -683,7 +683,7 @@ class GoogleAnalyticsDataService
                 ]
             ];
         }
-    
+
         return $this->runReport($connection, [
             'dateRanges' => [
                 ['startDate' => $startDate, 'endDate' => $endDate]
@@ -732,7 +732,7 @@ class GoogleAnalyticsDataService
                     'value' => '\.openai|copilot|chatgpt|gemini|gpt-[0-9]+|neeva|writesonic|nimble|perplexity|bard|edgeservices|bnngpt|google.*gemini|google.*bard'
                 ]
             ]
-        ];            
+        ];
 
         // Run the report
         return $this->runReport($connection, [
@@ -754,11 +754,11 @@ class GoogleAnalyticsDataService
             'metricAggregations' => ['TOTAL'],
         ]);
     }
-    
+
 
     /**
      * Run a report
-     * 
+     *
      * Docs: https://cloud.google.com/php/docs/reference/analytics-data/latest/Google.Analytics.Data.V1beta.BetaAnalyticsDataClient#_runReport
      * PHP Client: https://github.com/googleapis/php-analytics-data/blob/master/samples/V1beta/BetaAnalyticsDataClient/run_report.php
      */
@@ -766,7 +766,7 @@ class GoogleAnalyticsDataService
     {
         try {
             $accessToken = $this->setupAccessToken($connection);
-            
+
             $endpoint = 'https://analyticsdata.googleapis.com/v1beta/' . $connection->uid . ':runReport?access_token=' . $accessToken;
 
             $response = Http::post($endpoint, $params)->json();
@@ -779,8 +779,8 @@ class GoogleAnalyticsDataService
 
     /**
      * Setup credentials for Analytics Data Client
-     * 
-     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties 
+     *
+     * https://stackoverflow.com/questions/73334495/how-to-use-access-tokens-with-google-admin-api-for-ga4-properties
      */
     // TODO: Should this be a constructor, or a standalone class or helper?
     private function setupAccessToken(Connection $connection)
@@ -790,7 +790,7 @@ class GoogleAnalyticsDataService
         return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
     }
 
-    private function removeDisabledSteps($funnel, $disabledSteps) 
+    private function removeDisabledSteps($funnel, $disabledSteps)
     {
         if (!$disabledSteps) {
             return;
@@ -809,20 +809,20 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function calculateConversionRates() 
+    private function calculateConversionRates()
     {
         foreach ($this->report['steps'] as $index => $step) {
             if ($index === 0) {
                 $this->report['steps'][$index]['conversionRate'] = 100;
                 continue;
             }
-            
+
             try {
                 $conversionRate = $step['users'] / $this->report['steps'][$index - 1]['users'];
             } catch (DivisionByZeroError $e) {
                 $conversionRate = 0;
             }
-            
+
             if ($conversionRate === 0 || is_infinite($conversionRate) || is_nan($conversionRate)) {
                 $this->report['steps'][$index]['conversionRate'] = 0;
                 continue;
@@ -834,7 +834,7 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function calculateOverallConversionRate() 
+    private function calculateOverallConversionRate()
     {
         $first = $this->report['steps'][0]['users'];
         $last = end($this->report['steps'])['users'];
@@ -845,7 +845,7 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function calculateFunnelAssets($funnel) 
+    private function calculateFunnelAssets($funnel)
     {
         $lastStep = end($this->report['steps']);
         $users = $lastStep['users'];
@@ -854,7 +854,7 @@ class GoogleAnalyticsDataService
         $this->report['assets'] = ($assets / 100);
     }
 
-    private function getReportRowUsers($reportRows, $name) 
+    private function getReportRowUsers($reportRows, $name)
     {
         foreach ($reportRows as $row) {
             if (str_ends_with($row['dimensionValues'][0]['value'], $name)) {
@@ -864,7 +864,7 @@ class GoogleAnalyticsDataService
         }
     }
 
-    private function getStepIndex($steps, $id) 
+    private function getStepIndex($steps, $id)
     {
         foreach ($steps as $index => $step) {
             if (str_contains($step['id'], $id)) {

@@ -17,7 +17,7 @@ class AnalyzeDashboardAction
 
     public int $jobTries = 2;
     public int $jobBackoff = 120;
-    public int $jobTimeout = 30;
+    public int $jobTimeout = 300;
 
     function handle(Dashboard $dashboard)
     { 
