@@ -99,8 +99,8 @@ class GoogleAnalyticsDataService
 
                 elseif ($metric['metric'] === 'outboundLinkUsers') {
                     // For outbound links, allow different match types for linkUrl and pagePath
-                    $linkUrlMatchType = $metric['linkUrlMatchType'] ?? $matchType;
-                    $pagePathMatchType = $metric['pagePathMatchType'] ?? 'EXACT';
+                    // $linkUrlMatchType = $metric['linkUrlMatchType'] ?? $matchType;
+                    // $pagePathMatchType = $metric['pagePathMatchType'] ?? 'EXACT';
 
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
@@ -110,7 +110,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'linkUrl',
                                         'stringFilter' => [
                                             'value' => $metric['linkUrl'],
-                                            'matchType' => $linkUrlMatchType,
+                                            'matchType' => $matchType,
                                         ]
                                     ]
                                 ],
@@ -119,7 +119,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
                                             'value' => $metric['pagePath'],
-                                            'matchType' => $pagePathMatchType,
+                                            'matchType' => $matchType
                                         ]
                                     ]
                                 ]
@@ -129,7 +129,7 @@ class GoogleAnalyticsDataService
                 }
                 elseif ($metric['metric'] === 'formUserSubmissions') {
                     // Allow pagePath to use different match type
-                    $pagePathMatchType = $metric['pagePathMatchType'] ?? $matchType;
+                    // $pagePathMatchType = $metric['pagePathMatchType'] ?? $matchType;
 
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
@@ -148,7 +148,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
                                             'value' => $metric['pagePath'],
-                                            'matchType' => $pagePathMatchType,
+                                            'matchType' => $matchType,
                                         ]
                                     ]
                                 ],
