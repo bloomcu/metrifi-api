@@ -5,6 +5,7 @@ namespace DDD\Domain\Funnels\Actions;
 use Lorisleiva\Actions\Concerns\AsAction;
 use DDD\Domain\Funnels\Funnel;
 use DDD\App\Facades\GoogleAnalytics\GoogleAnalyticsData;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class GenerateFunnelStepsAction
 {
@@ -29,7 +30,8 @@ class GenerateFunnelStepsAction
                         'metric' => 'pageUsers',
                         'pagePath' => $pagePath,
                     ]
-                ]
+                ],
+                'metrics_expression' => MetricsExpression::default()
             ]);
 
             array_push($steps, $step);

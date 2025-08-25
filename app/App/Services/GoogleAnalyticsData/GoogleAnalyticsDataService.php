@@ -7,6 +7,7 @@ use DivisionByZeroError;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAuth;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class GoogleAnalyticsDataService
 {
@@ -214,11 +215,14 @@ class GoogleAnalyticsDataService
                 }
             }
 
+            // Determine the expression type (default to orGroup for backward compatibility)
+            $expressionType = $step['metrics_expression'] ?? MetricsExpression::default();
+
             // Add the structured step to the funnel report API request as a filter expression.
             $funnelSteps[] = [
                 'name' => $step['name'],
                 'filterExpression' => [
-                    'orGroup' => [
+                    $expressionType => [
                         'expressions' => $funnelFilterExpressionList
                     ]
                 ]
