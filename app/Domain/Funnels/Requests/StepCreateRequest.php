@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use DDD\Domain\Funnels\Enums\MatchType;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class StepCreateRequest extends FormRequest
 {
@@ -27,6 +28,7 @@ class StepCreateRequest extends FormRequest
     public function rules()
     {
         $allowedMatchTypes = implode(',', MatchType::common());
+        $allowedMetricsExpressions = implode(',', MetricsExpression::all());
 
         return [
             'order' => 'nullable|numeric',
@@ -45,6 +47,7 @@ class StepCreateRequest extends FormRequest
             'metrics.*.formLength' => 'nullable|string',
             'metrics.*.formSubmitText' => 'nullable|string',
             'metrics.*.hostname' => 'nullable|string',
+            'metrics_expression' => "nullable|string|in:{$allowedMetricsExpressions}",
         ];
     }
 

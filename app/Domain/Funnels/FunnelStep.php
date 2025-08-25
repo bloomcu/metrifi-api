@@ -41,7 +41,7 @@ class FunnelStep extends Model
     {
         static::updated(function ($funnelStep) {
             // Define the fields that should trigger the job when changed
-            $watchedFields = ['order', 'metrics'];
+            $watchedFields = ['order', 'metrics', 'metrics_expression'];
             $changes = $funnelStep->getChanges();
             $significantChanges = array_intersect_key($changes, array_flip($watchedFields));
             
