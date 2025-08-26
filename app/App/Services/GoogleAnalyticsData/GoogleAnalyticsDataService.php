@@ -7,6 +7,7 @@ use DivisionByZeroError;
 use DDD\Domain\Funnels\Funnel;
 use DDD\Domain\Connections\Connection;
 use DDD\App\Facades\Google\GoogleAuth;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class GoogleAnalyticsDataService
 {
@@ -49,9 +50,12 @@ class GoogleAnalyticsDataService
 
             // Process each metric within the step.
             foreach ($step['metrics'] as $metric) {
+                // Get match type, default to EXACT for backward compatibility
+                $matchType = $metric['matchType'] ?? 'EXACT';
+
                 // Structure the metric based on its type.
                 if ($metric['metric'] === 'pageUsers') {
-                    // Match exact page path
+                    // Match page path with specified match type
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             // The page path (web) or screen class (app) on which the event was logged.
@@ -59,14 +63,14 @@ class GoogleAnalyticsDataService
                             'fieldName' => 'unifiedPagePathScreen',
                             'stringFilter' => [
                                 'value' => $metric['pagePath'],
-                                'matchType' => 'EXACT'
+                                'matchType' => $matchType
                             ]
                         ]
                     ];
                 }
 
                 elseif ($metric['metric'] === 'pagePlusQueryStringUsers') {
-                    // Match exact page path plus query string
+                    // Match page path plus query string with specified match type
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             // The page path and query string (web) or screen class (app) on which the event was logged.
@@ -74,27 +78,31 @@ class GoogleAnalyticsDataService
                             'fieldName' => 'unifiedPageScreen',
                             'stringFilter' => [
                                 'value' => $metric['pagePathPlusQueryString'],
-                                'matchType' => 'EXACT',
+                                'matchType' => $matchType,
                             ]
                         ]
                     ];
                 }
 
                 if ($metric['metric'] === 'pageTitleUsers') {
-                    // Match exact page path
+                    // Match page title with specified match type
                     $funnelFilterExpressionList[] = [
                         'funnelFieldFilter' => [
                             // The page title (web) or screen name (app) on which the event was logged.
                             'fieldName' => 'unifiedScreenName',
                             'stringFilter' => [
                                 'value' => $metric['pageTitle'],
-                                'matchType' => 'EXACT'
+                                'matchType' => $matchType
                             ]
                         ]
                     ];
                 }
 
                 elseif ($metric['metric'] === 'outboundLinkUsers') {
+                    // For outbound links, allow different match types for linkUrl and pagePath
+                    // $linkUrlMatchType = $metric['linkUrlMatchType'] ?? $matchType;
+                    // $pagePathMatchType = $metric['pagePathMatchType'] ?? 'EXACT';
+
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
                             'expressions' => [
@@ -103,7 +111,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'linkUrl',
                                         'stringFilter' => [
                                             'value' => $metric['linkUrl'],
-                                            'matchType' => 'EXACT',
+                                            'matchType' => $matchType,
                                         ]
                                     ]
                                 ],
@@ -112,7 +120,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
                                             'value' => $metric['pagePath'],
-                                            'matchType' => 'EXACT',
+                                            'matchType' => $matchType
                                         ]
                                     ]
                                 ]
@@ -121,6 +129,9 @@ class GoogleAnalyticsDataService
                     ];
                 }
                 elseif ($metric['metric'] === 'formUserSubmissions') {
+                    // Allow pagePath to use different match type
+                    // $pagePathMatchType = $metric['pagePathMatchType'] ?? $matchType;
+
                     $funnelFilterExpressionList[] = [
                         'andGroup' => [
                             'expressions' => [
@@ -138,7 +149,7 @@ class GoogleAnalyticsDataService
                                         'fieldName' => 'unifiedPagePathScreen', // Synonymous with pagePath in GA4 reports
                                         'stringFilter' => [
                                             'value' => $metric['pagePath'],
-                                            'matchType' => 'EXACT',
+                                            'matchType' => $matchType,
                                         ]
                                     ]
                                 ],
@@ -204,11 +215,14 @@ class GoogleAnalyticsDataService
                 }
             }
 
+            // Determine the expression type (default to orGroup for backward compatibility)
+            $expressionType = $step['metrics_expression'] ?? MetricsExpression::default();
+
             // Add the structured step to the funnel report API request as a filter expression.
             $funnelSteps[] = [
                 'name' => $step['name'],
                 'filterExpression' => [
-                    'orGroup' => [
+                    $expressionType => [
                         'expressions' => $funnelFilterExpressionList
                     ]
                 ]

@@ -3,6 +3,7 @@
 namespace DDD\Domain\Funnels\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class FunnelStepResource extends JsonResource
 {
@@ -20,6 +21,7 @@ class FunnelStepResource extends JsonResource
             'order' => $this->order,
             'name' => $this->name,
             'metrics' => $this->metrics,
+            'metrics_expression' => $this->metrics_expression ?? MetricsExpression::default(),
             'users' => '0',
             'conversionRate' => '0.00'
         ];

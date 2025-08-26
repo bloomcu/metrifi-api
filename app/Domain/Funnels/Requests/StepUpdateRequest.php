@@ -5,6 +5,8 @@ namespace DDD\Domain\Funnels\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use DDD\Domain\Funnels\Enums\MatchType;
+use DDD\Domain\Funnels\Enums\MetricsExpression;
 
 class StepUpdateRequest extends FormRequest
 {
@@ -25,20 +27,27 @@ class StepUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $allowedMatchTypes = implode(',', MatchType::common());
+        $allowedMetricsExpressions = implode(',', MetricsExpression::all());
+
         return [
             'order' => 'nullable|numeric',
             'name' => 'nullable|string',
             'metrics' => 'nullable|array',
             'metrics.*.metric' => 'nullable|string',
+            'metrics.*.matchType' => "nullable|string|in:{$allowedMatchTypes}",
             'metrics.*.pagePath' => 'nullable|string',
+            'metrics.*.pagePathMatchType' => "nullable|string|in:{$allowedMatchTypes}",
             'metrics.*.pagePathPlusQueryString' => 'nullable|string',
             'metrics.*.pageTitle' => 'nullable|string',
             'metrics.*.linkUrl' => 'nullable|string',
+            'metrics.*.linkUrlMatchType' => "nullable|string|in:{$allowedMatchTypes}",
             'metrics.*.formDestination' => 'nullable|string',
             'metrics.*.formId' => 'nullable|string',
             'metrics.*.formLength' => 'nullable|string',
             'metrics.*.formSubmitText' => 'nullable|string',
             'metrics.*.hostname' => 'nullable|string',
+            'metrics_expression' => "nullable|string|in:{$allowedMetricsExpressions}",
         ];
     }
 

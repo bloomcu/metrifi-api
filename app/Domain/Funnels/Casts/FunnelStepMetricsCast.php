@@ -22,22 +22,28 @@ class FunnelStepMetricsCast implements CastsAttributes
                 'metric' => 'pageUsers',
                 'pagePath' => null,
                 'hostname' => null,
+                'matchType' => 'EXACT',
             ],
             'pagePlusQueryStringUsers' => [
                 'metric' => 'pagePlusQueryStringUsers',
                 'pagePathPlusQueryString' => null,
                 'hostname' => null,
+                'matchType' => 'EXACT',
             ],
             'pageTitleUsers' => [
                 'metric' => 'pageTitleUsers',
                 'pageTitle' => null,
                 'hostname' => null,
+                'matchType' => 'EXACT',
             ],
             'outboundLinkUsers' => [
                 'metric' => 'outboundLinkUsers',
                 'pagePath' => null,
                 'linkUrl' => null,
                 'hostname' => null,
+                'matchType' => 'EXACT',
+                'linkUrlMatchType' => 'EXACT',
+                'pagePathMatchType' => 'EXACT',
             ],
             'formUserSubmissions' => [
                 'metric' => 'formUserSubmissions',
@@ -47,13 +53,20 @@ class FunnelStepMetricsCast implements CastsAttributes
                 'formLength' => null,
                 'formSubmitText' => null,
                 'hostname' => null,
+                'matchType' => 'EXACT',
+                'pagePathMatchType' => 'EXACT',
             ],
         ];
 
         return collect(json_decode($value, true))->map(function ($metric) use ($defaultMetricAttributes) {
-            $defaults = $defaultMetricAttributes[$metric['metric']];
+            $defaults = $defaultMetricAttributes[$metric['metric']] ?? [];
 
-            return array_merge($defaults, $metric);
+            $mergedMetric = array_merge($defaults, $metric);
+            if (!isset($mergedMetric['matchType'])) {
+                $mergedMetric['matchType'] = 'EXACT';
+            }
+
+            return $mergedMetric;
         });
     }
 
