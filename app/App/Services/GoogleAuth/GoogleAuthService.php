@@ -4,6 +4,7 @@ namespace DDD\App\Services\GoogleAuth;
 
 use Google\Client;
 use DDD\Domain\Connections\Connection;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class GoogleAuthService
@@ -101,21 +102,39 @@ class GoogleAuthService
     {
         $storedToken = $connection->token ?? [];
 
+        Log::debug('Validating Google Analytics connection token', [
+            'connection_id' => $connection->id,
+            'service' => $connection->service,
+        ]);
+
         $this->client->setAccessToken($storedToken);
 
         $refreshToken = $storedToken['refresh_token'] ?? $this->client->getRefreshToken();
 
         if ($this->client->isAccessTokenExpired()) {
             if (!$refreshToken) {
+                Log::error('Unable to refresh Google Analytics token: refresh token missing', [
+                    'connection_id' => $connection->id,
+                ]);
                 throw new RuntimeException('Missing refresh token for Google Analytics connection.');
             }
 
+            Log::info('Refreshing expired Google Analytics access token', [
+                'connection_id' => $connection->id,
+            ]);
             $newToken = $this->refreshAccessToken($refreshToken);
 
             $connection->token = $newToken;
             $connection->save();
+            Log::info('Google Analytics access token refreshed successfully', [
+                'connection_id' => $connection->id,
+                'token_keys' => array_keys($newToken),
+            ]);
         } elseif ($refreshToken && empty($storedToken['refresh_token'])) {
             // Token is valid but persisted credentials were missing the refresh token; persist it now.
+            Log::warning('Persisting missing refresh token for Google Analytics connection', [
+                'connection_id' => $connection->id,
+            ]);
             $storedToken['refresh_token'] = $refreshToken;
             $connection->token = $storedToken;
             $connection->save();
@@ -129,6 +148,9 @@ class GoogleAuthService
         $newToken = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
 
         if (isset($newToken['error'])) {
+            Log::error('Google Analytics refresh token request returned an error', [
+                'error' => $newToken['error'],
+            ]);
             throw new RuntimeException('Unable to refresh Google Analytics access token: ' . $newToken['error']);
         }
 
@@ -138,6 +160,10 @@ class GoogleAuthService
 
         // Ensure the client instance has the updated token context
         $this->client->setAccessToken($newToken);
+
+        Log::debug('Google Analytics refresh token response received', [
+            'token_keys' => array_keys($newToken),
+        ]);
 
         return $newToken;
     }

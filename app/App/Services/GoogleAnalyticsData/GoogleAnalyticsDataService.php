@@ -2,6 +2,7 @@
 namespace DDD\App\Services\GoogleAnalyticsData;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Google\ApiCore\ApiException;
 use DivisionByZeroError;
 use DDD\Domain\Funnels\Funnel;
@@ -783,10 +784,42 @@ class GoogleAnalyticsDataService
 
             $endpoint = 'https://analyticsdata.googleapis.com/v1beta/' . $connection->uid . ':runReport?access_token=' . $accessToken;
 
+            Log::info('Sending Google Analytics runReport request', [
+                'connection_id' => $connection->id,
+                'property' => $connection->uid,
+                'has_dimensions' => !empty($params['dimensions'] ?? []),
+                'has_metrics' => !empty($params['metrics'] ?? []),
+            ]);
+
             $response = Http::post($endpoint, $params)->json();
+
+            if (isset($response['error'])) {
+                Log::error('Google Analytics runReport returned an error', [
+                    'connection_id' => $connection->id,
+                    'property' => $connection->uid,
+                    'message' => $response['error']['message'] ?? 'Unknown error',
+                    'status' => $response['error']['status'] ?? null,
+                ]);
+            } elseif (empty($response['rows'] ?? []) && empty($response['data'] ?? [])) {
+                Log::warning('Google Analytics runReport returned no data', [
+                    'connection_id' => $connection->id,
+                    'property' => $connection->uid,
+                ]);
+            } else {
+                Log::debug('Google Analytics runReport received response', [
+                    'connection_id' => $connection->id,
+                    'property' => $connection->uid,
+                    'row_count' => isset($response['rows']) ? count($response['rows']) : null,
+                ]);
+            }
 
             return $response;
         } catch (ApiException $ex) {
+            Log::error('Google Analytics runReport API exception', [
+                'connection_id' => $connection->id,
+                'property' => $connection->uid,
+                'message' => $ex->getMessage(),
+            ]);
             abort(500, 'Call failed with message: %s' . $ex->getMessage());
         }
     }
@@ -799,9 +832,21 @@ class GoogleAnalyticsDataService
     // TODO: Should this be a constructor, or a standalone class or helper?
     private function setupAccessToken(Connection $connection)
     {
+        Log::debug('Preparing Google Analytics access token', [
+            'connection_id' => $connection->id,
+        ]);
+
         $validConnection = GoogleAuth::validateConnection($connection);
 
-        return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
+        $accessToken = $validConnection->token['access_token'] ?? null;
+
+        if (!$accessToken) {
+            Log::error('Validated Google Analytics connection is missing an access token', [
+                'connection_id' => $connection->id,
+            ]);
+        }
+
+        return $accessToken; // TODO: consider renaming 'token' to 'credentials'
     }
 
     private function removeDisabledSteps($funnel, $disabledSteps)
