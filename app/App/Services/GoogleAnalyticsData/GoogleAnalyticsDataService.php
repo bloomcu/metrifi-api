@@ -791,7 +791,16 @@ class GoogleAnalyticsDataService
                 'has_metrics' => !empty($params['metrics'] ?? []),
             ]);
 
-            $response = Http::post($endpoint, $params)->json();
+            $httpResponse = Http::post($endpoint, $params);
+
+            Log::debug('Google Analytics runReport raw response', [
+                'connection_id' => $connection->id,
+                'property' => $connection->uid,
+                'status' => $httpResponse->status(),
+                'body_preview' => mb_substr($httpResponse->body(), 0, 500),
+            ]);
+
+            $response = $httpResponse->json();
 
             if (isset($response['error'])) {
                 Log::error('Google Analytics runReport returned an error', [
