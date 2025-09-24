@@ -4,6 +4,7 @@ namespace DDD\App\Services\GoogleAuth;
 
 use Google\Client;
 use DDD\Domain\Connections\Connection;
+use RuntimeException;
 
 class GoogleAuthService
 {
@@ -98,26 +99,47 @@ class GoogleAuthService
 
     public function validateConnection(Connection $connection)
     {
-        $this->client->setAccessToken($connection->token);
+        $storedToken = $connection->token ?? [];
+
+        $this->client->setAccessToken($storedToken);
+
+        $refreshToken = $storedToken['refresh_token'] ?? $this->client->getRefreshToken();
 
         if ($this->client->isAccessTokenExpired()) {
-            $this->refreshAccessToken($connection->token);
+            if (!$refreshToken) {
+                throw new RuntimeException('Missing refresh token for Google Analytics connection.');
+            }
 
-            // Update connection
-            $connection->token = $this->client->getAccessToken();
+            $newToken = $this->refreshAccessToken($refreshToken);
+
+            $connection->token = $newToken;
+            $connection->save();
+        } elseif ($refreshToken && empty($storedToken['refresh_token'])) {
+            // Token is valid but persisted credentials were missing the refresh token; persist it now.
+            $storedToken['refresh_token'] = $refreshToken;
+            $connection->token = $storedToken;
             $connection->save();
         }
 
-        return $connection;
+        return $connection->fresh();
     }
 
-    private function refreshAccessToken($token)
+    private function refreshAccessToken(string $refreshToken): array
     {
-        // Fetch new access token
-        $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+        $newToken = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
 
-        // Save new access token
-        return $this->client->getAccessToken();
+        if (isset($newToken['error'])) {
+            throw new RuntimeException('Unable to refresh Google Analytics access token: ' . $newToken['error']);
+        }
+
+        if (empty($newToken['refresh_token'])) {
+            $newToken['refresh_token'] = $refreshToken;
+        }
+
+        // Ensure the client instance has the updated token context
+        $this->client->setAccessToken($newToken);
+
+        return $newToken;
     }
 
     // public function storeCredentials($code): Connection | \Throwable
