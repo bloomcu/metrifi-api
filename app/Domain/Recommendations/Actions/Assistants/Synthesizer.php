@@ -32,7 +32,7 @@ class Synthesizer implements ShouldQueue
     function handle(Recommendation $recommendation)
     {
         // If there is not additional information prompt/images, skip to the next step
-        if (!$recommendation->prompt && !$recommendation->secret_shopper_prompt) {
+        if (!$recommendation->prompt) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Anonymizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
@@ -72,38 +72,6 @@ class Synthesizer implements ShouldQueue
                     message: 'The following information (and files, if attached) are additional information for your consideration: ' . $recommendation->prompt,
                     fileIds: [
                         ...$files,
-                    ]
-                );
-            }
-
-            // Handle secret shopper info
-            if ($recommendation->secret_shopper_prompt) {
-                // Upload files
-                try {
-                    $secretShopperFiles = [];
-                    foreach ($recommendation->files as $file) {
-                        if ($file->pivot->type !== 'secret-shopper') {
-                            continue;
-                        }
-                        
-                        $secretShopperFiles[] = $this->assistant->uploadFile(
-                            url: $file->getStorageUrl(),
-                            name: 'secret_shopper',
-                            extension: $file->extension
-                        );
-                    }
-                } catch (Exception $e) {
-                    $recommendation->update(['status' => $this->name . '_failed']);
-                    Log::info('Synthesizer: Failed to upload additional information files');
-                    return;
-                }
-
-                // Add secret shopper information to the thread
-                $this->assistant->addMessageToThread(
-                    threadId: $recommendation->thread_id,
-                    message: 'The following information (and files, if attached) are from a secret shopper study done on my website: ' . $recommendation->secret_shopper_prompt,
-                    fileIds: [
-                        ...$secretShopperFiles,
                     ]
                 );
             }
