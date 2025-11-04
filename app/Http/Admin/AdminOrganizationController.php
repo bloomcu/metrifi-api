@@ -3,6 +3,7 @@
 namespace DDD\Http\Admin;
 
 use Illuminate\Http\Request;
+use DDD\Http\Admin\Requests\AdminUpdateOrganizationRequest;
 use DDD\Http\Admin\Requests\AdminStoreOrganizationRequest;
 use DDD\Domain\Organizations\Resources\OrganizationResource;
 use DDD\Domain\Organizations\Organization;
@@ -26,6 +27,16 @@ class AdminOrganizationController extends Controller
     public function store(AdminStoreOrganizationRequest $request)
     {
         $organization = Organization::create($request->all());
+
+        return new OrganizationResource($organization);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(AdminUpdateOrganizationRequest $request, Organization $organization)
+    {
+        $organization->update($request->validated());
 
         return new OrganizationResource($organization);
     }
