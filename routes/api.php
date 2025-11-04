@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::prefix('organizations')->group(function () {
             Route::get('/', [AdminOrganizationController::class, 'index']);
             Route::post('/', [AdminOrganizationController::class, 'store']);
+            Route::put('/{organization}', [AdminOrganizationController::class, 'update']);
         });
     });
 

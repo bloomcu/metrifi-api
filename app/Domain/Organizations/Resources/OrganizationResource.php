@@ -27,6 +27,7 @@ class OrganizationResource extends JsonResource
             'return_on_assets' => $this->return_on_assets,
             'onboarding' => $this->onboarding,
             'assets' => $this->assets,
+            'recommendations_limit' => $this->recommendations_limit,
             'subscribed' => $this->subscribed('default'),
             'funnels_count' => $this->whenLoaded('funnels', function () {
                 return $this->funnels->count();

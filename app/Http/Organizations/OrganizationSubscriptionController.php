@@ -50,12 +50,18 @@ class OrganizationSubscriptionController extends Controller
                 $upcomingPlanStartAt = Carbon::createFromTimeStamp($upcomingPhase->start_date);
             }
 
+            // Get limit (custom org limit takes precedence over plan limit)
+            $recommendationsLimit = $organization->recommendations_limit 
+                ?? $organization->plan->limits['recommendations'] 
+                ?? null;
+
             return response()->json([
                 'subscribed' => true,
                 'plan' => new PlanResource($organization->plan),
                 'started_at' => $startedAt,
                 'renews_at' => $renewsAt,
                 'recommendations_used' => $recommendationsUsed,
+                'recommendations_limit' => $recommendationsLimit,
                 'ends_at' => $organization->subscription('default')->ends_at,
                 'upcoming_plan' => $upcomingPlan,
                 'upcoming_plan_start_at' => $upcomingPlanStartAt,
@@ -92,12 +98,16 @@ class OrganizationSubscriptionController extends Controller
                 })
                 ->count();
 
+            // Get limit (custom org limit takes precedence, default to 2 for free plan)
+            $recommendationsLimit = $organization->recommendations_limit ?? 2;
+
             return response()->json([
                 'subscribed' => false,
                 'plan' => new PlanResource($organization->plan),
                 'started_at' => $startedAt,
                 'renews_at' => $renewsAt,
                 'recommendations_used' => $recommendationsUsed,
+                'recommendations_limit' => $recommendationsLimit,
                 'ends_at' => null,
             ]);
         }
