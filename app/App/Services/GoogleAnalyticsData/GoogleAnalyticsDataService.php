@@ -783,7 +783,9 @@ class GoogleAnalyticsDataService
 
             $endpoint = 'https://analyticsdata.googleapis.com/v1beta/' . $connection->uid . ':runReport?access_token=' . $accessToken;
 
-            $response = Http::post($endpoint, $params)->json();
+            $httpResponse = Http::post($endpoint, $params);
+
+            $response = $httpResponse->json();
 
             return $response;
         } catch (ApiException $ex) {
@@ -801,7 +803,9 @@ class GoogleAnalyticsDataService
     {
         $validConnection = GoogleAuth::validateConnection($connection);
 
-        return $validConnection->token['access_token']; // TODO: consider renaming 'token' to 'credentials'
+        $accessToken = $validConnection->token['access_token'] ?? null;
+
+        return $accessToken; // TODO: consider renaming 'token' to 'credentials'
     }
 
     private function removeDisabledSteps($funnel, $disabledSteps)
