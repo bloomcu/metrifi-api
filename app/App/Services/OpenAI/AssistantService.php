@@ -4,6 +4,8 @@ namespace DDD\App\Services\OpenAI;
 
 use OpenAI\Laravel\Facades\OpenAI;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -182,30 +184,53 @@ class AssistantService
     }
 
     public function uploadFile(string $url, string $name, string $extension) {
-        // Download the image
-        $client = new Client();
-        $response = $client->get($url);
-        $imageContent = $response->getBody()->getContents();
-
-        // Save the image temporarily
-        $tempImagePath = storage_path('app/' . $name . '_' . uniqid() . '.' . $extension);
-        file_put_contents($tempImagePath, $imageContent);
-
+        $tempImagePath = null;
+        
         try {
+            // Download the image
+            $client = new Client();
+            $response = $client->get($url);
+            $imageContent = $response->getBody()->getContents();
+
+            // Save the image temporarily
+            $tempImagePath = storage_path('app/' . $name . '_' . uniqid() . '.' . $extension);
+            file_put_contents($tempImagePath, $imageContent);
+
             $response = OpenAI::files()->upload([
                 'purpose' => 'vision',
                 'file' => fopen($tempImagePath, 'r')
             ]);
 
             // Clean up and delete the temporary file
-            unlink($tempImagePath);
+            if ($tempImagePath && file_exists($tempImagePath)) {
+                unlink($tempImagePath);
+            }
 
             return $response->id;
+        } catch (ClientException | RequestException $e) {
+            // Clean up temporary file if it was created
+            if ($tempImagePath && file_exists($tempImagePath)) {
+                unlink($tempImagePath);
+            }
+            
+            // Log the error details for debugging
+            Log::warning("Failed to download or upload file from URL: {$url}", [
+                'error' => $e->getMessage(),
+                'statusCode' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : null,
+            ]);
+
+            // Throw a more specific exception that can be caught and handled gracefully
+            throw new Exception("Failed to download image from screenshot service: " . $e->getMessage(), 0, $e);
         } catch (Exception $e) {
+            // Clean up temporary file if it was created
+            if ($tempImagePath && file_exists($tempImagePath)) {
+                unlink($tempImagePath);
+            }
+            
             // Log the error details
             Log::error("OpenAI API error:", ['errorData' => $e]);
 
-            throw $e; // Rethrow the exception if you want it to propagate
+            throw $e;
         }
     }
 }
