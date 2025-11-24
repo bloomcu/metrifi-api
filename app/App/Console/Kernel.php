@@ -6,6 +6,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Scheduling\Schedule;
 use DDD\Domain\Admin\Commands\SnapshotAllFunnelsCommand;
 use DDD\Domain\Admin\Commands\SendAllOrganizationWeeklyAnalysisEmailCommand;
+use DDD\Domain\Admin\Commands\TestWeeklyAnalysisEmailCommand;
 use DDD\Domain\Admin\Commands\AnalyzeAllDashboardsCommand;
 use DDD\App\Console\Commands\EncryptConnectionTokens;
 use DDD\App\Console\Commands\RefreshGoogleAnalyticsTokens;
@@ -20,6 +21,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         AnalyzeAllDashboardsCommand::class,
         SendAllOrganizationWeeklyAnalysisEmailCommand::class,
+        TestWeeklyAnalysisEmailCommand::class,
         SnapshotAllFunnelsCommand::class,
         EncryptConnectionTokens::class,
         RefreshGoogleAnalyticsTokens::class,
