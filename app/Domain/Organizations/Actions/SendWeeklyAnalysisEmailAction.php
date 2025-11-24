@@ -5,6 +5,7 @@ namespace DDD\Domain\Organizations\Actions;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Organizations\Mail\WeeklyAnalysisEmail;
 
@@ -20,6 +21,13 @@ class SendWeeklyAnalysisEmailAction
          * into weekly website analysis emails
          * 
          */
+
+        // Prevent duplicate sends within 24 hours using cache lock
+        $cacheKey = "weekly-analysis-email-sent-{$organization->id}";
+        if (Cache::has($cacheKey)) {
+            // Email was already sent recently, skip
+            return;
+        }
 
         // Get the organizations users
         $users = $organization->users()->get();
@@ -69,6 +77,9 @@ class SendWeeklyAnalysisEmailAction
             Sleep::for(1)->seconds();
             Mail::to($email)->queue(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         }
+
+        // Set cache lock to prevent duplicate sends for 24 hours
+        Cache::put($cacheKey, true, now()->addHours(24));
 
         // For testing
         // Sleep::for(1)->seconds();

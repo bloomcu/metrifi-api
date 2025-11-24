@@ -38,7 +38,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 4:30 am
 
         if (app()->environment() === 'production') {
-            $schedule->command('admin:send-all-organization-weekly-analysis-email')->mondays()->at('09:00')->timezone('America/Denver'); // 9:00 am on Monday
+            $schedule->command('admin:send-all-organization-weekly-analysis-email')
+                ->mondays()
+                ->at('09:00')
+                ->timezone('America/Denver')
+                ->withoutOverlapping(120); // Prevent overlapping runs, lock for 120 minutes max
         }
     }
 

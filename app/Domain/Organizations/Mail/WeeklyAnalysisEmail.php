@@ -33,6 +33,10 @@ class WeeklyAnalysisEmail extends Mailable
      */
     public function build()
     {
+        // Refresh the organization model to ensure we have the latest assets data
+        // This prevents race conditions where assets are updated after the job is dispatched
+        $this->organization->refresh();
+        
         $organizationPotentialRounded = round($this->organization->assets['median']['potential']); 
         $organizationPotentialAnnualized = bcmul($organizationPotentialRounded, 13.04, 2); 
         $figure = number_format($organizationPotentialAnnualized);
