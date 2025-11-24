@@ -246,7 +246,7 @@ class GoogleAnalyticsDataService
         try {
             $accessToken = $this->setupAccessToken($funnel->connection);
             $endpoint = 'https://analyticsdata.googleapis.com/v1alpha/' . $funnel->connection->uid . ':runFunnelReport?access_token=' . $accessToken;
-            $gaFunnelReport = Http::timeout(600)->post($endpoint, $funnelReportRequest)->json();
+            $gaFunnelReport = Http::timeout(1000)->post($endpoint, $funnelReportRequest)->json();
 
             // Bail early if no rows in report
             if (!isset($gaFunnelReport['funnelTable']['rows'])) {

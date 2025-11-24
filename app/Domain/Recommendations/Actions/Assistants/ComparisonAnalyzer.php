@@ -79,44 +79,52 @@ class ComparisonAnalyzer implements ShouldQueue
         }
 
         // Upload the screenshots
-        try {
-            // Wait before uploading the screenshot
-            sleep(5);
-            
-            if ($recommendation->metadata['comparisonScreenshots']) {
-                $comparisonScreenshotIds = [];
-                
-                foreach ($recommendation->metadata['comparisonScreenshots'] as $comparisonScreenshot) {
-                    $comparisonScreenshotIds[] = $this->assistant->uploadFile(
+        // Wait before uploading the screenshots
+        sleep(5);
+        
+        $comparisonScreenshotIds = [];
+        
+        if ($recommendation->metadata['comparisonScreenshots']) {
+            foreach ($recommendation->metadata['comparisonScreenshots'] as $index => $comparisonScreenshot) {
+                try {
+                    $fileId = $this->assistant->uploadFile(
                         url: $comparisonScreenshot,
                         name: 'screenshot',
                         extension: 'png'
                     );
+                    $comparisonScreenshotIds[] = $fileId;
+                } catch (Exception $e) {
+                    // Log the error for this specific screenshot but continue with others
+                    Log::warning("Failed to upload comparison screenshot {$index} for recommendation ID {$recommendation->id}: " . $e->getMessage());
+                    // Continue processing other screenshots
                 }
             }
-        } catch (Exception $e) {
-            // Log the error message for debugging purposes
-            Log::error("Error uploading comparison screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
-
-            // Gracefully fail the job
-            $recommendation->update([
-                'status' => $this->name . '_failed',
-                'error_message' => $e->getMessage(), // Optionally store the error message in the metadata
-            ]);
-
-            // Rethrow the exception to retry based on $tries/backoff
-            throw $e;
+        }
+        
+        // Log if all screenshots failed to upload
+        if (empty($comparisonScreenshotIds) && !empty($recommendation->metadata['comparisonScreenshots'])) {
+            Log::warning("All comparison screenshots failed to upload for recommendation ID {$recommendation->id}. Continuing without screenshots.");
         }
 
         // Start the run if it hasn't been started yet
         if (!isset($recommendation->runs[$this->name])) {
-            $this->assistant->addMessageToThread(
-                threadId: $recommendation->thread_id,
-                message: 'I\'ve attached screenshots of other higher performing pages (' . count($comparisonScreenshotIds) . ' files).',
-                fileIds: [
-                    ...$comparisonScreenshotIds,
-                ]
-            );
+            // Only add message with screenshots if we have successfully uploaded files
+            if (!empty($comparisonScreenshotIds)) {
+                $this->assistant->addMessageToThread(
+                    threadId: $recommendation->thread_id,
+                    message: 'I\'ve attached screenshots of other higher performing pages (' . count($comparisonScreenshotIds) . ' files).',
+                    fileIds: [
+                        ...$comparisonScreenshotIds,
+                    ]
+                );
+            } else {
+                // If no screenshots were uploaded, add a message explaining that
+                $this->assistant->addMessageToThread(
+                    threadId: $recommendation->thread_id,
+                    message: 'I attempted to attach screenshots of other higher performing pages, but they were unavailable. Please proceed with the analysis based on the comparison URLs provided.',
+                    fileIds: []
+                );
+            }
     
             $run = $this->assistant->createRun(
                 threadId: $recommendation->thread_id,
