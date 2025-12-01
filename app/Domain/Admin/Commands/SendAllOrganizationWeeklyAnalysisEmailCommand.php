@@ -22,17 +22,22 @@ class SendAllOrganizationWeeklyAnalysisEmailCommand extends Command
         $skippedCount = 0;
 
         foreach ($organizations as $index => $organization) {
-            // Check if email was already sent recently (within 24 hours)
+            // Pre-check if email was already sent recently (within 24 hours)
+            // This is an optimization to avoid dispatching jobs that will be skipped anyway
+            // The action itself has atomic deduplication via Cache::add() to handle race conditions
             $cacheKey = "weekly-analysis-email-sent-{$organization->id}";
             if (Cache::has($cacheKey)) {
                 $skippedCount++;
                 continue;
             }
 
-            // Calculate incremental delay based on organization index
-            $delayInSeconds = $index * $delay;
+            // Calculate incremental delay based on dispatched count (not index)
+            // This ensures proper spacing between jobs that actually get dispatched
+            $delayInSeconds = $dispatchedCount * $delay;
             
             // Dispatch the job with the calculated delay
+            // Note: The action uses atomic Cache::add() to prevent race conditions
+            // even if multiple jobs start processing simultaneously
             SendWeeklyAnalysisEmailAction::dispatch($organization)
                 ->delay(now()->addSeconds($delayInSeconds));
             

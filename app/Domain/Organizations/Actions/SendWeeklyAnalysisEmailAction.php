@@ -6,6 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Organizations\Mail\WeeklyAnalysisEmail;
 
@@ -22,12 +23,20 @@ class SendWeeklyAnalysisEmailAction
          * 
          */
 
-        // Prevent duplicate sends within 24 hours using cache lock
+        // Use atomic cache operation to prevent race conditions
+        // Cache::add() only sets if key doesn't exist AND returns true if it succeeded
+        // This is atomic and prevents the race condition where two jobs both check
+        // Cache::has() before either sets the cache
         $cacheKey = "weekly-analysis-email-sent-{$organization->id}";
-        if (Cache::has($cacheKey)) {
-            // Email was already sent recently, skip
+        
+        // Try to acquire the lock atomically - if another job already has it, skip
+        if (!Cache::add($cacheKey, true, now()->addHours(24))) {
+            // Another job already acquired the lock, skip to prevent duplicate
+            Log::info("Weekly analysis email skipped for org {$organization->id} - already sent recently (cache lock exists)");
             return;
         }
+
+        Log::info("Weekly analysis email processing for org {$organization->id} - cache lock acquired");
 
         // Get the organizations users
         $users = $organization->users()->get();
@@ -78,11 +87,9 @@ class SendWeeklyAnalysisEmailAction
             Mail::to($email)->queue(new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
         }
 
-        // Set cache lock to prevent duplicate sends for 24 hours
-        Cache::put($cacheKey, true, now()->addHours(24));
+        Log::info("Weekly analysis email sent for org {$organization->id} to " . count($emails) . " recipient(s)");
 
-        // For testing
-        // Sleep::for(1)->seconds();
-        // Mail::to(['ryan@bloomcu.com', 'derik@bloomcu.com'])->later(now()->addSeconds(1), new WeeklyAnalysisEmail($period, $organization, $dashboards->toArray()));
+        // Note: Cache lock was already set atomically at the start of this method
+        // using Cache::add() to prevent race conditions
     }
 }
