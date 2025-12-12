@@ -39,13 +39,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('admin:snapshot-all-funnels')->dailyAt('04:00')->timezone('America/Denver'); // 4:00 am
         $schedule->command('admin:analyze-all-dashboards')->dailyAt('04:30')->timezone('America/Denver'); // 4:30 am
 
-        if (app()->environment() === 'production') {
-            $schedule->command('admin:send-all-organization-weekly-analysis-email')
-                ->mondays()
-                ->at('09:00')
-                ->timezone('America/Denver')
-                ->withoutOverlapping(120); // Prevent overlapping runs, lock for 120 minutes max
-        }
+        // Disable the weekly email
+        // if (app()->environment() === 'production') {
+        //     $schedule->command('admin:send-all-organization-weekly-analysis-email')
+        //         ->mondays()
+        //         ->at('09:00')
+        //         ->timezone('America/Denver')
+        //         ->withoutOverlapping(120); // Prevent overlapping runs, lock for 120 minutes max
+        // }
     }
 
     /**
