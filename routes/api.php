@@ -121,8 +121,8 @@ Route::middleware('auth:sanctum')->group(function() {
       // Subscription
       Route::get('{organization:slug}/subscription', [OrganizationSubscriptionController::class, 'show']);
 
-      // Weekly analysis email
-      Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
+      // Weekly analysis email - disabled while investigating duplicate email issue
+      // Route::get('{organization:slug}/weekly-analysis-email', [OrganizationWeeklyAnalysisEmailController::class, 'send']);
     });
 
     Route::prefix('{organization:slug}')->group(function() {
