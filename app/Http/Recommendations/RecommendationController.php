@@ -7,9 +7,7 @@ use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Requests\UpdateRecommendationRequest;
 use DDD\Domain\Recommendations\Requests\StoreRecommendationRequest;
 use DDD\Domain\Recommendations\Recommendation;
-use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
 use DDD\Domain\Organizations\Organization;
-use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
 class RecommendationController extends Controller
