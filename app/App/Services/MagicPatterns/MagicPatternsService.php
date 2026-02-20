@@ -18,7 +18,7 @@ class MagicPatternsService
 
     public function createDesign(
         string $prompt,
-        int $timeout = 300,
+        int $timeout = 600,
         int $retryTimes = 15,
         int $retryMilliseconds = 2000
     ) {

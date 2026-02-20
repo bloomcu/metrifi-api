@@ -6,18 +6,14 @@ use DDD\Domain\Recommendations\Resources\RecommendationResource;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ScreenshotGrabber;
 use DDD\Domain\Organizations\Organization;
-use DDD\App\Services\OpenAI\AssistantService;
 use DDD\App\Controllers\Controller;
 
 class RecommendationGenerateController extends Controller
 {
-    public function update(Organization $organization, Recommendation $recommendation, AssistantService $assistant)
+    public function update(Organization $organization, Recommendation $recommendation)
     {
-        $thread = $assistant->createThread();
-
         $recommendation->update([
             'status' => 'queued',
-            'thread_id' => $thread['id'],
         ]);
 
         ScreenshotGrabber::dispatch($recommendation);

@@ -41,7 +41,7 @@ class IndexDashboardResource extends JsonResource
             'description' => $this->description,
             'zoom' => $this->zoom,
             // 'funnels' => FunnelResource::collection($this->whenLoaded('funnels')),
-            'funnels_count' => $this->funnels->count(),
+            'funnels_count' => $this->funnels_count ?? $this->funnels->count(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

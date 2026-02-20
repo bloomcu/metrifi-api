@@ -14,8 +14,9 @@ class AdminDashboardController extends Controller
     public function index()
     {
         $dashboards = Dashboard::query()
-            ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
-            ->get();
+            ->with(['organization.subscriptions', 'medianAnalysis', 'maxAnalysis'])
+            ->withCount('allFunnels as funnels_count')
+            ->paginate(50);
 
         return IndexDashboardResource::collection($dashboards);
     }
@@ -23,7 +24,8 @@ class AdminDashboardController extends Controller
     public function analyzeAll()
     {
         $dashboards = Dashboard::query()
-            ->with(['organization', 'medianAnalysis', 'maxAnalysis'])
+            ->with(['organization.subscriptions', 'medianAnalysis', 'maxAnalysis'])
+            ->withCount('allFunnels as funnels_count')
             ->get();
 
         foreach ($dashboards as $dashboard) {

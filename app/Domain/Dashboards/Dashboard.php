@@ -27,6 +27,20 @@ class Dashboard extends Model
     ];
 
     /**
+     * All funnels associated with the dashboard (no privacy filter).
+     * Use for admin counts and when organization context is not available during query building.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function allFunnels()
+    {
+        return $this->belongsToMany(Funnel::class)
+            ->withPivot(['order', 'disabled_steps', 'issue'])
+            ->orderBy('order')
+            ->withTimestamps();
+    }
+
+    /**
      * Funnels associated with the dashboard.
      *
      * @return BelongsToMany
@@ -86,12 +100,18 @@ class Dashboard extends Model
 
     public function medianAnalysis(): HasOne
     {
-        return $this->hasOne(Analysis::class)->whereType('median')->latest();
+        return $this->hasOne(Analysis::class)->ofMany(
+            ['created_at' => 'max'],
+            fn ($query) => $query->where('type', 'median')
+        );
     }
 
     public function maxAnalysis(): HasOne
     {
-        return $this->hasOne(Analysis::class)->whereType('max')->latest();
+        return $this->hasOne(Analysis::class)->ofMany(
+            ['created_at' => 'max'],
+            fn ($query) => $query->where('type', 'max')
+        );
     }
 
     /**
