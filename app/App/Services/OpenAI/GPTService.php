@@ -2,6 +2,10 @@
 
 namespace DDD\App\Services\OpenAI;
 
+/**
+ * @deprecated For new AI features, prefer Neuron AI agents with structured output.
+ * @see DDD\App\Neuron\Agents\Recommendations
+ */
 use OpenAI;
 
 class GPTService

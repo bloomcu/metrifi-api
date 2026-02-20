@@ -17,9 +17,9 @@ class SectionCategorizer implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
     
     public $name = 'section_categorizer';
-    public $timeout = 60;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 60;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     protected AssistantService $assistant;
 

@@ -3,78 +3,58 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\BlockBuilderMagicPatterns;
-use DDD\App\Services\OpenAI\GPTService;
+use DDD\App\Neuron\Agents\Recommendations\ContentOutlineToSectionsAgent;
+use NeuronAI\Chat\Messages\UserMessage;
 
 class CreateBlocksFromContentOutline implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public $name = 'content_json_formatter';
-    public $timeout = 60;
-    public $tries = 50;
-    public $backoff = 5;
-
-    protected GPTService $gpt;
-
-    public function __construct(GPTService $gpt)
-    {
-        $this->gpt = $gpt;
-    }
+    public $jobTimeout = 60;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     function handle(Recommendation $recommendation)
     {
-      $recommendation->update(['status' => $this->name . '_in_progress']);
+        $recommendation->update(['status' => $this->name . '_in_progress']);
 
-      $response = $this->gpt->chat(
-        model: 'gpt-4o',
-        instructions: 
-          'I am going to give you a Content Outline. Your job is to convert it into a JSON array.
-           The Content Outline contains Sections, labeled Section 1, Section 2, Section 3, etc. 
-           Your JSON array must contain an object for each Section.',
-        message: $recommendation->content_outline,
-        responseFormat: '{sections: [{ outline: string }]}'
-      );
-      
-      // $response will be a json string, we need to decode it into actual json
-      $json = json_decode($response, true);
-      Log::info('GPT Response: ' . $response);
+        $result = ContentOutlineToSectionsAgent::make()->structured(
+            new UserMessage($recommendation->content_outline ?? ''),
+            \DDD\App\Neuron\Output\ContentOutlineSections::class,
+        );
 
-      // Create a new page
-      $page = $recommendation->pages()->create([
-        'organization_id' => $recommendation->organization_id,
-        'user_id' => $recommendation->user_id,
-        'title' => $recommendation->title,
-      ]);
+        $sections = $result->sections ?? [];
 
-      // For each section in content outline, create a new block
-      foreach ($json['sections'] as $index => $section) {
-        $page->blocks()->create([
+        $page = $recommendation->pages()->create([
             'organization_id' => $recommendation->organization_id,
             'user_id' => $recommendation->user_id,
-            'order' => (int)$index + 1,
-            'status' => 'generating',
-            'outline' => $section['outline'],
+            'title' => $recommendation->title,
         ]);
-      }
 
-      // Queue block builder
-      $blocks = $page->blocks()->get();
-      foreach ($blocks as $index => $block) {
-        BlockBuilderMagicPatterns::dispatch($recommendation, $block)->delay(2);
-      }
-      
-      // We're done
-      $recommendation->update([
-        'status' => $this->name . '_completed',
-      ]);
+        foreach ($sections as $index => $section) {
+            $page->blocks()->create([
+                'organization_id' => $recommendation->organization_id,
+                'user_id' => $recommendation->user_id,
+                'order' => (int) $index + 1,
+                'status' => 'generating',
+                'outline' => $section->outline ?? '',
+            ]);
+        }
 
-      return;
+        $blocks = $page->blocks()->get();
+        foreach ($blocks as $block) {
+            BlockBuilderMagicPatterns::dispatch($recommendation, $block)->delay(2);
+        }
+
+        $recommendation->update(['status' => $this->name . '_completed']);
+
+        return;
     }
 }

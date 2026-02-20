@@ -11,157 +11,126 @@ use Illuminate\Bus\Queueable;
 use Exception;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\Synthesizer;
+use DDD\App\Neuron\Agents\Recommendations\ComparisonAnalyzerAgent;
+use DDD\App\Neuron\ImageAttachmentHelper;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
-use DDD\App\Services\OpenAI\AssistantService;
+use NeuronAI\Chat\Messages\UserMessage;
 
 class ComparisonAnalyzer implements ShouldQueue
 {
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'comparison_analyzer';
-    public $timeout = 240;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 240;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     protected ScreenshotInterface $screenshotter;
-    protected AssistantService $assistant;
 
-    public function __construct(ScreenshotInterface $screenshotter, AssistantService $assistant)
+    public function __construct(ScreenshotInterface $screenshotter)
     {
         $this->screenshotter = $screenshotter;
-        $this->assistant = $assistant;
     }
 
     function handle(Recommendation $recommendation)
     {
-        // If there is not comparisons, skip to the next step
         if (!$recommendation->metadata || !$recommendation->metadata['comparisons']) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
             return;
         }
 
-        // Refresh the recommendation so we get the file ids
         $recommendation = $recommendation->fresh();
-
-        // Set status to in progress
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
         try {
-            // Iterate over the comparisons and get the screenshots
-            $comparisonScreenshots = [];
+            $this->captureComparisonScreenshots($recommendation);
 
-            foreach ($recommendation->metadata['comparisons'] as $comparison) {
-                $comparisonScreenshot = $this->screenshotter->getScreenshot(
-                    url: $comparison['url'],
-                );
-
-                $comparisonScreenshots[] = $comparisonScreenshot;
-            }
+            $message = $this->buildMessage($recommendation);
+            $response = ComparisonAnalyzerAgent::make()->chat($message);
+            $analysis = $response->getContent();
 
             $recommendation->update([
+                'status' => $this->name . '_completed',
                 'metadata' => array_merge($recommendation->metadata, [
-                    'comparisonScreenshots' => $comparisonScreenshots,
+                    'comparisonAnalysis' => $analysis,
                 ]),
             ]);
         } catch (Exception $e) {
-            // Log the error message for debugging purposes
-            Log::error("Error grabbing comparison screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
-
-            // Gracefully fail the job
-            $recommendation->update([
-                'status' => $this->name . '_failed',
-                'error_message' => $e->getMessage(), // Optionally store the error message in the metadata
-            ]);
-
-            // Rethrow the exception to retry based on $tries/backoff
+            Log::error("ComparisonAnalyzer failed for recommendation ID {$recommendation->id}: " . $e->getMessage());
+            $recommendation->update(['status' => $this->name . '_failed', 'error_message' => $e->getMessage()]);
             throw $e;
         }
 
-        // Upload the screenshots
-        // Wait before uploading the screenshots
-        sleep(5);
-        
-        $comparisonScreenshotIds = [];
-        
-        if ($recommendation->metadata['comparisonScreenshots']) {
-            foreach ($recommendation->metadata['comparisonScreenshots'] as $index => $comparisonScreenshot) {
-                try {
-                    $fileId = $this->assistant->uploadFile(
-                        url: $comparisonScreenshot,
-                        name: 'screenshot',
-                        extension: 'png'
-                    );
-                    $comparisonScreenshotIds[] = $fileId;
-                } catch (Exception $e) {
-                    // Log the error for this specific screenshot but continue with others
-                    Log::warning("Failed to upload comparison screenshot {$index} for recommendation ID {$recommendation->id}: " . $e->getMessage());
-                    // Continue processing other screenshots
-                }
-            }
-        }
-        
-        // Log if all screenshots failed to upload
-        if (empty($comparisonScreenshotIds) && !empty($recommendation->metadata['comparisonScreenshots'])) {
-            Log::warning("All comparison screenshots failed to upload for recommendation ID {$recommendation->id}. Continuing without screenshots.");
-        }
+        Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
 
-        // Start the run if it hasn't been started yet
-        if (!isset($recommendation->runs[$this->name])) {
-            // Only add message with screenshots if we have successfully uploaded files
-            if (!empty($comparisonScreenshotIds)) {
-                $this->assistant->addMessageToThread(
-                    threadId: $recommendation->thread_id,
-                    message: 'I\'ve attached screenshots of other higher performing pages (' . count($comparisonScreenshotIds) . ' files).',
-                    fileIds: [
-                        ...$comparisonScreenshotIds,
-                    ]
-                );
-            } else {
-                // If no screenshots were uploaded, add a message explaining that
-                $this->assistant->addMessageToThread(
-                    threadId: $recommendation->thread_id,
-                    message: 'I attempted to attach screenshots of other higher performing pages, but they were unavailable. Please proceed with the analysis based on the comparison URLs provided.',
-                    fileIds: []
-                );
-            }
-    
-            $run = $this->assistant->createRun(
-                threadId: $recommendation->thread_id,
-                assistantId: 'asst_3tbe9jGHIJcWnmb19GwSMQuM',
-            );
-
-            $recommendation->runs = array_merge($recommendation->runs, [
-                $this->name => $run['id'],
-            ]);
-
-            $recommendation->save();
-        }
-
-        // Check the status of the run
-        $run = $this->assistant->getRun(
-            threadId: $recommendation->thread_id,
-            runId: $recommendation->runs[$this->name]
-        );
-
-        // Issue, end the job
-        if (in_array($run['status'], ['requires_action', 'cancelled', 'failed', 'incomplete', 'expired'])) {
-            $recommendation->update(['status' => $this->name . '_' . $run['status']]);
-            return;
-        }
-
-        if (in_array($run['status'], ['in_progress', 'queued'])) {
-            // Dispatch a new instance of the job with a delay
-            self::dispatch($recommendation)->delay(now()->addSeconds($this->backoff));
-            return;
-        }
-
-        if (in_array($run['status'], ['completed', 'incomplete'])) {
-            $recommendation->update(['status' => $this->name . '_completed']);
-            Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
-            return;
-        }
-        
         return;
+    }
+
+    protected function captureComparisonScreenshots(Recommendation $recommendation): void
+    {
+        $screenshots = [];
+        $mediaType = 'image/jpeg';
+
+        foreach ($recommendation->metadata['comparisons'] as $comparison) {
+            $screenshotUrl = $this->screenshotter->getScreenshot(url: $comparison['url']);
+            $mediaType = ImageAttachmentHelper::detectMediaType($screenshotUrl);
+            $base64 = ImageAttachmentHelper::downloadToBase64($screenshotUrl);
+
+            if ($base64 === null) {
+                Log::warning("Could not capture comparison screenshot for {$comparison['url']}, skipping.");
+            }
+
+            $screenshots[] = $base64;
+        }
+
+        $recommendation->update([
+            'metadata' => array_merge($recommendation->metadata, [
+                'comparisonScreenshots' => $screenshots,
+                'comparisonScreenshotMediaType' => $mediaType,
+            ]),
+        ]);
+    }
+
+    protected function buildMessage(Recommendation $recommendation): UserMessage
+    {
+        $metadata = $recommendation->metadata;
+        $attachedCount = 0;
+
+        $focusBase64 = $metadata['focusScreenshot'] ?? null;
+        $focusMediaType = $metadata['focusScreenshotMediaType'] ?? 'image/jpeg';
+        $comparisonScreenshots = array_filter($metadata['comparisonScreenshots'] ?? []);
+        $comparisonMediaType = $metadata['comparisonScreenshotMediaType'] ?? 'image/jpeg';
+
+        $userMessage = new UserMessage('');
+
+        if ($focusBase64) {
+            $userMessage->addAttachment(ImageAttachmentHelper::fromBase64($focusBase64, $focusMediaType));
+            $attachedCount++;
+        }
+
+        foreach ($comparisonScreenshots as $base64) {
+            $userMessage->addAttachment(ImageAttachmentHelper::fromBase64($base64, $comparisonMediaType));
+            $attachedCount++;
+        }
+
+        $text = 'My current page is called: ' . $recommendation->title . '.';
+
+        if ($focusBase64) {
+            $text = 'I\'ve attached a screenshot of my current page called: ' . $recommendation->title . '.';
+        }
+
+        $comparisonCount = count($comparisonScreenshots);
+        if ($comparisonCount > 0) {
+            $text .= ' I\'ve also attached ' . $comparisonCount . ' screenshot(s) of other higher performing pages.';
+        }
+
+        if ($attachedCount === 0) {
+            $text .= ' (Screenshots could not be captured, please provide analysis based on the page name and context.)';
+        }
+
+        $userMessage->setContent($text);
+
+        return $userMessage;
     }
 }

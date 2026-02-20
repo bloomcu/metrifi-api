@@ -2,6 +2,10 @@
 
 namespace DDD\App\Services\OpenAI;
 
+/**
+ * @deprecated Use Neuron AI agents instead. This service wraps the deprecated OpenAI Assistants API.
+ * @see DDD\App\Neuron\Agents\Recommendations
+ */
 use OpenAI\Laravel\Facades\OpenAI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
