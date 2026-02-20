@@ -3,7 +3,6 @@
 namespace DDD\Domain\Recommendations\Actions\Assistants;
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,9 +10,8 @@ use Illuminate\Bus\Queueable;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\Anonymizer;
 use DDD\App\Neuron\Agents\Recommendations\SynthesizerAgent;
+use DDD\App\Neuron\ImageAttachmentHelper;
 use NeuronAI\Chat\Attachments\Document;
-use NeuronAI\Chat\Attachments\Image;
-use NeuronAI\Chat\Enums\AttachmentContentType;
 use NeuronAI\Chat\Messages\UserMessage;
 
 class Synthesizer implements ShouldQueue
@@ -21,9 +19,9 @@ class Synthesizer implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'synthesizer';
-    public $timeout = 60;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 60;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     function handle(Recommendation $recommendation)
     {
@@ -78,7 +76,8 @@ class Synthesizer implements ShouldQueue
         $message = new UserMessage(implode("\n\n", $parts));
 
         if (!empty($recommendation->metadata['focusScreenshot'])) {
-            $message->addAttachment(new Image($recommendation->metadata['focusScreenshot'], AttachmentContentType::URL));
+            $mediaType = $recommendation->metadata['focusScreenshotMediaType'] ?? 'image/jpeg';
+            $message->addAttachment(ImageAttachmentHelper::fromBase64($recommendation->metadata['focusScreenshot'], $mediaType));
         }
 
         foreach ($recommendation->files as $file) {

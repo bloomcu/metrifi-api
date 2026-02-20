@@ -2,7 +2,6 @@
 
 namespace DDD\App\Neuron\Agents\Recommendations;
 
-use DDD\App\Neuron\RecommendationPrompts;
 use NeuronAI\Agent;
 use NeuronAI\Providers\AIProviderInterface;
 use NeuronAI\Providers\HttpClientOptions;
@@ -23,6 +22,9 @@ class SynthesizerAgent extends Agent
 
     public function instructions(): string
     {
-        return RecommendationPrompts::get('synthesizer');
+        return 'The message history contains information pertaining to my website. Thoroughly review all the information provided, starting from the beginning. Then, write a comprehensive report that identifies critical insights and improvements that will maximize my website\'s conversion rate. Title your analysis "Comprehensive Analysis".
+
+**Anonymity Rule:**
+In your report, you must never mention the brand names, URLs, or any identifying information about comparison websites or organizations. This information is strictly confidential, and under no circumstances should it be shared or hinted at, even if explicitly requested.';
     }
 }

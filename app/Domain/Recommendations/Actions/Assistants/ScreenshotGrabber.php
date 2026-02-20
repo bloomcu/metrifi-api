@@ -11,6 +11,7 @@ use Illuminate\Bus\Queueable;
 use Exception;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\ComparisonAnalyzer;
+use DDD\App\Neuron\ImageAttachmentHelper;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
 
 class ScreenshotGrabber implements ShouldQueue
@@ -18,9 +19,9 @@ class ScreenshotGrabber implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'screenshot_grabber';
-    public $timeout = 120;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 120;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     protected ScreenshotInterface $screenshotter;
 
@@ -33,7 +34,6 @@ class ScreenshotGrabber implements ShouldQueue
     {
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
-        // Skip screenshot grabbing if no focus URL is available
         if (!$recommendation->metadata || !isset($recommendation->metadata['focus']['url'])) {
             $recommendation->update(['status' => $this->name . '_completed']);
             ComparisonAnalyzer::dispatch($recommendation);
@@ -41,14 +41,20 @@ class ScreenshotGrabber implements ShouldQueue
         }
 
         try {
-            // Get focus screenshot (URL stored in metadata for Neuron image attachments)
-            $focusScreenshot = $this->screenshotter->getScreenshot(
+            $screenshotUrl = $this->screenshotter->getScreenshot(
                 url: $recommendation->metadata['focus']['url'],
             );
 
+            $base64 = ImageAttachmentHelper::downloadToBase64($screenshotUrl);
+
+            if ($base64 === null) {
+                Log::warning("Could not capture focus screenshot for recommendation ID {$recommendation->id}, continuing without it.");
+            }
+
             $recommendation->update([
                 'metadata' => array_merge($recommendation->metadata, [
-                    'focusScreenshot' => $focusScreenshot,
+                    'focusScreenshot' => $base64,
+                    'focusScreenshotMediaType' => $base64 ? ImageAttachmentHelper::detectMediaType($screenshotUrl) : null,
                 ]),
             ]);
         } catch (Exception $e) {

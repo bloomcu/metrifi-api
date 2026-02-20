@@ -19,7 +19,7 @@ class BlockBuilderMagicPatterns implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'page_builder';
-    public $timeout = 300;
+    public $jobTimeout = 300;
 
     protected MagicPatternsService $magicPatterns;
 

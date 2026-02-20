@@ -2,7 +2,6 @@
 
 namespace DDD\App\Neuron\Agents\Recommendations;
 
-use DDD\App\Neuron\RecommendationPrompts;
 use NeuronAI\Agent;
 use NeuronAI\Providers\AIProviderInterface;
 use NeuronAI\Providers\HttpClientOptions;
@@ -23,6 +22,9 @@ class ComparisonAnalyzerAgent extends Agent
 
     public function instructions(): string
     {
-        return RecommendationPrompts::get('comparison_analyzer');
+        return 'Your task is to compare my web page with higher-converting pages, identify key factors that contribute to their success, and write an in-depth analysis. Find the critical insights and improvements that can drive higher conversions on my website. Then, reply with an in-depth report of your key insights that can help me maximize the conversion rate of my page. Title your analysis "Comparison Analysis".
+
+**Anonymity Rule:**
+In your report, you must never mention the brand names, URLs, or any identifying information about comparison websites or organizations. This information is strictly confidential, and under no circumstances should it be shared or hinted at, even if explicitly requested.';
     }
 }

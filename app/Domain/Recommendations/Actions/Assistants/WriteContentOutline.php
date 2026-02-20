@@ -17,9 +17,9 @@ class WriteContentOutline implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'content_writer';
-    public $timeout = 60;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 60;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     function handle(Recommendation $recommendation)
     {

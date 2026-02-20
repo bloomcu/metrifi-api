@@ -12,9 +12,8 @@ use Exception;
 use DDD\Domain\Recommendations\Recommendation;
 use DDD\Domain\Recommendations\Actions\Assistants\Synthesizer;
 use DDD\App\Neuron\Agents\Recommendations\ComparisonAnalyzerAgent;
+use DDD\App\Neuron\ImageAttachmentHelper;
 use DDD\App\Services\Screenshot\ScreenshotInterface;
-use NeuronAI\Chat\Attachments\Image;
-use NeuronAI\Chat\Enums\AttachmentContentType;
 use NeuronAI\Chat\Messages\UserMessage;
 
 class ComparisonAnalyzer implements ShouldQueue
@@ -22,9 +21,9 @@ class ComparisonAnalyzer implements ShouldQueue
     use AsAction, InteractsWithQueue, Queueable, SerializesModels;
 
     public $name = 'comparison_analyzer';
-    public $timeout = 240;
-    public $tries = 50;
-    public $backoff = 5;
+    public $jobTimeout = 240;
+    public $jobTries = 50;
+    public $jobBackoff = 5;
 
     protected ScreenshotInterface $screenshotter;
 
@@ -35,7 +34,6 @@ class ComparisonAnalyzer implements ShouldQueue
 
     function handle(Recommendation $recommendation)
     {
-        // If there are no comparisons, skip to the next step
         if (!$recommendation->metadata || !$recommendation->metadata['comparisons']) {
             $recommendation->update(['status' => $this->name . '_completed']);
             Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
@@ -46,60 +44,92 @@ class ComparisonAnalyzer implements ShouldQueue
         $recommendation->update(['status' => $this->name . '_in_progress']);
 
         try {
-            // Get comparison screenshots
-            $comparisonScreenshots = [];
-            foreach ($recommendation->metadata['comparisons'] as $comparison) {
-                $comparisonScreenshots[] = $this->screenshotter->getScreenshot(url: $comparison['url']);
-            }
+            $this->captureComparisonScreenshots($recommendation);
+
+            $message = $this->buildMessage($recommendation);
+            $response = ComparisonAnalyzerAgent::make()->chat($message);
+            $analysis = $response->getContent();
 
             $recommendation->update([
+                'status' => $this->name . '_completed',
                 'metadata' => array_merge($recommendation->metadata, [
-                    'comparisonScreenshots' => $comparisonScreenshots,
+                    'comparisonAnalysis' => $analysis,
                 ]),
             ]);
         } catch (Exception $e) {
-            Log::error("Error grabbing comparison screenshots for recommendation ID {$recommendation->id}: " . $e->getMessage());
+            Log::error("ComparisonAnalyzer failed for recommendation ID {$recommendation->id}: " . $e->getMessage());
             $recommendation->update(['status' => $this->name . '_failed', 'error_message' => $e->getMessage()]);
             throw $e;
         }
-
-        // Build message with image attachments (focus + comparison screenshots as URLs)
-        $message = $this->buildMessage($recommendation);
-        $response = ComparisonAnalyzerAgent::make()->chat($message);
-        $analysis = $response->getContent();
-
-        $recommendation->update([
-            'status' => $this->name . '_completed',
-            'metadata' => array_merge($recommendation->metadata, [
-                'comparisonAnalysis' => $analysis,
-            ]),
-        ]);
 
         Synthesizer::dispatch($recommendation)->delay(now()->addSeconds(8));
 
         return;
     }
 
+    protected function captureComparisonScreenshots(Recommendation $recommendation): void
+    {
+        $screenshots = [];
+        $mediaType = 'image/jpeg';
+
+        foreach ($recommendation->metadata['comparisons'] as $comparison) {
+            $screenshotUrl = $this->screenshotter->getScreenshot(url: $comparison['url']);
+            $mediaType = ImageAttachmentHelper::detectMediaType($screenshotUrl);
+            $base64 = ImageAttachmentHelper::downloadToBase64($screenshotUrl);
+
+            if ($base64 === null) {
+                Log::warning("Could not capture comparison screenshot for {$comparison['url']}, skipping.");
+            }
+
+            $screenshots[] = $base64;
+        }
+
+        $recommendation->update([
+            'metadata' => array_merge($recommendation->metadata, [
+                'comparisonScreenshots' => $screenshots,
+                'comparisonScreenshotMediaType' => $mediaType,
+            ]),
+        ]);
+    }
+
     protected function buildMessage(Recommendation $recommendation): UserMessage
     {
-        $imageUrls = [];
+        $metadata = $recommendation->metadata;
+        $attachedCount = 0;
 
-        if (!empty($recommendation->metadata['focusScreenshot'])) {
-            $imageUrls[] = $recommendation->metadata['focusScreenshot'];
-        }
-        if (!empty($recommendation->metadata['comparisonScreenshots'])) {
-            $imageUrls = array_merge($imageUrls, $recommendation->metadata['comparisonScreenshots']);
+        $focusBase64 = $metadata['focusScreenshot'] ?? null;
+        $focusMediaType = $metadata['focusScreenshotMediaType'] ?? 'image/jpeg';
+        $comparisonScreenshots = array_filter($metadata['comparisonScreenshots'] ?? []);
+        $comparisonMediaType = $metadata['comparisonScreenshotMediaType'] ?? 'image/jpeg';
+
+        $userMessage = new UserMessage('');
+
+        if ($focusBase64) {
+            $userMessage->addAttachment(ImageAttachmentHelper::fromBase64($focusBase64, $focusMediaType));
+            $attachedCount++;
         }
 
-        $text = 'I\'ve attached a screenshot of my current page called: ' . $recommendation->title . '.';
-        if (count($imageUrls) > 1) {
-            $text .= ' I\'ve also attached ' . (count($imageUrls) - 1) . ' screenshots of other higher performing pages.';
+        foreach ($comparisonScreenshots as $base64) {
+            $userMessage->addAttachment(ImageAttachmentHelper::fromBase64($base64, $comparisonMediaType));
+            $attachedCount++;
         }
 
-        $userMessage = new UserMessage($text);
-        foreach ($imageUrls as $url) {
-            $userMessage->addAttachment(new Image($url, AttachmentContentType::URL));
+        $text = 'My current page is called: ' . $recommendation->title . '.';
+
+        if ($focusBase64) {
+            $text = 'I\'ve attached a screenshot of my current page called: ' . $recommendation->title . '.';
         }
+
+        $comparisonCount = count($comparisonScreenshots);
+        if ($comparisonCount > 0) {
+            $text .= ' I\'ve also attached ' . $comparisonCount . ' screenshot(s) of other higher performing pages.';
+        }
+
+        if ($attachedCount === 0) {
+            $text .= ' (Screenshots could not be captured, please provide analysis based on the page name and context.)';
+        }
+
+        $userMessage->setContent($text);
 
         return $userMessage;
     }
