@@ -28,6 +28,7 @@ use DDD\Http\Dashboards\DashboardFunnelController;
 use DDD\Http\Dashboards\DashboardController;
 use DDD\Http\Connections\ConnectionController;
 use DDD\Http\Chats\ChatsController;
+use DDD\Http\Blocks\BlockAIController;
 use DDD\Http\Blocks\BlockRegenerationController;
 use DDD\Http\Blocks\BlockVersionController;
 use DDD\Http\Blocks\BlockOrderController;
@@ -276,6 +277,11 @@ Route::middleware('auth:sanctum')->group(function() {
             
             // Block versions
             Route::put('/{block}/versions/{version}', [BlockVersionController::class, 'revert']);
+
+            // AI operations (server-side OpenAI proxy)
+            Route::put('/{block}/ai-edit', [BlockAIController::class, 'edit']);
+            Route::post('/{block}/predict-category', [BlockAIController::class, 'predictCategory']);
+            Route::post('/{block}/write-content', [BlockAIController::class, 'writeContent']);
         });
 
         // WordPress
