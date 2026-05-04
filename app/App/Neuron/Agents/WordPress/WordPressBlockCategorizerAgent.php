@@ -12,11 +12,26 @@ class WordPressBlockCategorizerAgent extends Agent
 {
     /**
      * Valid `acf_fc_layout--layout` combinations available in the connected
-     * WordPress theme. Mirror of the unique entries in
-     * metrifi-ui/src/domain/wordpress/store/wordpressBlockSchemas.js.
+     * WordPress theme.
      *
-     * Keep this list in sync with the frontend schemas. If a new schema is
-     * added there, add it here too.
+     * Source of truth: metrifi-ui/src/domain/wordpress/store/wordpressBlockSchemas.js
+     * (each entry's `acf_fc_layout` and `layout` fields). This array is a
+     * derived mirror used to constrain the categorizer agent's output and
+     * server-side validation in BlockAIController::predictCategory.
+     *
+     * To regenerate this list when wordpressBlockSchemas.js changes, run:
+     *
+     *     node -e "
+     *       const fs = require('fs');
+     *       const src = fs.readFileSync('../metrifi-ui/src/domain/wordpress/store/wordpressBlockSchemas.js', 'utf8');
+     *       const wrapped = src.replace(/^const wordpressBlockSchemas\s*=\s*/, 'module.exports = ');
+     *       fs.writeFileSync('/tmp/_wp.js', wrapped);
+     *       const ids = [...new Set(require('/tmp/_wp.js').map(s => s.acf_fc_layout + '--' + s.layout))].sort();
+     *       console.log(ids.map(id => \"        '\" + id + \"',\").join('\n'));
+     *     "
+     *
+     * Then paste the output between the array brackets below, replacing the
+     * previous contents. Commit with the matching frontend change.
      */
     private const VALID_BLOCK_IDS = [
         'accordion_repeater--default',
