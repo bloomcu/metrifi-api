@@ -16,17 +16,14 @@ class BlockController extends Controller
     $validated = $request->validate([
       'page_id' => 'nullable|exists:pages,id',
       'order' => 'nullable|integer',
-      'status' => 'nullable|string',
+      'status' => 'nullable|string|max:64',
       'error' => 'nullable|string',
-      'title' => 'nullable|string',
-      'type' => 'nullable|string',
-      'layout' => 'nullable|string',
-      'wordpress_category' => 'nullable|string',
+      'title' => 'nullable|string|max:255',
+      'type' => 'nullable|string|max:64',
+      'layout' => 'nullable|string|max:64',
+      'wordpress_category' => 'nullable|string|max:128',
       'html' => 'nullable|string',
     ]);
-
-    // Log validate
-    // Log::info('Validated block data: ' . json_encode($validated));
 
     $block = $organization->blocks()->create($validated);
 
@@ -42,12 +39,12 @@ class BlockController extends Controller
   {        
     $validated = $request->validate([
       'order' => 'nullable|integer',
-      'status' => 'nullable|string',
+      'status' => 'nullable|string|max:64',
       'error' => 'nullable|string',
-      'title' => 'nullable|string',
-      'type' => 'nullable|string',
-      'layout' => 'nullable|string',
-      'wordpress_category' => 'nullable|string',
+      'title' => 'nullable|string|max:255',
+      'type' => 'nullable|string|max:64',
+      'layout' => 'nullable|string|max:64',
+      'wordpress_category' => 'nullable|string|max:128',
       'outline' => 'nullable|string',
       'html' => 'nullable|string',
     ]);
